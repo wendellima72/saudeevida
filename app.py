@@ -815,8 +815,6 @@ def chat_ia():
     dados = request.get_json()
     historico = dados.get('historico', [])
 
-    GROQ_KEY = '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'
-    GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions'
 
     SYSTEM_PROMPT = """Você é o assistente virtual do Centro Médico Saúde & Vida, um sistema hospitalar online.
 Responda SOMENTE perguntas relacionadas ao hospital: agendamentos, consultas, planos de saúde, especialidades médicas, exames, unidades, horários e dúvidas gerais sobre o sistema.
