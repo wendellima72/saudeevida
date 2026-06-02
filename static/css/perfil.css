@@ -1,0 +1,140 @@
+
+
+/* ===================== VARIÁVEIS ===================== */
+:root{
+  --verde: #1c9fd3;
+  --verde-claro: #e9f5ee;
+  --cinza: #ffffff;
+  --branco: #ffffff;
+  --texto: #ffffff;
+  --hover: #0a6a4c;
+}
+
+/* ===================== RESET ===================== */
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Segoe UI', Arial, sans-serif;
+}
+
+body{
+  background:var(--cinza);
+}
+
+.login img {
+  width: 40px; /* tamanho do ícone */
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.login img:hover {
+  transform: scale(1.1);
+}
+
+
+/* ===== CONTEÚDO ===== */
+.container{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:85vh;
+}
+
+/* CARD PERFIL */
+.card{
+    background:#1f7ea4;
+    padding:40px;
+    width:400px;
+    border-radius:20px;
+    color:white;
+}
+
+.card h2{
+    text-align:center;
+    margin-bottom:25px;
+    letter-spacing:1px;
+}
+
+label{
+    font-size:12px;
+    font-weight:bold;
+}
+
+input{
+    width:100%;
+    padding:10px;
+    margin:5px 0 15px 0;
+    border:none;
+    border-radius:5px;
+    background:#135c78;
+    color:white;
+}
+
+input::placeholder{
+    color:#cfe8f3;
+}
+
+
+
+
+/* ===================== RESPONSIVO ===================== */
+
+/* tablet */
+@media(max-width:820px){
+
+  .topbar{
+    height:80px;
+  }
+
+  .logo{
+    width:95px;
+  }
+
+  .medic-name{
+    font-size:1rem;
+  }
+
+  .menu ul{
+    gap:18px;
+  }
+}
+
+/* celular */
+@media(max-width:480px){
+
+  .topbar{
+    height:70px;
+  }
+
+  .logo{
+    width:130px;
+  }
+
+  .medic-name{
+    display:none;
+  }
+
+  .menu ul{
+    gap:12px;
+  }
+
+  .menu ul li a{
+    font-size:0.9rem;
+  }
+
+  .banner h2{
+    font-size:1.7rem;
+  }
+}
+
+
+.login img {
+  width: 38px;
+  cursor: pointer;
+  position: relative;
+  margin-top: 5px;
+}
+
+
+  

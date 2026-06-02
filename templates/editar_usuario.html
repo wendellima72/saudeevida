@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Editar Usuário | Suporte</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    body {
+        font-family: 'Inter', -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        background: linear-gradient(135deg, #1c9fd3, #000000);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 16px;
+        position: relative;
+    }
+    
+    body::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 20% 50%, rgba(28, 159, 211, 0.1), transparent 70%);
+        pointer-events: none;
+    }
+    
+    .container {
+        background: rgba(255, 255, 255, 0.98);
+        border-radius: 24px;
+        box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.3);
+        max-width: 560px;
+        width: 100%;
+        overflow: hidden;
+        animation: slideUp 0.4s ease-out;
+    }
+    
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Header compacto */
+    .header {
+        background: linear-gradient(135deg, #1c9fd3, #000000);
+        color: white;
+        padding: 24px 20px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 150px;
+        height: 150px;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.08), transparent);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+    
+    .header h1 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: -0.3px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .header h1 i {
+        margin-right: 10px;
+        font-size: 22px;
+    }
+    
+    .header p {
+        margin: 6px 0 0;
+        opacity: 0.85;
+        font-size: 13px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .form-container {
+        padding: 24px;
+    }
+    
+    .form-group {
+        margin-bottom: 16px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 600;
+        color: #1a202c;
+        font-size: 13px;
+    }
+    
+    .form-group label i {
+        margin-right: 6px;
+        color: #1c9fd3;
+        font-size: 12px;
+    }
+    
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 13px;
+        font-family: inherit;
+        transition: all 0.2s ease;
+        background: #ffffff;
+        color: #1a202c;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: #1c9fd3;
+        box-shadow: 0 0 0 3px rgba(28, 159, 211, 0.1);
+    }
+    
+    /* Grid responsivo */
+    .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+    
+    /* Botão submit compacto */
+    .btn-submit {
+        background: linear-gradient(135deg, #1c9fd3, #000000);
+        color: white;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        width: 100%;
+        transition: all 0.2s ease;
+        margin-top: 8px;
+    }
+    
+    .btn-submit:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px -4px rgba(28, 159, 211, 0.3);
+    }
+    
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+    
+    .btn-submit i {
+        margin-right: 8px;
+    }
+    
+    /* Botão voltar compacto */
+    .btn-voltar {
+        background: transparent;
+        color: #4a5568;
+        padding: 10px 20px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+        margin-top: 12px;
+        width: 100%;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-voltar:hover {
+        background: #f7fafc;
+        border-color: #1c9fd3;
+        color: #1c9fd3;
+    }
+    
+    .btn-voltar i {
+        margin-right: 6px;
+        transition: transform 0.2s;
+    }
+    
+    .btn-voltar:hover i {
+        transform: translateX(-3px);
+    }
+    
+    /* Estilização para selects */
+    select {
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%234a5568' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+        background-position: right 10px center;
+        background-repeat: no-repeat;
+        background-size: 16px;
+    }
+    
+    /* Badge compacto */
+    .info-badge {
+        background: #f7fafc;
+        border-radius: 10px;
+        padding: 10px 12px;
+        margin-bottom: 20px;
+        border-left: 3px solid #1c9fd3;
+        font-size: 12px;
+        color: #4a5568;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .info-badge i {
+        color: #1c9fd3;
+        font-size: 14px;
+    }
+    
+    /* Responsividade */
+    @media (max-width: 560px) {
+        body {
+            padding: 12px;
+        }
+        
+        .container {
+            border-radius: 20px;
+        }
+        
+        .header {
+            padding: 20px 16px;
+        }
+        
+        .header h1 {
+            font-size: 20px;
+        }
+        
+        .header h1 i {
+            font-size: 18px;
+        }
+        
+        .form-container {
+            padding: 20px;
+        }
+        
+        .row {
+            grid-template-columns: 1fr;
+            gap: 0;
+        }
+        
+        .form-group {
+            margin-bottom: 14px;
+        }
+        
+        .btn-submit {
+            padding: 11px 18px;
+            font-size: 13px;
+        }
+    }
+    
+    /* Scrollbar personalizada */
+    ::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: #1c9fd3;
+        border-radius: 3px;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1><i class="fas fa-user-edit"></i> Editar Usuário</h1>
+        <p>Altere os dados do usuário</p>
+    </div>
+    <div class="form-container">
+        {% if usuario %}
+        <div class="info-badge">
+            <i class="fas fa-info-circle"></i>
+            <span>Editando ID: {{ usuario[0] if usuario else 'N/A' }}</span>
+        </div>
+        {% endif %}
+        
+        <form method="POST">
+            <div class="form-group">
+                <label><i class="fas fa-user"></i> Nome Completo</label>
+                <input type="text" name="nome" required value="{{ usuario[1] if usuario else '' }}" placeholder="Digite o nome completo">
+            </div>
+            
+            <div class="row">
+                <div class="form-group">
+                    <label><i class="fas fa-id-card"></i> CPF</label>
+                    <input type="text" name="cpf" id="cpf" value="{{ usuario[2] if usuario else '' }}" placeholder="000.000.000-00" maxlength="14">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-phone"></i> Telefone</label>
+                    <input type="text" name="telefone" id="telefone" value="{{ usuario[3] if usuario else '' }}" placeholder="(00) 00000-0000">
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="form-group">
+                    <label><i class="fas fa-venus-mars"></i> Gênero</label>
+                    <select name="genero">
+                        <option value="">Selecione</option>
+                        <option value="Masculino" {% if usuario and usuario[4] == 'Masculino' %}selected{% endif %}>Masculino</option>
+                        <option value="Feminino" {% if usuario and usuario[4] == 'Feminino' %}selected{% endif %}>Feminino</option>
+                        <option value="Outro" {% if usuario and usuario[4] == 'Outro' %}selected{% endif %}>Outro</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-calendar"></i> Nascimento</label>
+                    <input type="date" name="nascimento" value="{{ usuario[5] if usuario else '' }}">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-envelope"></i> Email</label>
+                <input type="email" name="email" required value="{{ usuario[6] if usuario else '' }}" placeholder="usuario@email.com">
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-users"></i> Tipo</label>
+                <select name="tipo" required>
+                    <option value="">Selecione</option>
+                    <option value="cliente" {% if usuario and usuario[7] == 'cliente' %}selected{% endif %}>Cliente</option>
+                    <option value="medico" {% if usuario and usuario[7] == 'medico' %}selected{% endif %}>Médico</option>
+                    <option value="financeiro" {% if usuario and usuario[7] == 'financeiro' %}selected{% endif %}>Financeiro</option>
+                    <option value="suporte" {% if usuario and usuario[7] == 'suporte' %}selected{% endif %}>Suporte</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-save"></i> Salvar
+            </button>
+        </form>
+        
+        <a href="/suporte" class="btn-voltar">
+            <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+    </div>
+</div>
+
+<script>
+    // Máscara para CPF
+    const cpfInput = document.getElementById('cpf');
+    if (cpfInput) {
+        cpfInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length <= 11) {
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+                e.target.value = value;
+            }
+        });
+    }
+    
+    // Máscara para Telefone
+    const telefoneInput = document.getElementById('telefone');
+    if (telefoneInput) {
+        telefoneInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length <= 11) {
+                value = value.replace(/^(\d{2})(\d)/, '($1) $2');
+                value = value.replace(/(\d{5})(\d)/, '$1-$2');
+                e.target.value = value;
+            }
+        });
+    }
+</script>
+</body>
+</html>

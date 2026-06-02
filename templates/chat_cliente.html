@@ -1,0 +1,457 @@
+{% extends "base.html" %}
+
+{% block title %}Atendimento Online | Saúde & Vida{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===================== CHAT CONTAINER ===================== */
+    .chat-container {
+        max-width: 1200px;
+        margin: 30px auto;
+        padding: 0 40px;
+    }
+
+    /* Botão Voltar */
+    .back-button {
+        margin-bottom: 25px;
+    }
+
+    .btn-voltar {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--white);
+        color: var(--primary);
+        padding: 12px 24px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: var(--transition);
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .btn-voltar:hover {
+        background: var(--primary);
+        color: var(--white);
+        transform: translateX(-5px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary);
+    }
+
+    /* Título */
+    .chat-title {
+        text-align: center;
+        margin-bottom: 35px;
+    }
+
+    .chat-title h2 {
+        color: var(--primary);
+        font-size: 1.8rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+    }
+
+    .chat-title h2 i {
+        font-size: 2rem;
+    }
+
+    /* Card Novo Atendimento */
+    .abrir-chat {
+        background: linear-gradient(135deg, var(--white) 0%, var(--primary-light) 100%);
+        border-radius: 28px;
+        padding: 40px;
+        text-align: center;
+        cursor: pointer;
+        transition: var(--transition);
+        border: 2px dashed var(--primary);
+        margin-bottom: 40px;
+    }
+
+    .abrir-chat:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+        border: 2px solid var(--primary);
+        background: var(--white);
+    }
+
+    .abrir-chat i {
+        font-size: 64px;
+        color: var(--primary);
+        margin-bottom: 15px;
+    }
+
+    .abrir-chat h3 {
+        color: var(--text-dark);
+        font-size: 1.3rem;
+        margin-bottom: 8px;
+    }
+
+    .abrir-chat p {
+        color: var(--text-gray);
+        font-size: 0.9rem;
+    }
+
+    /* Aviso ticket ativo */
+    .aviso-ticket-ativo {
+        background: rgba(245, 158, 11, 0.1);
+        border-left: 4px solid var(--warning);
+        padding: 20px;
+        border-radius: 16px;
+        margin-bottom: 40px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .aviso-ticket-ativo i {
+        font-size: 32px;
+        color: var(--warning);
+    }
+
+    .aviso-ticket-ativo strong {
+        color: var(--warning);
+    }
+
+    /* Histórico de Atendimentos */
+    .historico-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .historico-title i {
+        color: var(--primary);
+    }
+
+    .ticket-card {
+        background: var(--white);
+        border-radius: 20px;
+        padding: 20px;
+        margin-bottom: 15px;
+        transition: var(--transition);
+        cursor: pointer;
+        border: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .ticket-card:hover {
+        transform: translateX(8px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary);
+    }
+
+    .ticket-info {
+        flex: 1;
+    }
+
+    .ticket-info strong {
+        color: var(--text-dark);
+        font-size: 1rem;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .ticket-info small {
+        color: var(--text-gray);
+        font-size: 0.75rem;
+    }
+
+    .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 14px;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+
+    .status-aberto {
+        background: rgba(33, 150, 243, 0.12);
+        color: #1565c0;
+    }
+
+    .status-aguardando_suporte {
+        background: rgba(255, 152, 0, 0.12);
+        color: #e65100;
+    }
+
+    .status-aguardando_cliente {
+        background: rgba(76, 175, 80, 0.12);
+        color: #2e7d32;
+    }
+
+    .status-fechado {
+        background: rgba(108, 117, 125, 0.12);
+        color: #6c757d;
+    }
+
+    .sem-tickets {
+        text-align: center;
+        padding: 60px;
+        background: var(--white);
+        border-radius: 20px;
+        color: var(--text-gray);
+        border: 1px solid var(--border);
+    }
+
+    .sem-tickets i {
+        font-size: 48px;
+        color: var(--border);
+        margin-bottom: 15px;
+    }
+
+    /* ===================== MODAL ===================== */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background: var(--white);
+        max-width: 500px;
+        width: 90%;
+        padding: 35px;
+        border-radius: 28px;
+        box-shadow: var(--shadow-lg);
+        animation: modalFadeIn 0.3s ease;
+    }
+
+    @keyframes modalFadeIn {
+        from { opacity: 0; transform: scale(0.9); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-content h3 {
+        color: var(--primary);
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .modal-content select,
+    .modal-content textarea {
+        width: 100%;
+        padding: 14px 18px;
+        margin-bottom: 15px;
+        border: 1.5px solid var(--border);
+        border-radius: 16px;
+        font-size: 0.9rem;
+        font-family: 'Poppins', 'Montserrat', sans-serif;
+        transition: var(--transition);
+    }
+
+    .modal-content select:focus,
+    .modal-content textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(28, 159, 211, 0.1);
+    }
+
+    .btn-enviar {
+        width: 100%;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: var(--white);
+        border: none;
+        padding: 14px;
+        border-radius: 50px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .btn-enviar:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-cancelar {
+        width: 100%;
+        background: var(--text-gray);
+        color: var(--white);
+        border: none;
+        padding: 12px;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: var(--transition);
+    }
+
+    .btn-cancelar:hover {
+        background: #7f8c8d;
+    }
+
+    /* Responsividade específica */
+    @media (max-width: 992px) {
+        .chat-container { padding: 0 30px; }
+    }
+
+    @media (max-width: 768px) {
+        .chat-container { padding: 0 20px; margin: 20px auto; }
+        .chat-title h2 { font-size: 1.4rem; }
+        .chat-title h2 i { font-size: 1.6rem; }
+        .abrir-chat { padding: 30px; }
+        .abrir-chat i { font-size: 48px; }
+        .abrir-chat h3 { font-size: 1.1rem; }
+        .ticket-card { flex-direction: column; align-items: flex-start; }
+    }
+
+    @media (max-width: 480px) {
+        .chat-container { padding: 0 15px; }
+        .chat-title h2 { font-size: 1.2rem; }
+        .abrir-chat { padding: 25px; }
+        .abrir-chat i { font-size: 40px; }
+        .modal-content { padding: 25px; }
+        .modal-content h3 { font-size: 1.3rem; }
+        .sem-tickets { padding: 40px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+    <!-- Botão Voltar -->
+    <div class="back-button">
+        <a href="/contato" class="btn-voltar">
+            <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    <!-- Título -->
+    <div class="chat-title">
+        <h2><i class="fa-solid fa-headset"></i> Atendimento Online</h2>
+    </div>
+
+    <!-- Verificar tickets ativos -->
+    {% set tem_ticket_aberto = false %}
+    {% for ticket in tickets %}
+        {% if ticket[2] != 'fechado' %}
+            {% set tem_ticket_aberto = true %}
+        {% endif %}
+    {% endfor %}
+
+    <!-- Card Novo Atendimento -->
+    {% if not tem_ticket_aberto %}
+    <div class="abrir-chat" onclick="abrirModal()">
+        <i class="fa-regular fa-message"></i>
+        <h3>Novo atendimento</h3>
+        <p>Clique aqui para abrir um chat com o suporte</p>
+    </div>
+    {% else %}
+    <div class="aviso-ticket-ativo">
+        <i class="fa-solid fa-info-circle"></i> 
+        <div>
+            <strong>Você já possui um atendimento ativo!</strong><br>
+            Para abrir um novo atendimento, finalize o atual clicando em "Finalizar atendimento" na conversa.
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Histórico de Atendimentos -->
+    <div class="historico-title">
+        <i class="fas fa-history"></i>
+        Meus atendimentos
+    </div>
+
+    {% if tickets %}
+        {% for ticket in tickets %}
+        <div class="ticket-card" onclick="window.location.href='/ver_chat/{{ ticket[0] }}'">
+            <div class="ticket-info">
+                <strong>{{ ticket[1] }}</strong>
+                <small>Aberto em: {{ ticket[3] }}</small>
+            </div>
+            <span class="status status-{{ ticket[2] }}">
+                <i class="fas {{ 'fa-hourglass-half' if ticket[2] == 'aguardando_suporte' else 'fa-reply-all' if ticket[2] == 'aguardando_cliente' else 'fa-check-circle' if ticket[2] == 'fechado' else 'fa-inbox' }}"></i>
+                {{ ticket[2].replace('_', ' ') }}
+            </span>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="sem-tickets">
+            <i class="fas fa-inbox"></i>
+            <p>Nenhum atendimento realizado</p>
+            <p style="font-size: 0.8rem; margin-top: 8px;">Clique em "Novo atendimento" para iniciar uma conversa</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Modal -->
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <h3><i class="fas fa-headset"></i> Novo atendimento</h3>
+        <form action="/abrir_ticket" method="POST">
+            <select name="motivo" required>
+                <option value="">Selecione o motivo</option>
+                <option value="Dúvida sobre agendamento">Dúvida sobre agendamento</option>
+                <option value="Problema com pagamento">Problema com pagamento</option>
+                <option value="Cancelamento de consulta">Cancelamento de consulta</option>
+                <option value="Reclamação">Reclamação</option>
+                <option value="Sugestão">Sugestão</option>
+                <option value="Outros">Outros</option>
+            </select>
+            <textarea name="mensagem" placeholder="Descreva seu problema..." rows="5" required></textarea>
+            <button type="submit" class="btn-enviar">
+                <i class="fas fa-paper-plane"></i> Enviar
+            </button>
+        </form>
+        <button onclick="fecharModal()" class="btn-cancelar">
+            <i class="fas fa-times"></i> Cancelar
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function abrirModal() {
+        fetch('/verificar_ticket_ativo')
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (data.tem_ticket_aberto) {
+                showToast('Atenção', 'Você já possui um atendimento ativo! Finalize o atual para abrir um novo.', 'warning');
+            } else {
+                document.getElementById('modal').style.display = 'flex';
+            }
+        });
+    }
+
+    function fecharModal() {
+        document.getElementById('modal').style.display = 'none';
+    }
+
+    // Fechar modal ao clicar fora
+    window.onclick = function(event) {
+        const modal = document.getElementById('modal');
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    }
+</script>
+{% endblock %}

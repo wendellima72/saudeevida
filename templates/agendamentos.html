@@ -1,0 +1,985 @@
+{% extends "base.html" %}
+
+{% block title %}Agendamentos | Saúde & Vida
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  :root {
+    --brand: #1c9fd3;
+    --brand-dark: #1482ae;
+    --brand-light: #e8f4fc;
+    --brand-mid: #b3def4;
+    --success-bg: #eaf3de;
+    --success-text: #27500a;
+    --warning-bg: #faeeda;
+    --warning-text: #633806;
+    --danger-bg: #fcebeb;
+    --danger-text: #791f1f;
+    --info-bg: #e6f1fb;
+    --info-text: #0c447c;
+    --bg-page: #f8fafc;
+    --bg-card: #ffffff;
+    --border: #eef2f8;
+    --text-primary: #1e2f44;
+    --text-secondary: #6a7c9e;
+    --text-muted: #8d9db0;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --shadow-sm: 0 4px 12px rgba(0,0,0,0.05);
+    --shadow-md: 0 8px 24px rgba(0,0,0,0.08);
+  }
+
+  .page-wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 36px 24px 60px;
+  }
+
+  /* ── STEPPER ── */
+  .stepper {
+    display: flex;
+    align-items: center;
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: 20px 32px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
+  }
+  .step { display: flex; align-items: center; gap: 12px; flex: 1; }
+  .step-num {
+    width: 34px; height: 34px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; flex-shrink: 0;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s;
+  }
+  .step-num.done { background: var(--brand); color: #fff; }
+  .step-num.active { background: var(--brand); color: #fff; box-shadow: 0 0 0 5px rgba(28,159,211,0.2); }
+  .step-num.pending { background: var(--bg-page); border: 2px solid var(--border); color: var(--text-muted); }
+  .step-info { flex: 1; }
+  .step-label { font-size: 13px; font-weight: 600; color: var(--text-primary); font-family: 'Poppins', sans-serif; }
+  .step-label.pending { color: var(--text-muted); }
+  .step-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .step-line { flex: 0 0 48px; height: 2px; background: var(--border); border-radius: 2px; margin: 0 8px; transition: background 0.3s; }
+  .step-line.done { background: var(--brand); }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    padding: 28px;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 20px;
+  }
+  .card-header {
+    display: flex; align-items: center;
+    justify-content: space-between; margin-bottom: 20px;
+  }
+  .card-title {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 16px; font-weight: 700;
+    color: var(--text-primary);
+    font-family: 'Poppins', sans-serif;
+  }
+  .card-title i { color: var(--brand); font-size: 18px; }
+
+  /* ── TIPO CONSULTA ── */
+  .type-options { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 22px; }
+  .type-option {
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .type-option:hover { border-color: var(--brand); background: var(--brand-light); }
+  .type-option.active { border-color: var(--brand); background: var(--brand-light); }
+  .type-option input[type="radio"] { display: none; }
+  .type-icon {
+    width: 44px; height: 44px;
+    background: var(--brand-light);
+    border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .type-option.active .type-icon { background: var(--brand); }
+  .type-option.active .type-icon i { color: #fff !important; }
+  .type-icon i { color: var(--brand); font-size: 20px; }
+  .type-title { font-size: 14px; font-weight: 600; color: var(--text-primary); font-family: 'Poppins', sans-serif; }
+  .type-desc { font-size: 12px; color: var(--text-secondary); margin-top: 3px; }
+
+  /* ── FORMULÁRIO ── */
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  .form-group:last-child { margin-bottom: 0; }
+  .form-label {
+    font-size: 11px; font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase; letter-spacing: 0.6px;
+    font-family: 'Poppins', sans-serif;
+  }
+  .form-control {
+    width: 100%; padding: 11px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px; font-family: 'Poppins', sans-serif;
+    color: var(--text-primary); background: #fafbfc;
+    outline: none; transition: all 0.2s;
+    appearance: none;
+  }
+  .form-control:focus {
+    border-color: var(--brand); background: #fff;
+    box-shadow: 0 0 0 3px rgba(28,159,211,0.1);
+  }
+  select.form-control {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238d9db0' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 14px center;
+    padding-right: 38px;
+  }
+
+  /* ── CALENDÁRIO ── */
+  .cal-nav-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .cal-month-label { font-size: 14px; font-weight: 700; color: var(--text-primary); font-family: 'Poppins', sans-serif; }
+  .cal-btn {
+    width: 32px; height: 32px; border-radius: var(--radius-sm);
+    border: 1.5px solid var(--border); background: #fafbfc;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    color: var(--text-secondary); transition: all 0.2s; font-size: 13px;
+  }
+  .cal-btn:hover { border-color: var(--brand); color: var(--brand); background: var(--brand-light); }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+  .cal-dow {
+    font-size: 10px; font-weight: 700; color: var(--text-muted);
+    text-align: center; padding: 5px 0; text-transform: uppercase;
+    letter-spacing: 0.3px; font-family: 'Poppins', sans-serif;
+  }
+  .cal-day {
+    aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 500; border-radius: var(--radius-sm);
+    cursor: pointer; transition: all 0.15s; color: var(--text-primary);
+    position: relative; font-family: 'Poppins', sans-serif;
+  }
+  .cal-day:hover:not(.empty):not(.past) { background: var(--brand-light); color: var(--brand); }
+  .cal-day.today { font-weight: 800; color: var(--brand); }
+  .cal-day.today::after {
+    content: ''; position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%);
+    width: 4px; height: 4px; border-radius: 50%; background: var(--brand);
+  }
+  .cal-day.selected { background: var(--brand); color: #fff; font-weight: 700; }
+  .cal-day.selected::after { display: none; }
+  .cal-day.past { color: var(--text-muted); cursor: default; opacity: 0.35; }
+  .cal-day.empty { cursor: default; }
+
+  /* ── HORÁRIOS ── */
+  .slots-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; font-family: 'Poppins', sans-serif; }
+  .slots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .slot {
+    padding: 10px 4px; text-align: center;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: all 0.15s;
+    background: #fafbfc; color: var(--text-primary);
+    font-family: 'Poppins', sans-serif;
+  }
+  .slot:hover { border-color: var(--brand); color: var(--brand); background: var(--brand-light); }
+  .slot.selected { background: var(--brand); color: #fff; border-color: var(--brand); }
+  .slot.full { background: var(--bg-page); color: var(--text-muted); cursor: not-allowed; opacity: 0.5; border-style: dashed; }
+
+  /* ── GRID ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+  .bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+
+  /* ── BOTÕES ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 11px 22px; border-radius: 50px;
+    font-size: 13px; font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer; transition: all 0.2s;
+    border: none; text-decoration: none;
+  }
+  .btn-primary { background: var(--brand); color: #fff; }
+  .btn-primary:hover { background: var(--brand-dark); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(28,159,211,0.35); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-outline { background: transparent; color: var(--brand); border: 1.5px solid var(--brand); }
+  .btn-outline:hover { background: var(--brand-light); }
+  .btn-ghost { background: transparent; color: var(--text-secondary); border: 1.5px solid var(--border); }
+  .btn-ghost:hover { background: var(--bg-page); }
+  .btn-danger { background: var(--danger-bg); color: var(--danger-text); border: 1.5px solid #f09595; font-size: 12px; padding: 7px 14px; }
+  .btn-danger:hover { background: #f7c1c1; }
+  .btn-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; }
+
+  /* ── STEP VIEWS ── */
+  .step-view { display: none; }
+  .step-view.active { display: block; }
+
+  /* ── CONFIRMAÇÃO ── */
+  .confirm-wrapper { max-width: 500px; margin: 0 auto; }
+  .confirm-head { text-align: center; margin-bottom: 28px; }
+  .confirm-icon {
+    width: 68px; height: 68px;
+    background: var(--brand-light); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;
+  }
+  .confirm-icon i { color: var(--brand); font-size: 28px; }
+  .confirm-title { font-size: 18px; font-weight: 700; color: var(--text-primary); font-family: 'Poppins', sans-serif; }
+  .confirm-sub { font-size: 13px; color: var(--text-secondary); margin-top: 5px; }
+  .summary-list { border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; }
+  .summary-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 13px 18px; border-bottom: 1px solid var(--border); font-size: 13px;
+  }
+  .summary-row:last-child { border-bottom: none; }
+  .summary-key { color: var(--text-secondary); font-family: 'Poppins', sans-serif; }
+  .summary-val { font-weight: 700; color: var(--text-primary); font-family: 'Poppins', sans-serif; }
+
+  /* ── SUCESSO ── */
+  .success-wrapper { text-align: center; padding: 48px 20px; }
+  .success-icon {
+    width: 80px; height: 80px; background: var(--success-bg); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;
+  }
+  .success-icon i { color: #27500a; font-size: 36px; }
+
+  /* ── CONSULTAS ── */
+  .consulta-item {
+    display: flex; align-items: center; gap: 16px;
+    padding: 16px 0; border-bottom: 1px solid var(--border);
+  }
+  .consulta-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .consulta-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--brand-light);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .consulta-avatar i { color: var(--brand); font-size: 20px; }
+  .consulta-body { flex: 1; min-width: 0; }
+  .consulta-name { font-size: 14px; font-weight: 600; color: var(--text-primary); font-family: 'Poppins', sans-serif; }
+  .consulta-meta {
+    font-size: 12px; color: var(--text-secondary); margin-top: 4px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap; font-family: 'Poppins', sans-serif;
+  }
+  .consulta-meta span { display: flex; align-items: center; gap: 5px; }
+  .consulta-meta i { font-size: 11px; color: var(--brand); }
+  .consulta-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+
+  /* ── BADGES ── */
+  .badge {
+    display: inline-flex; align-items: center;
+    padding: 4px 12px; border-radius: 20px;
+    font-size: 11px; font-weight: 700;
+    font-family: 'Poppins', sans-serif; white-space: nowrap;
+  }
+  .badge-success { background: var(--success-bg); color: var(--success-text); }
+  .badge-warning { background: var(--warning-bg); color: var(--warning-text); }
+  .badge-info { background: var(--info-bg); color: var(--info-text); }
+  .badge-danger { background: var(--danger-bg); color: var(--danger-text); }
+
+  /* ── EMPTY STATE ── */
+  .empty-state { text-align: center; padding: 36px 16px; color: var(--text-muted); }
+  .empty-state i { font-size: 40px; margin-bottom: 12px; display: block; opacity: 0.35; }
+  .empty-state p { font-size: 13px; line-height: 1.6; font-family: 'Poppins', sans-serif; }
+
+  /* ── PRONTUÁRIOS ── */
+  .registro-item {
+    padding: 14px; border: 1px solid var(--border);
+    border-radius: var(--radius-sm); margin-bottom: 10px;
+    transition: border-color 0.2s;
+  }
+  .registro-item:last-child { margin-bottom: 0; }
+  .registro-item:hover { border-color: var(--brand-mid); }
+  .registro-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+  .registro-medico { font-size: 13px; font-weight: 600; color: var(--text-primary); font-family: 'Poppins', sans-serif; }
+  .registro-data { font-size: 11px; color: var(--text-muted); }
+  .registro-detail { font-size: 12px; color: var(--text-secondary); line-height: 1.5; font-family: 'Poppins', sans-serif; }
+  .registro-tag {
+    display: inline-block; background: var(--info-bg); color: var(--info-text);
+    font-size: 10px; font-weight: 700; padding: 2px 8px;
+    border-radius: 4px; margin-top: 6px; font-family: 'Poppins', sans-serif;
+  }
+
+
+  /* ── MODO ESCURO - AGENDAMENTOS ── */
+  [data-theme="dark"] .page-wrap { background: transparent; }
+  [data-theme="dark"] .stepper,
+  [data-theme="dark"] .card { background: #1a2332 !important; border-color: #1e2f44 !important; }
+  [data-theme="dark"] .card-title,
+  [data-theme="dark"] .step-label,
+  [data-theme="dark"] .type-title,
+  [data-theme="dark"] .form-label,
+  [data-theme="dark"] .consulta-name,
+  [data-theme="dark"] .confirm-title,
+  [data-theme="dark"] .summary-val,
+  [data-theme="dark"] .slots-label { color: #e8eef5 !important; }
+  [data-theme="dark"] .step-sub,
+  [data-theme="dark"] .type-desc,
+  [data-theme="dark"] .consulta-meta,
+  [data-theme="dark"] .summary-key,
+  [data-theme="dark"] .confirm-sub,
+  [data-theme="dark"] .step-label.pending { color: #94a8bf !important; }
+  [data-theme="dark"] .form-control {
+    background: #0f1923 !important;
+    border-color: #1e2f44 !important;
+    color: #e8eef5 !important;
+  }
+  [data-theme="dark"] .form-control:focus {
+    background: #1a2332 !important;
+    border-color: var(--brand) !important;
+  }
+  [data-theme="dark"] .type-option {
+    border-color: #1e2f44 !important;
+    background: #1a2332 !important;
+  }
+  [data-theme="dark"] .type-option:hover,
+  [data-theme="dark"] .type-option.active {
+    border-color: var(--brand) !important;
+    background: #0d2a3a !important;
+  }
+  [data-theme="dark"] .step-num.pending {
+    background: #0f1923 !important;
+    border-color: #1e2f44 !important;
+    color: #6a7c9e !important;
+  }
+  [data-theme="dark"] .step-line { background: #1e2f44 !important; }
+  [data-theme="dark"] .step-line.done { background: var(--brand) !important; }
+  [data-theme="dark"] .summary-list { border-color: #1e2f44 !important; }
+  [data-theme="dark"] .summary-row { border-color: #1e2f44 !important; }
+  [data-theme="dark"] .consulta-item { border-color: #1e2f44 !important; }
+  [data-theme="dark"] .consulta-avatar { background: #0d2a3a !important; }
+  [data-theme="dark"] .slot {
+    background: #0f1923 !important;
+    border-color: #1e2f44 !important;
+    color: #e8eef5 !important;
+  }
+  [data-theme="dark"] .slot:hover { background: #0d2a3a !important; border-color: var(--brand) !important; }
+  [data-theme="dark"] .slot.selected { background: var(--brand) !important; color: #fff !important; }
+  [data-theme="dark"] .slot.full { background: #141e2a !important; color: #6a7c9e !important; }
+  [data-theme="dark"] .cal-day { color: #e8eef5 !important; }
+  [data-theme="dark"] .cal-day.past { color: #3a4a5a !important; }
+  [data-theme="dark"] .cal-dow { color: #6a7c9e !important; }
+  [data-theme="dark"] .cal-day:hover:not(.empty):not(.past) { background: #0d2a3a !important; color: var(--brand) !important; }
+  [data-theme="dark"] .cal-day.selected { background: var(--brand) !important; color: #fff !important; }
+  [data-theme="dark"] .cal-day.today { color: var(--brand) !important; }
+  [data-theme="dark"] .cal-month-label { color: #e8eef5 !important; }
+  [data-theme="dark"] .cal-btn {
+    background: #0f1923 !important;
+    border-color: #1e2f44 !important;
+    color: #94a8bf !important;
+  }
+  [data-theme="dark"] .btn-ghost {
+    background: transparent !important;
+    border-color: #1e2f44 !important;
+    color: #94a8bf !important;
+  }
+  [data-theme="dark"] .btn-ghost:hover { background: #1e2f44 !important; }
+  [data-theme="dark"] .confirm-icon { background: #0d2a3a !important; }
+  [data-theme="dark"] .empty-state { color: #6a7c9e !important; }
+  [data-theme="dark"] .registro-item { background: #141e2a !important; border-color: #1e2f44 !important; }
+  [data-theme="dark"] .registro-medico { color: #e8eef5 !important; }
+  [data-theme="dark"] .registro-detail { color: #94a8bf !important; }
+  [data-theme="dark"] #modalComprovante > div { background: #1a2332 !important; }
+  [data-theme="dark"] .success-wrapper { color: #e8eef5; }
+
+  @media (max-width: 768px) {
+    .grid-2, .form-row, .type-options, .bottom-grid { grid-template-columns: 1fr; }
+    .page-wrap { padding: 20px 16px 40px; }
+    .stepper { overflow-x: auto; padding: 16px; }
+    .slots-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+</style>
+
+{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+
+  <!-- ── STEPPER ── -->
+  <div class="stepper">
+    <div class="step">
+      <div class="step-num active" id="sn1"><i class="fas fa-stethoscope" style="font-size:13px"></i></div>
+      <div class="step-info">
+        <div class="step-label" id="sl1">Especialidade</div>
+        <div class="step-sub">Médico e tipo</div>
+      </div>
+    </div>
+    <div class="step-line" id="line1"></div>
+    <div class="step">
+      <div class="step-num pending" id="sn2">2</div>
+      <div class="step-info">
+        <div class="step-label pending" id="sl2">Data &amp; Horário</div>
+        <div class="step-sub">Calendário</div>
+      </div>
+    </div>
+    <div class="step-line" id="line2"></div>
+    <div class="step">
+      <div class="step-num pending" id="sn3">3</div>
+      <div class="step-info">
+        <div class="step-label pending" id="sl3">Confirmação</div>
+        <div class="step-sub">Revisar e agendar</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ STEP 1 ══ -->
+  <div class="step-view active" id="view1">
+    <div class="card">
+      <div class="card-title" style="margin-bottom:20px">
+        <i class="fas fa-heart-pulse"></i> Nova consulta
+      </div>
+
+      <div class="type-options">
+        <label class="type-option active" id="lbl-presencial">
+          <input type="radio" name="tipo_vis" value="presencial" checked onchange="setTipo(this)"/>
+          <div class="type-icon"><i class="fas fa-hospital"></i></div>
+          <div>
+            <div class="type-title">Presencial</div>
+            <div class="type-desc">No centro médico</div>
+          </div>
+        </label>
+        <label class="type-option" id="lbl-online">
+          <input type="radio" name="tipo_vis" value="online" onchange="setTipo(this)"/>
+          <div class="type-icon"><i class="fas fa-video"></i></div>
+          <div>
+            <div class="type-title">Online</div>
+            <div class="type-desc">Videochamada</div>
+          </div>
+        </label>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Seu nome completo</label>
+          <input class="form-control" type="text" id="inp-nome" placeholder="Digite seu nome" value="{{ session.get('nome', '') }}" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Unidade</label>
+          <select class="form-control" id="inp-unidade">
+            <option value="Centro">Centro</option>
+            <option value="Aldeota">Aldeota</option>
+            <option value="Messejana">Messejana</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Especialidade</label>
+          <select class="form-control" id="inp-especialidade" onchange="carregarMedicos()">
+            <option value="">Selecione...</option>
+            <option>Clínica Geral</option>
+            <option>Cardiologia</option>
+            <option>Dermatologia</option>
+            <option>Ortopedia</option>
+            <option>Pediatria</option>
+            <option>Neurologia</option>
+            <option>Ginecologia</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Médico</label>
+          <select class="form-control" id="inp-medico">
+            <option value="">Selecione a especialidade</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="btn-actions">
+        <span></span>
+        <button class="btn btn-primary" onclick="irStep(2)">
+          Próximo <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ STEP 2 ══ -->
+  <div class="step-view" id="view2">
+    <div class="grid-2">
+      <div class="card" style="margin-bottom:0">
+        <div class="card-title" style="margin-bottom:16px">
+          <i class="fas fa-calendar-days"></i> Escolha a data
+        </div>
+        <div class="cal-nav-row">
+          <button class="cal-btn" onclick="mudarMes(-1)"><i class="fas fa-chevron-left"></i></button>
+          <span class="cal-month-label" id="cal-label"></span>
+          <button class="cal-btn" onclick="mudarMes(1)"><i class="fas fa-chevron-right"></i></button>
+        </div>
+        <div class="cal-grid" id="cal-grid"></div>
+      </div>
+
+      <div class="card" style="margin-bottom:0">
+        <div class="card-title" style="margin-bottom:14px">
+          <i class="fas fa-clock"></i> Horários disponíveis
+        </div>
+        <p class="slots-label" id="slots-label">Selecione uma data primeiro</p>
+        <div class="slots-grid" id="slots-grid"></div>
+      </div>
+    </div>
+
+    <div class="btn-actions" style="margin-top:0; padding-top:4px;">
+      <button class="btn btn-ghost" onclick="irStep(1)">
+        <i class="fas fa-arrow-left"></i> Voltar
+      </button>
+      <button class="btn btn-primary" onclick="irStep(3)">
+        Revisar pedido <i class="fas fa-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ STEP 3 ══ -->
+  <div class="step-view" id="view3">
+    <div class="card">
+      <div class="confirm-wrapper">
+        <div class="confirm-head">
+          <div class="confirm-icon"><i class="fas fa-circle-check"></i></div>
+          <div class="confirm-title">Confirmar agendamento</div>
+          <div class="confirm-sub">Verifique os dados antes de confirmar</div>
+        </div>
+        <div class="summary-list">
+          <div class="summary-row"><span class="summary-key">Paciente</span><span class="summary-val" id="sum-nome">—</span></div>
+          <div class="summary-row"><span class="summary-key">Tipo</span><span class="summary-val" id="sum-tipo">—</span></div>
+          <div class="summary-row"><span class="summary-key">Unidade</span><span class="summary-val" id="sum-unidade">—</span></div>
+          <div class="summary-row"><span class="summary-key">Especialidade</span><span class="summary-val" id="sum-esp">—</span></div>
+          <div class="summary-row"><span class="summary-key">Médico</span><span class="summary-val" id="sum-medico">—</span></div>
+          <div class="summary-row"><span class="summary-key">Data</span><span class="summary-val" id="sum-data">—</span></div>
+          <div class="summary-row"><span class="summary-key">Horário</span><span class="summary-val" id="sum-hora">—</span></div>
+        </div>
+
+        <form method="POST" action="/agendar" id="form-agendar" style="display:none">
+          <input type="hidden" name="nome" id="f-nome" />
+          <input type="hidden" name="tipo" id="f-tipo" />
+          <input type="hidden" name="unidade" id="f-unidade" />
+          <input type="hidden" name="especialidade" id="f-especialidade" />
+          <input type="hidden" name="medico" id="f-medico" />
+          <input type="hidden" name="data" id="f-data" />
+          <input type="hidden" name="hora" id="f-hora" />
+        </form>
+
+        <div class="btn-actions">
+          <button class="btn btn-ghost" onclick="irStep(2)">
+            <i class="fas fa-arrow-left"></i> Voltar
+          </button>
+          <button class="btn btn-primary" onclick="confirmarAgendamento()">
+            <i class="fas fa-check"></i> Agendar consulta
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SUCESSO ══ -->
+  <div class="step-view" id="view4">
+    <div class="card">
+      <div class="success-wrapper">
+        <div class="success-icon"><i class="fas fa-circle-check"></i></div>
+        <h3 style="font-size:20px;font-weight:700;font-family:'Poppins',sans-serif;color:var(--text-primary);margin-bottom:8px">Consulta agendada!</h3>
+        <p style="font-size:14px;color:var(--text-secondary);margin-bottom:28px">Você receberá uma confirmação por e-mail em breve.</p>
+        <button class="btn btn-primary" onclick="reiniciar()">
+          <i class="fas fa-plus"></i> Novo agendamento
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MINHAS CONSULTAS ══ -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <i class="fas fa-list-check"></i> Minhas consultas
+      </div>
+      <a href="#historico" class="btn btn-ghost" style="padding:8px 16px;font-size:12px;border-radius:50px" onclick="document.getElementById('historico').scrollIntoView({behavior:'smooth'})">
+        <i class="fas fa-clock-rotate-left"></i> Ver histórico
+      </a>
+    </div>
+
+    {% if consultas %}
+      {% for c in consultas %}
+      <div class="consulta-item">
+        <div class="consulta-avatar"><i class="fas fa-user-doctor"></i></div>
+        <div class="consulta-body">
+          <div class="consulta-name">{{ c[5] }} — {{ c[4] }}</div>
+          <div class="consulta-meta">
+            <span><i class="fas fa-calendar"></i> {{ c[6] }}</span>
+            <span><i class="fas fa-clock"></i> {{ c[7] }}</span>
+            <span><i class="fas fa-location-dot"></i> {{ c[8] }}</span>
+          </div>
+        </div>
+        <div class="consulta-actions">
+          {% if c[9] == 'Confirmado' %}
+            <span class="badge badge-success">{{ c[9] }}</span>
+          {% elif c[9] == 'Aguardando' %}
+            <span class="badge badge-warning">{{ c[9] }}</span>
+          {% else %}
+            <span class="badge badge-info">{{ c[9] }}</span>
+          {% endif %}
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn btn-ghost btn-sm" onclick="abrirComprovante('{{ c[0] }}','{{ c[5] }}','{{ c[4] }}','{{ c[6] }}','{{ c[7] }}','{{ c[8] }}','{{ c[9] }}')">
+              <i class="fas fa-file-pdf"></i> Comprovante
+            </button>
+            <form method="POST" action="/cancelar_consulta" onsubmit="return confirm('Cancelar esta consulta?')">
+              <input type="hidden" name="id" value="{{ c[0] }}" />
+              <button type="submit" class="btn btn-danger">
+                <i class="fas fa-xmark"></i> Cancelar
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">
+        <i class="fas fa-calendar-xmark"></i>
+        <p>Nenhuma consulta agendada.<br>Use o formulário acima para marcar!</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- ══ HISTÓRICO ══ -->
+  <div class="card" id="historico">
+    <div class="card-title" style="margin-bottom:18px">
+      <i class="fas fa-clock-rotate-left"></i> Histórico
+    </div>
+    {% if historico %}
+      {% for c in historico %}
+      <div class="consulta-item">
+        <div class="consulta-avatar"><i class="fas fa-user-doctor"></i></div>
+        <div class="consulta-body">
+          <div class="consulta-name">{{ c[5] }} — {{ c[4] }}</div>
+          <div class="consulta-meta">
+            <span><i class="fas fa-calendar"></i> {{ c[6] }}</span>
+            <span><i class="fas fa-clock"></i> {{ c[7] }}</span>
+          </div>
+        </div>
+        {% if c[9] == 'Finalizado' %}
+          <span class="badge badge-success">{{ c[9] }}</span>
+        {% else %}
+          <span class="badge badge-danger">{{ c[9] }}</span>
+        {% endif %}
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">
+        <i class="fas fa-file-circle-xmark"></i>
+        <p>Nenhum histórico disponível ainda.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- ══ BOTTOM GRID ══ -->
+  <div class="bottom-grid">
+    <div class="card" style="margin-bottom:0">
+      <div class="card-title" style="margin-bottom:18px">
+        <i class="fas fa-file-medical"></i> Prontuários
+      </div>
+      {% if prontuarios %}
+        {% for p in prontuarios %}
+        <div class="registro-item">
+          <div class="registro-header">
+            <span class="registro-medico">Dr(a). {{ p[3] }}</span>
+            <span class="registro-data">{{ p[7] }}</span>
+          </div>
+          {% if p[5] %}<div class="registro-detail"><strong>Diagnóstico:</strong> {{ p[5] }}</div>{% endif %}
+          {% if p[6] %}<div class="registro-detail" style="margin-top:4px"><strong>Prescrição:</strong> {{ p[6] }}</div>{% endif %}
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <i class="fas fa-file-circle-xmark"></i>
+          <p>Nenhum prontuário disponível</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="card" style="margin-bottom:0">
+      <div class="card-title" style="margin-bottom:18px">
+        <i class="fas fa-flask"></i> Exames solicitados
+      </div>
+      {% if exames %}
+        {% for e in exames %}
+        <div class="registro-item">
+          <div class="registro-header">
+            <span class="registro-medico">Dr(a). {{ e[3] }}</span>
+            <span class="registro-data">{{ e[6] }}</span>
+          </div>
+          <div class="registro-detail">{{ e[4] }}</div>
+          {% if e[5] %}<div class="registro-detail" style="margin-top:4px;color:var(--text-muted)">{{ e[5] }}</div>{% endif %}
+          <span class="registro-tag"><i class="fas fa-vial" style="font-size:9px"></i> Exame solicitado</span>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <i class="fas fa-flask"></i>
+          <p>Nenhum exame solicitado</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/* ─── STATE ─── */
+let curStep = 1, selDate = null, selTime = null, selTipo = 'presencial';
+let calYear, calMonth;
+
+const MEDICOS = {
+  'Clínica Geral': ['Dr. Ricardo Alves', 'Dra. Ana Souza'],
+  'Cardiologia': ['Dr. Carlos Mendes', 'Dra. Patrícia Lima'],
+  'Dermatologia': ['Dra. Fernanda Costa', 'Dr. Eduardo Braga'],
+  'Ortopedia': ['Dr. Bruno Ferreira', 'Dr. Leandro Nunes'],
+  'Pediatria': ['Dra. Juliana Rocha', 'Dr. Marcos Freitas'],
+  'Neurologia': ['Dra. Camila Torres'],
+  'Ginecologia': ['Dra. Renata Albuquerque', 'Dra. Isabela Cruz']
+};
+
+const SLOTS = ['07:00','07:30','08:00','08:30','09:00','09:30','10:00','10:30','14:00','14:30','15:00','15:30','16:00','16:30'];
+const SLOTS_LOTADOS = ['07:30','09:00','14:30'];
+const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const DIAS = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+
+function setTipo(r) {
+  selTipo = r.value;
+  document.getElementById('lbl-presencial').classList.toggle('active', selTipo === 'presencial');
+  document.getElementById('lbl-online').classList.toggle('active', selTipo === 'online');
+}
+
+function carregarMedicos() {
+  const esp = document.getElementById('inp-especialidade').value;
+  const sel = document.getElementById('inp-medico');
+  sel.innerHTML = '';
+  const lista = MEDICOS[esp] || [];
+  if (!lista.length) { sel.innerHTML = '<option value="">Selecione a especialidade</option>'; return; }
+  lista.forEach(m => { const o = document.createElement('option'); o.value = m; o.textContent = m; sel.appendChild(o); });
+}
+
+function irStep(n) {
+  if (n === 2) {
+    const nome = document.getElementById('inp-nome').value.trim();
+    const esp = document.getElementById('inp-especialidade').value;
+    const med = document.getElementById('inp-medico').value;
+    if (!nome || !esp || !med) { showToast('Atenção', 'Preencha nome, especialidade e médico!', 'warning'); return; }
+  }
+  if (n === 3) {
+    if (!selDate) { showToast('Atenção', 'Selecione uma data!', 'warning'); return; }
+    if (!selTime) { showToast('Atenção', 'Selecione um horário!', 'warning'); return; }
+    preencherResumo();
+  }
+  document.getElementById('view' + curStep).classList.remove('active');
+  curStep = n;
+  document.getElementById('view' + n).classList.add('active');
+  atualizarStepper();
+  if (n === 2) renderCal();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function atualizarStepper() {
+  for (let i = 1; i <= 3; i++) {
+    const sn = document.getElementById('sn' + i);
+    const sl = document.getElementById('sl' + i);
+    sn.className = 'step-num ' + (i < curStep ? 'done' : i === curStep ? 'active' : 'pending');
+    if (i < curStep) sn.innerHTML = '<i class="fas fa-check" style="font-size:13px"></i>';
+    else if (i === 1) sn.innerHTML = '<i class="fas fa-stethoscope" style="font-size:13px"></i>';
+    else sn.textContent = i;
+    sl.className = 'step-label' + (i !== curStep && i > curStep ? ' pending' : '');
+    if (i < 3) document.getElementById('line' + i).className = 'step-line' + (i < curStep ? ' done' : '');
+  }
+}
+
+function renderCal() {
+  const now = new Date();
+  if (!calYear) { calYear = now.getFullYear(); calMonth = now.getMonth(); }
+  document.getElementById('cal-label').textContent = MESES[calMonth] + ' ' + calYear;
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = '';
+  DIAS.forEach(d => { const el = document.createElement('div'); el.className = 'cal-dow'; el.textContent = d; grid.appendChild(el); });
+  const primeiro = new Date(calYear, calMonth, 1).getDay();
+  const total = new Date(calYear, calMonth + 1, 0).getDate();
+  const hoje = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  for (let i = 0; i < primeiro; i++) { const el = document.createElement('div'); el.className = 'cal-day empty'; grid.appendChild(el); }
+  for (let d = 1; d <= total; d++) {
+    const date = new Date(calYear, calMonth, d);
+    const isPast = date < hoje;
+    const isToday = date.toDateString() === now.toDateString();
+    const isSel = selDate && date.toDateString() === selDate.toDateString();
+    const el = document.createElement('div');
+    el.className = 'cal-day' + (isPast ? ' past' : '') + (isToday && !isSel ? ' today' : '') + (isSel ? ' selected' : '');
+    el.textContent = d;
+    if (!isPast) el.addEventListener('click', () => selecionarData(date));
+    grid.appendChild(el);
+  }
+}
+
+function mudarMes(dir) {
+  calMonth += dir;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  renderCal();
+}
+
+function selecionarData(date) {
+  selDate = date; selTime = null;
+  renderCal();
+  document.getElementById('slots-label').textContent = 'Horários para ' + DIAS[date.getDay()] + ', ' + date.getDate() + ' de ' + MESES[date.getMonth()].toLowerCase();
+  renderSlots();
+}
+
+function renderSlots() {
+  const grid = document.getElementById('slots-grid');
+  grid.innerHTML = '';
+  SLOTS.forEach(s => {
+    const el = document.createElement('div');
+    const full = SLOTS_LOTADOS.includes(s);
+    el.className = 'slot' + (full ? ' full' : '') + (selTime === s ? ' selected' : '');
+    el.textContent = s;
+    if (!full) el.addEventListener('click', () => { selTime = s; renderSlots(); });
+    grid.appendChild(el);
+  });
+}
+
+function preencherResumo() {
+  const nome = document.getElementById('inp-nome').value;
+  const unidade = document.getElementById('inp-unidade').value;
+  const esp = document.getElementById('inp-especialidade').value;
+  const med = document.getElementById('inp-medico').value;
+  document.getElementById('sum-nome').textContent = nome;
+  document.getElementById('sum-tipo').textContent = selTipo === 'presencial' ? 'Presencial' : 'Online';
+  document.getElementById('sum-unidade').textContent = unidade;
+  document.getElementById('sum-esp').textContent = esp;
+  document.getElementById('sum-medico').textContent = med;
+  document.getElementById('sum-data').textContent = selDate
+    ? selDate.getDate() + '/' + String(selDate.getMonth()+1).padStart(2,'0') + '/' + selDate.getFullYear() : '—';
+  document.getElementById('sum-hora').textContent = selTime || '—';
+}
+
+function confirmarAgendamento() {
+  if (!selDate || !selTime) { showToast('Atenção', 'Selecione data e horário!', 'warning'); return; }
+  const dataFmt = selDate.getFullYear() + '-' + String(selDate.getMonth()+1).padStart(2,'0') + '-' + String(selDate.getDate()).padStart(2,'0');
+  document.getElementById('f-nome').value = document.getElementById('inp-nome').value;
+  document.getElementById('f-tipo').value = selTipo;
+  document.getElementById('f-unidade').value = document.getElementById('inp-unidade').value;
+  document.getElementById('f-especialidade').value = document.getElementById('inp-especialidade').value;
+  document.getElementById('f-medico').value = document.getElementById('inp-medico').value;
+  document.getElementById('f-data').value = dataFmt;
+  document.getElementById('f-hora').value = selTime;
+  document.getElementById('form-agendar').submit();
+}
+
+function reiniciar() {
+  document.getElementById('view4').classList.remove('active');
+  curStep = 1;
+  selDate = null; selTime = null;
+  document.getElementById('view1').classList.add('active');
+  atualizarStepper();
+}
+
+  // ── COMPROVANTE ──
+  let dadosComp = {};
+
+  function abrirComprovante(id, medico, esp, data, hora, unidade, status) {
+    dadosComp = { id, medico, esp, data, hora, unidade: unidade || '—', status };
+    document.getElementById('comp-id').textContent = '#' + id;
+    document.getElementById('comp-medico').textContent = medico;
+    document.getElementById('comp-esp').textContent = esp;
+    document.getElementById('comp-data').textContent = data;
+    document.getElementById('comp-hora').textContent = hora;
+    document.getElementById('comp-unidade').textContent = unidade || '—';
+    document.getElementById('comp-status').textContent = status;
+    document.getElementById('modalComprovante').style.display = 'flex';
+  }
+
+  function fecharComprovante() {
+    document.getElementById('modalComprovante').style.display = 'none';
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('modalComprovante');
+    if (modal) modal.addEventListener('click', function(e) {
+      if (e.target === document.getElementById('modalComprovante')) fecharComprovante();
+    });
+  });
+
+  function imprimirComprovante() {
+    const d = dadosComp;
+    const win = window.open('', '_blank', 'width=620,height=750');
+    win.document.write(`<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Comprovante #${d.id} - Saúde & Vida</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: Arial, sans-serif; background:#f8fafc; padding:40px; color:#1e2f44; }
+    .wrap { max-width:480px; margin:0 auto; background:#fff; border-radius:16px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.12); }
+    .header { background:linear-gradient(135deg,#1c9fd3,#0d6fa8); padding:28px 32px; color:#fff; text-align:center; }
+    .header h2 { font-size:18px; font-weight:700; margin-bottom:4px; }
+    .header p { font-size:13px; opacity:0.85; }
+    .header .logo { font-size:36px; margin-bottom:10px; }
+    .body { padding:24px 32px; }
+    .row { display:flex; justify-content:space-between; padding:13px 0; border-bottom:1px solid #eef2f8; font-size:14px; }
+    .row:last-child { border-bottom:none; }
+    .key { color:#6a7c9e; }
+    .val { font-weight:700; color:#1e2f44; }
+    .badge { background:#eaf3de; color:#27500a; padding:3px 12px; border-radius:20px; font-size:12px; font-weight:700; }
+    .footer { padding:16px 32px; background:#f8fafc; text-align:center; font-size:11px; color:#8d9db0; border-top:1px solid #eef2f8; }
+    @media print { body { padding:0; background:#fff; } .wrap { box-shadow:none; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="header">
+      <div class="logo">🏥</div>
+      <h2>Comprovante de Agendamento</h2>
+      <p>Centro Médico Saúde &amp; Vida</p>
+    </div>
+    <div class="body">
+      <div class="row"><span class="key">Nº do agendamento</span><span class="val">#${d.id}</span></div>
+      <div class="row"><span class="key">Médico</span><span class="val">${d.medico}</span></div>
+      <div class="row"><span class="key">Especialidade</span><span class="val">${d.esp}</span></div>
+      <div class="row"><span class="key">Data</span><span class="val">${d.data}</span></div>
+      <div class="row"><span class="key">Horário</span><span class="val">${d.hora}</span></div>
+      <div class="row"><span class="key">Unidade</span><span class="val">${d.unidade}</span></div>
+      <div class="row"><span class="key">Status</span><span class="val"><span class="badge">${d.status}</span></span></div>
+    </div>
+    <div class="footer">Gerado em ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</div>
+  </div>
+  <script>window.onload=function(){window.print();}<\/script>
+</body>
+</html>`);
+    win.document.close();
+  }
+
+</script>
+
+
+<!-- ── MODAL COMPROVANTE ── -->
+<div class="modal-comprovante-overlay" id="modalComprovante" style="position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:99998;align-items:center;justify-content:center;display:none;">
+  <div style="background:#fff;border-radius:20px;width:90%;max-width:480px;box-shadow:0 24px 60px rgba(0,0,0,0.25);overflow:hidden;animation:fadeInUp 0.3s ease;">
+    <div style="background:linear-gradient(135deg,#1c9fd3,#0d6fa8);padding:24px 28px;color:#fff;">
+      <div style="font-size:15px;font-weight:700;font-family:'Poppins',sans-serif;"><i class="fas fa-file-medical"></i> Comprovante de Agendamento</div>
+      <div style="font-size:12px;opacity:0.85;margin-top:4px;font-family:'Poppins',sans-serif;">Centro Médico Saúde &amp; Vida</div>
+    </div>
+    <div style="padding:8px 0 0 0;">
+      <div style="display:flex;justify-content:space-between;padding:12px 24px;border-bottom:1px solid #eef2f8;font-size:13px;font-family:'Poppins',sans-serif;"><span style="color:#6a7c9e;">Nº do agendamento</span><span style="font-weight:700;" id="comp-id">—</span></div>
+      <div style="display:flex;justify-content:space-between;padding:12px 24px;border-bottom:1px solid #eef2f8;font-size:13px;font-family:'Poppins',sans-serif;"><span style="color:#6a7c9e;">Médico</span><span style="font-weight:700;" id="comp-medico">—</span></div>
+      <div style="display:flex;justify-content:space-between;padding:12px 24px;border-bottom:1px solid #eef2f8;font-size:13px;font-family:'Poppins',sans-serif;"><span style="color:#6a7c9e;">Especialidade</span><span style="font-weight:700;" id="comp-esp">—</span></div>
+      <div style="display:flex;justify-content:space-between;padding:12px 24px;border-bottom:1px solid #eef2f8;font-size:13px;font-family:'Poppins',sans-serif;"><span style="color:#6a7c9e;">Data</span><span style="font-weight:700;" id="comp-data">—</span></div>
+      <div style="display:flex;justify-content:space-between;padding:12px 24px;border-bottom:1px solid #eef2f8;font-size:13px;font-family:'Poppins',sans-serif;"><span style="color:#6a7c9e;">Horário</span><span style="font-weight:700;" id="comp-hora">—</span></div>
+      <div style="display:flex;justify-content:space-between;padding:12px 24px;border-bottom:1px solid #eef2f8;font-size:13px;font-family:'Poppins',sans-serif;"><span style="color:#6a7c9e;">Unidade</span><span style="font-weight:700;" id="comp-unidade">—</span></div>
+      <div style="display:flex;justify-content:space-between;padding:12px 24px;font-size:13px;font-family:'Poppins',sans-serif;"><span style="color:#6a7c9e;">Status</span><span style="font-weight:700;" id="comp-status">—</span></div>
+    </div>
+    <div style="padding:16px 24px 24px;display:flex;gap:10px;justify-content:flex-end;border-top:1px solid #eef2f8;">
+      <button onclick="fecharComprovante()" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:50px;font-size:13px;font-weight:700;font-family:'Poppins',sans-serif;cursor:pointer;background:transparent;color:#6a7c9e;border:1.5px solid #eef2f8;"><i class="fas fa-times"></i> Fechar</button>
+      <button onclick="imprimirComprovante()" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:50px;font-size:13px;font-weight:700;font-family:'Poppins',sans-serif;cursor:pointer;background:#1c9fd3;color:#fff;border:none;"><i class="fas fa-print"></i> Imprimir / PDF</button>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

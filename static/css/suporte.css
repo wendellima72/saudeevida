@@ -1,0 +1,865 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    padding-top: 90px; /* Espaço para o header fixo */
+}
+
+/* ===================== HEADER ===================== */
+header {
+    background: #1c9fd3;
+    color: white;
+    text-align: center;
+    padding: 15px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+/* DASHBOARD */
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    padding: 15px;
+}
+
+.box {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 18px;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(28, 159, 211, 0.2);
+}
+
+.icon {
+    color: #1c9fd3;
+    font-size: 25px;
+}
+
+/* TABS */
+.tabs {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    flex-wrap: wrap;
+}
+
+.tabs button {
+    padding: 10px 20px;
+    background: #1c9fd3;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+
+.tabs button:hover {
+    background: #1580ac;
+}
+
+/* SEÇÕES */
+.secao {
+    display: none;
+    padding: 15px;
+}
+
+.ativa {
+    display: block;
+}
+
+/* CARDS */
+.card {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* USUÁRIOS */
+.lista-usuarios {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.lista-usuarios::-webkit-scrollbar {
+    width: 5px;
+}
+
+.lista-usuarios::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.lista-usuarios::-webkit-scrollbar-thumb {
+    background: #1c9fd3;
+    border-radius: 5px;
+}
+
+.user {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.user:hover {
+    background: #ecf0f1;
+}
+
+.user span {
+    display: block;
+    font-size: 12px;
+    color: gray;
+}
+
+.perfil {
+    margin-top: 10px;
+    background: #ecf0f1;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+/* CONSULTAS */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: #1c9fd3;
+    color: white;
+    padding: 12px;
+}
+
+td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.agendada { 
+    color: #ff9800; 
+    font-weight: bold;
+}
+
+.finalizada { 
+    color: #4caf50; 
+    font-weight: bold;
+}
+
+/* ================= CHAT MODERNO ================= */
+
+.chat {
+    display: flex;
+    height: 550px;
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s;
+}
+
+.chat:hover {
+    box-shadow: 0 15px 40px rgba(28, 159, 211, 0.15);
+}
+
+/* ================= CONTATOS ================= */
+.contatos {
+    width: 30%;
+    border-right: 1px solid #eef2f7;
+    overflow-y: auto;
+    background: #ffffff;
+}
+
+/* Scroll personalizado */
+.contatos::-webkit-scrollbar {
+    width: 5px;
+}
+
+.contatos::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.contatos::-webkit-scrollbar-thumb {
+    background: #1c9fd3;
+    border-radius: 5px;
+}
+
+.contato {
+    padding: 15px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.contato:hover {
+    background: #f0f9ff;
+    transform: translateX(3px);
+}
+
+.contato-avatar {
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(135deg, #1c9fd3, #1580ac);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.contato-info {
+    flex: 1;
+}
+
+.contato-nome {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 4px;
+}
+
+.contato-mensagem {
+    font-size: 12px;
+    color: #888;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.contato-tempo {
+    font-size: 10px;
+    color: #aaa;
+}
+
+.ativo {
+    background: linear-gradient(135deg, #1c9fd3, #1580ac);
+    color: white;
+    position: relative;
+}
+
+.ativo::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: white;
+}
+
+.ativo .contato-nome,
+.ativo .contato-mensagem,
+.ativo .contato-tempo {
+    color: white;
+}
+
+.ativo .contato-avatar {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+/* ================= CONVERSA ================= */
+.conversa {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #f8faff;
+}
+
+/* Topo do chat */
+.topo-chat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 25px;
+    border-bottom: 1px solid #eef2f7;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.usuario-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.usuario-avatar {
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(135deg, #1c9fd3, #1580ac);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.usuario-detalhes h4 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 16px;
+}
+
+.status-online {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #4caf50;
+    border-radius: 50%;
+    margin-right: 5px;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.7; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.status-text {
+    font-size: 12px;
+    color: #888;
+}
+
+/* Ações do chat */
+.chat-acoes {
+    display: flex;
+    gap: 15px;
+}
+
+.chat-acoes button {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #888;
+    transition: 0.3s;
+    padding: 5px;
+}
+
+.chat-acoes button:hover {
+    color: #1c9fd3;
+    transform: scale(1.1);
+}
+
+/* Área de mensagens */
+.mensagens {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: #f8faff;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Scroll mensagens */
+.mensagens::-webkit-scrollbar {
+    width: 5px;
+}
+
+.mensagens::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.mensagens::-webkit-scrollbar-thumb {
+    background: #1c9fd3;
+    border-radius: 5px;
+}
+
+/* Mensagens */
+.msg {
+    max-width: 70%;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.cliente {
+    align-self: flex-end;
+}
+
+.suporte {
+    align-self: flex-start;
+}
+
+.message-content {
+    padding: 12px 18px;
+    border-radius: 20px;
+    position: relative;
+    word-wrap: break-word;
+}
+
+.cliente .message-content {
+    background: linear-gradient(135deg, #1c9fd3, #1580ac);
+    color: white;
+    border-radius: 20px 20px 5px 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.suporte .message-content {
+    background: white;
+    color: #333;
+    border-radius: 20px 20px 20px 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.message-time {
+    font-size: 10px;
+    opacity: 0.7;
+    margin-top: 5px;
+    display: block;
+}
+
+.cliente .message-time {
+    text-align: right;
+}
+
+/* Indicador de digitando */
+.digitando {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 10px 15px;
+    background: white;
+    border-radius: 20px;
+    width: fit-content;
+    margin-bottom: 10px;
+}
+
+.digitando span {
+    width: 8px;
+    height: 8px;
+    background: #aaa;
+    border-radius: 50%;
+    animation: typing 1.4s infinite;
+}
+
+.digitando span:nth-child(2) { animation-delay: 0.2s; }
+.digitando span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typing {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-10px); opacity: 1; }
+}
+
+/* Input do chat */
+.input-chat {
+    display: flex;
+    padding: 18px 20px;
+    border-top: 1px solid #eef2f7;
+    background: white;
+    gap: 12px;
+    align-items: center;
+}
+
+.input-chat .emoji-btn {
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: #888;
+    transition: 0.3s;
+    padding: 5px;
+}
+
+.input-chat .emoji-btn:hover {
+    color: #1c9fd3;
+    transform: scale(1.1);
+}
+
+.input-chat input {
+    flex: 1;
+    padding: 14px 18px;
+    border: 1px solid #eef2f7;
+    border-radius: 30px;
+    outline: none;
+    font-size: 14px;
+    transition: all 0.3s;
+    background: #f8faff;
+}
+
+.input-chat input:focus {
+    border-color: #1c9fd3;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(28, 159, 211, 0.1);
+}
+
+.input-chat button {
+    background: linear-gradient(135deg, #1c9fd3, #1580ac);
+    color: white;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.input-chat button:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(28, 159, 211, 0.3);
+}
+
+.input-chat button i {
+    font-size: 16px;
+}
+
+/* Badges de status */
+.status-badge { 
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+    color: white;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.fechar-badge { 
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.fechar-badge:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.4);
+}
+
+/* ================= RESPONSIVIDADE ================= */
+
+/* Tablet (820px) */
+@media (max-width: 820px) {
+    body {
+        padding-top: 80px;
+    }
+    
+    header {
+        padding: 12px;
+        font-size: 18px;
+    }
+    
+    .dashboard {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    
+    .box {
+        padding: 15px;
+        font-size: 16px;
+    }
+    
+    .tabs {
+        justify-content: center;
+    }
+    
+    .tabs button {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+    
+    table {
+        font-size: 14px;
+    }
+    
+    th, td {
+        padding: 8px;
+    }
+    
+    .chat {
+        height: auto;
+    }
+}
+
+/* Celular (768px) */
+@media (max-width: 768px) {
+    body {
+        padding-top: 70px;
+    }
+    
+    header {
+        padding: 10px;
+        font-size: 16px;
+    }
+    
+    .dashboard {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding: 10px;
+    }
+    
+    .box {
+        padding: 12px;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .icon {
+        font-size: 20px;
+    }
+    
+    .tabs {
+        gap: 8px;
+        padding: 8px;
+    }
+    
+    .tabs button {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+    
+    .secao {
+        padding: 10px;
+    }
+    
+    /* Chat responsivo */
+    .chat {
+        flex-direction: column;
+        height: auto;
+        border-radius: 15px;
+    }
+    
+    .contatos {
+        width: 100%;
+        max-height: 200px;
+        border-right: none;
+        border-bottom: 1px solid #eef2f7;
+    }
+    
+    .conversa {
+        height: 450px;
+    }
+    
+    .topo-chat {
+        padding: 12px 15px;
+    }
+    
+    .usuario-avatar {
+        width: 35px;
+        height: 35px;
+        font-size: 14px;
+    }
+    
+    .msg {
+        max-width: 85%;
+    }
+    
+    .message-content {
+        padding: 10px 14px;
+        font-size: 13px;
+    }
+    
+    .input-chat {
+        padding: 12px;
+    }
+    
+    .input-chat input {
+        padding: 10px 15px;
+        font-size: 13px;
+    }
+    
+    .input-chat button {
+        padding: 10px 20px;
+        font-size: 13px;
+    }
+    
+    /* Tabela responsiva */
+    table {
+        font-size: 12px;
+    }
+    
+    th, td {
+        padding: 6px;
+    }
+    
+    /* Cards de usuários */
+    .card {
+        padding: 12px;
+    }
+    
+    .user {
+        padding: 8px;
+        font-size: 14px;
+    }
+    
+    .user span {
+        font-size: 11px;
+    }
+}
+
+/* Celular pequeno (480px) */
+@media (max-width: 480px) {
+    body {
+        padding-top: 60px;
+    }
+    
+    header {
+        padding: 8px;
+        font-size: 14px;
+    }
+    
+    .dashboard {
+        gap: 8px;
+        padding: 8px;
+    }
+    
+    .box {
+        padding: 10px;
+        font-size: 13px;
+    }
+    
+    .icon {
+        font-size: 18px;
+    }
+    
+    .tabs {
+        gap: 6px;
+        padding: 6px;
+    }
+    
+    .tabs button {
+        padding: 5px 10px;
+        font-size: 11px;
+    }
+    
+    .secao {
+        padding: 8px;
+    }
+    
+    .contato {
+        padding: 10px;
+    }
+    
+    .contato-avatar {
+        width: 35px;
+        height: 35px;
+        font-size: 14px;
+    }
+    
+    .contato-nome {
+        font-size: 13px;
+    }
+    
+    .conversa {
+        height: 400px;
+    }
+    
+    .topo-chat {
+        padding: 10px;
+    }
+    
+    .mensagens {
+        padding: 10px;
+    }
+    
+    .msg {
+        max-width: 90%;
+    }
+    
+    .message-content {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    
+    .input-chat {
+        padding: 10px;
+    }
+    
+    .input-chat input {
+        padding: 8px;
+        font-size: 12px;
+    }
+    
+    .input-chat button span {
+        display: none;
+    }
+    
+    .input-chat button i {
+        margin: 0;
+    }
+    
+    .input-chat button {
+        padding: 8px 15px;
+    }
+    
+    /* Tabela - rolagem horizontal */
+    .card {
+        overflow-x: auto;
+    }
+    
+    table {
+        min-width: 500px;
+    }
+    
+    .status-badge, .fechar-badge {
+        padding: 2px 8px;
+        font-size: 10px;
+    }
+}
+
+/* Orientação paisagem em mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+    body {
+        padding-top: 60px;
+    }
+    
+    .chat {
+        flex-direction: row;
+        height: 350px;
+    }
+    
+    .contatos {
+        width: 35%;
+        max-height: none;
+    }
+    
+    .conversa {
+        height: auto;
+    }
+    
+    .dashboard {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Telas muito grandes (acima de 1400px) */
+@media (min-width: 1400px) {
+    .dashboard {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .chat {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+}
