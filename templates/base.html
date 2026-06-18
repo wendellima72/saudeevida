@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>{% block title %}Saúde & Vida{% endblock %}</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --primary: #1c9fd3;
+      --primary-dark: #1482ae;
+      --primary-light: #e8f4fc;
+      --secondary: #0a1220;
+      --text-dark: #1e2f44;
+      --text-gray: #6a7c9e;
+      --text-light: #8d9db0;
+      --white: #ffffff;
+      --gray-bg: #f8fafc;
+      --border: #eef2f8;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --shadow-sm: 0 4px 12px rgba(0,0,0,0.05);
+      --shadow-md: 0 8px 24px rgba(0,0,0,0.08);
+      --shadow-lg: 0 20px 40px rgba(0,0,0,0.1);
+      --transition: all 0.3s ease;
+    }
+
+    body {
+      font-family: 'Poppins', 'Montserrat', 'Segoe UI', sans-serif;
+      background: var(--gray-bg);
+      color: var(--text-dark);
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    main { flex: 1; }
+
+
+    /* ===================== MODO ESCURO ===================== */
+    [data-theme="dark"] {
+      --primary: #1c9fd3;
+      --primary-dark: #1482ae;
+      --primary-light: #0d2a3a;
+      --text-dark: #e8eef5;
+      --text-gray: #94a8bf;
+      --text-light: #6a7c9e;
+      --white: #1a2332;
+      --gray-bg: #0f1923;
+      --border: #1e2f44;
+      --shadow-sm: 0 4px 12px rgba(0,0,0,0.3);
+      --shadow-md: 0 8px 24px rgba(0,0,0,0.4);
+      --shadow-lg: 0 20px 40px rgba(0,0,0,0.5);
+    }
+    [data-theme="dark"] body { background: #0f1923; color: #e8eef5; }
+    [data-theme="dark"] .user-dropdown { background: #1a2332; border-color: #1e2f44; }
+    [data-theme="dark"] .user-dropdown a { color: #e8eef5; }
+    [data-theme="dark"] .user-dropdown a:hover { background: #0d2a3a; }
+    [data-theme="dark"] .toast { background: #1a2332; color: #e8eef5; }
+    [data-theme="dark"] .toast-title { color: #e8eef5; }
+    [data-theme="dark"] .toast-message { color: #94a8bf; }
+    [data-theme="dark"] #chatMsgs { background: #0f1923 !important; }
+    [data-theme="dark"] #chatInput { background: #0f1923 !important; border-color: #1e2f44 !important; color: #e8eef5 !important; }
+    [data-theme="dark"] #modalChatIA > div { background: #1a2332 !important; border-top-color: #1e2f44 !important; }
+    [data-theme="dark"] footer { background: #0a1220; }
+    [data-theme="dark"] input, [data-theme="dark"] select, [data-theme="dark"] textarea {
+      background: #0f1923 !important; color: #e8eef5 !important; border-color: #1e2f44 !important;
+    }
+
+
+    /* ===================== SINO DE NOTIFICAÇÕES ===================== */
+    .notif-wrap { position: relative; }
+    .notif-btn {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      border: none; color: #fff; cursor: pointer; font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+      transition: var(--transition); flex-shrink: 0; position: relative;
+    }
+    .notif-btn:hover { background: rgba(255,255,255,0.28); transform: scale(1.1); }
+    .notif-badge {
+      position: absolute; top: -3px; right: -3px;
+      background: #ef4444; color: #fff;
+      width: 18px; height: 18px; border-radius: 50%;
+      font-size: 10px; font-weight: 700;
+      display: none; align-items: center; justify-content: center;
+      border: 2px solid var(--primary);
+      font-family: 'Poppins', sans-serif;
+    }
+    .notif-badge.show { display: flex; }
+    .notif-dropdown {
+      position: absolute; top: 48px; right: 0;
+      background: var(--white); border-radius: 16px;
+      box-shadow: var(--shadow-lg); width: 320px;
+      border: 1px solid var(--border); display: none; z-index: 200;
+      overflow: hidden;
+    }
+    .notif-dropdown.show { display: block; animation: fadeIn 0.2s ease; }
+    .notif-header {
+      padding: 14px 18px; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .notif-header span {
+      font-size: 13px; font-weight: 700;
+      color: var(--text-dark); font-family: 'Poppins', sans-serif;
+    }
+    .notif-limpar {
+      font-size: 11px; color: var(--primary); cursor: pointer;
+      background: none; border: none; font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+    }
+    .notif-list { max-height: 320px; overflow-y: auto; }
+    .notif-list::-webkit-scrollbar { width: 4px; }
+    .notif-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    .notif-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 14px 18px; border-bottom: 1px solid var(--border);
+      transition: background 0.2s; cursor: pointer;
+    }
+    .notif-item:last-child { border-bottom: none; }
+    .notif-item:hover { background: var(--gray-bg); }
+    .notif-icon {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 15px;
+    }
+    .notif-body { flex: 1; min-width: 0; }
+    .notif-titulo {
+      font-size: 12px; font-weight: 700; color: var(--text-dark);
+      font-family: 'Poppins', sans-serif; margin-bottom: 3px;
+    }
+    .notif-msg {
+      font-size: 11px; color: var(--text-gray);
+      font-family: 'Poppins', sans-serif; line-height: 1.4;
+    }
+    .notif-empty {
+      padding: 32px; text-align: center;
+      color: var(--text-light); font-size: 13px;
+      font-family: 'Poppins', sans-serif;
+    }
+    .notif-empty i { font-size: 32px; display: block; margin-bottom: 10px; opacity: 0.4; }
+    .notif-footer {
+      padding: 10px 18px; border-top: 1px solid var(--border);
+      text-align: center;
+    }
+    .notif-footer a {
+      font-size: 12px; color: var(--primary); font-weight: 600;
+      text-decoration: none; font-family: 'Poppins', sans-serif;
+    }
+    [data-theme="dark"] .notif-dropdown { background: #1a2332; border-color: #1e2f44; }
+    [data-theme="dark"] .notif-header { border-color: #1e2f44; }
+    [data-theme="dark"] .notif-header span { color: #e8eef5; }
+    [data-theme="dark"] .notif-item { border-color: #1e2f44; }
+    [data-theme="dark"] .notif-item:hover { background: #0f1923; }
+    [data-theme="dark"] .notif-titulo { color: #e8eef5; }
+    [data-theme="dark"] .notif-footer { border-color: #1e2f44; background: #1a2332; }
+
+    /* Botão modo escuro na navbar */
+    .dark-toggle {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      border: none; color: #fff;
+      cursor: pointer; font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+      transition: var(--transition);
+      flex-shrink: 0;
+    }
+    .dark-toggle:hover { background: rgba(255,255,255,0.28); transform: scale(1.1); }
+
+    /* ===================== TOAST ===================== */
+    .toast-container {
+      position: fixed; top: 20px; right: 20px; z-index: 9999;
+      display: flex; flex-direction: column; gap: 12px;
+      max-width: 380px; width: calc(100% - 40px); pointer-events: none;
+    }
+    .toast {
+      background: var(--white); border-radius: 16px; padding: 14px 18px;
+      display: flex; align-items: flex-start; gap: 14px;
+      box-shadow: var(--shadow-lg); pointer-events: auto; cursor: pointer;
+      animation: toastSlideIn 0.3s ease forwards;
+      position: relative; overflow: hidden; border-left: 4px solid;
+    }
+    .toast::before {
+      content: ''; position: absolute; bottom: 0; left: 0;
+      height: 3px; width: 100%; animation: toastProgress 4s linear forwards;
+    }
+    @keyframes toastProgress { 0% { width: 100%; } 100% { width: 0%; } }
+    @keyframes toastSlideIn { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } }
+    .toast-success { border-left-color: var(--success); }
+    .toast-success::before { background: var(--success); }
+    .toast-error { border-left-color: var(--error); }
+    .toast-error::before { background: var(--error); }
+    .toast-warning { border-left-color: var(--warning); }
+    .toast-warning::before { background: var(--warning); }
+    .toast-info { border-left-color: var(--primary); }
+    .toast-info::before { background: var(--primary); }
+    .toast-icon { width: 32px; height: 32px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .toast-success .toast-icon { background: rgba(16,185,129,0.12); color: var(--success); }
+    .toast-error .toast-icon { background: rgba(239,68,68,0.12); color: var(--error); }
+    .toast-warning .toast-icon { background: rgba(245,158,11,0.12); color: var(--warning); }
+    .toast-info .toast-icon { background: rgba(28,159,211,0.12); color: var(--primary); }
+    .toast-content { flex: 1; }
+    .toast-title { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+    .toast-message { font-size: 12px; color: var(--text-gray); line-height: 1.4; }
+    .toast-close { background: none; border: none; font-size: 14px; color: var(--text-light); cursor: pointer; padding: 4px; transition: var(--transition); }
+
+    /* ===================== HEADER ===================== */
+    .topbar { background: var(--primary); position: sticky; top: 0; z-index: 1000; box-shadow: var(--shadow-md); }
+    .container-header { max-width: 1400px; margin: 0 auto; padding: 0 40px; }
+    .topbar .container-header { display: flex; align-items: center; justify-content: space-between; height: 85px; }
+    .logo-area { display: flex; align-items: center; gap: 20px; flex-shrink: 0; }
+    .logo { width: 75px; height: auto; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15)); transition: var(--transition); }
+    .logo:hover { transform: scale(1.02); }
+    .medic-name { font-family: 'Poppins','Montserrat',sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--white); letter-spacing: -0.3px; }
+    .menu { position: absolute; left: 50%; transform: translateX(-50%); }
+    .menu ul { display: flex; list-style: none; gap: 32px; }
+    .menu ul li a {
+      color: var(--white); text-decoration: none; font-size: 0.95rem;
+      font-weight: 500; padding: 8px 0; position: relative; transition: var(--transition);
+    }
+    .menu ul li a::after {
+      content: ''; position: absolute; bottom: 0; left: 0;
+      width: 0; height: 2px; background: var(--white); transition: var(--transition);
+    }
+    .menu ul li a:hover::after, .menu ul li a.active::after { width: 100%; }
+    .right-area { display: flex; align-items: center; gap: 20px; flex-shrink: 0; }
+    .user-menu { position: relative; }
+    .user-btn {
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(255,255,255,0.15); color: var(--white);
+      border: none; padding: 8px 18px; border-radius: 50px;
+      cursor: pointer; font-weight: 500; font-size: 0.85rem; transition: var(--transition);
+    }
+    .user-btn:hover { background: rgba(255,255,255,0.25); transform: translateY(-2px); }
+    .user-avatar { width: 32px; height: 32px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .user-avatar i { font-size: 18px; }
+    .user-dropdown {
+      position: absolute; top: 55px; right: 0;
+      background: var(--white); border-radius: 16px; box-shadow: var(--shadow-lg);
+      min-width: 200px; overflow: hidden; display: none; z-index: 100; border: 1px solid var(--border);
+    }
+    .user-dropdown.show { display: block; animation: fadeIn 0.2s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    .user-dropdown a {
+      display: flex; align-items: center; gap: 12px; padding: 12px 18px;
+      color: var(--text-dark); text-decoration: none; font-size: 0.85rem; transition: var(--transition);
+    }
+    .user-dropdown a:hover { background: var(--primary-light); color: var(--primary); }
+    .user-dropdown hr { margin: 5px 0; border: none; border-top: 1px solid var(--border); }
+    .dropdown-logout { color: var(--error) !important; }
+    .dropdown-logout:hover { background: rgba(239,68,68,0.1) !important; }
+    .hamburger { display: none; font-size: 26px; color: var(--white); cursor: pointer; padding: 8px; min-width: 44px; min-height: 44px; align-items: center; justify-content: center; }
+    .menu-overlay {
+      display: none; position: fixed; inset: 0; top: 70px;
+      background: rgba(10, 18, 32, 0.45); z-index: 998;
+      backdrop-filter: blur(2px);
+    }
+    .menu-overlay.active { display: block; }
+
+    /* ===================== FOOTER ===================== */
+    footer { background: var(--primary); color: var(--white); text-align: center; padding: 30px 20px; margin-top: 0; }
+    footer p { opacity: 0.9; font-size: 0.85rem; }
+
+
+    /* ===================== RESPONSIVIDADE ===================== */
+    @media (max-width: 1200px) {
+      .menu ul { gap: 22px; }
+      .menu ul li a { font-size: 0.9rem; }
+    }
+    @media (max-width: 992px) {
+      .container-header { padding: 0 24px; }
+      .logo { width: 60px; } .medic-name { font-size: 1.15rem; }
+      .user-btn span, .user-btn .fa-chevron-down { display: none; }
+      .user-btn { padding: 10px 12px; min-width: 44px; min-height: 44px; justify-content: center; }
+      .menu ul { gap: 16px; }
+      .menu ul li a { font-size: 0.88rem; }
+      .right-area { gap: 10px; }
+      .notif-dropdown { width: min(320px, calc(100vw - 32px)); }
+    }
+    @media (max-width: 768px) {
+      .container-header { padding: 0 16px; }
+      .topbar .container-header { height: 70px; }
+      .menu {
+        display: flex; position: fixed; top: 70px; left: -100%; transform: none;
+        width: min(300px, 88vw); height: calc(100dvh - 70px);
+        background: var(--primary); transition: var(--transition); z-index: 999;
+        padding: 28px 20px; box-shadow: var(--shadow-lg);
+      }
+      .menu.active { left: 0; }
+      .menu ul { flex-direction: column; gap: 8px; width: 100%; }
+      .menu ul li a { display: block; padding: 14px 12px; font-size: 1rem; border-radius: 12px; }
+      .menu ul li a:hover { background: rgba(255,255,255,0.12); }
+      .hamburger { display: flex; }
+      .medic-name { font-size: 0.95rem; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .logo { width: 52px; }
+      .right-area { gap: 6px; }
+      .dark-toggle, .notif-btn { width: 40px; height: 40px; font-size: 15px; }
+      .user-dropdown {
+        position: fixed; bottom: 0; top: auto; left: 0; right: 0;
+        border-radius: 20px 20px 0 0; width: 100%; min-width: 0;
+        padding-bottom: env(safe-area-inset-bottom, 0);
+      }
+      .notif-dropdown {
+        position: fixed; top: auto; bottom: 0; left: 0; right: 0;
+        width: 100%; max-width: none; border-radius: 20px 20px 0 0;
+        max-height: 70dvh;
+      }
+      .toast-container { top: auto; bottom: 16px; left: 16px; right: 16px; max-width: none; }
+      footer { padding: 24px 16px; font-size: 0.8rem; }
+    }
+    @media (max-width: 480px) {
+      .logo { width: 46px; }
+      .medic-name { font-size: 0.82rem; max-width: 110px; }
+      .logo-area { gap: 10px; }
+    }
+    @media (max-width: 380px) {
+      .medic-name { display: none; }
+    }
+    @media (min-width: 1400px) {
+      .container-header { max-width: 1400px; }
+      .logo { width: 85px; } .medic-name { font-size: 1.6rem; }
+    }
+
+    #modalAgente { display: none !important; }
+    #modalAgente[style*="display: flex"] { display: flex !important; }
+    @keyframes slideUpLegacy { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+    #modalContent { animation: slideUpLegacy 0.3s ease; }
+
+
+  </style>
+
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<header class="topbar">
+  <div class="container-header">
+    <div class="logo-area">
+      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="logo">
+      <h1 class="medic-name"></h1>
+    </div>
+    <nav class="menu" id="menu">
+      <ul>
+        <li><a href="/painel_cliente" class="{% if request.endpoint == 'painel_cliente' %}active{% endif %}">Home</a></li>
+        <li><a href="/agendamentos" class="{% if request.endpoint == 'agendamentos' %}active{% endif %}">Agendamentos</a></li>
+        <li><a href="/planos" class="{% if request.endpoint == 'planos' %}active{% endif %}">Planos</a></li>
+        <li><a href="/trabalhe_conosco" class="{% if request.endpoint == 'trabalhe_conosco' %}active{% endif %}">Trabalhe Conosco</a></li>
+      </ul>
+    </nav>
+    <div class="right-area">
+      <div class="hamburger" id="hamburger"><i class="fas fa-bars"></i></div>
+      <button class="dark-toggle" id="darkToggle" onclick="toggleDarkMode()" title="Modo escuro">
+        <i class="fas fa-moon" id="darkIcon"></i>
+      </button>
+      <div class="notif-wrap">
+        <button class="notif-btn" onclick="toggleNotif()" title="Notificações">
+          <i class="fas fa-bell"></i>
+          <span class="notif-badge" id="notifBadge">0</span>
+        </button>
+        <div class="notif-dropdown" id="notifDropdown">
+          <div class="notif-header">
+            <span><i class="fas fa-bell" style="color:var(--primary);margin-right:6px"></i> Notificações</span>
+            <button class="notif-limpar" onclick="limparNotif()">Marcar como lidas</button>
+          </div>
+          <div class="notif-list" id="notifList">
+            <div class="notif-empty"><i class="fas fa-bell-slash"></i>Sem notificações</div>
+          </div>
+          <div class="notif-footer">
+            <a href="/agendamentos"><i class="fas fa-calendar"></i> Ver agendamentos</a>
+          </div>
+        </div>
+      </div>
+      <div class="user-menu">
+        <button class="user-btn" onclick="toggleUserMenu()">
+          <div class="user-avatar"><i class="fas fa-user-circle"></i></div>
+          <span>{{ session.nome if session.nome else 'Usuário' }}</span>
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="user-dropdown" id="userDropdown">
+          <a href="/meu_perfil"><i class="fas fa-id-card"></i> Meu Perfil</a>
+          <hr>
+          <a href="/logout" class="dropdown-logout" onclick="return confirmLogout(event)"><i class="fas fa-sign-out-alt"></i> Sair</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+<div class="menu-overlay" id="menuOverlay" aria-hidden="true"></div>
+
+<main>
+  {% block content %}{% endblock %}
+</main>
+
+<footer>
+  <p>Este projeto foi desenvolvido exclusivamente para fins escolares, com o objetivo de aplicar conhecimentos acadêmicos na prática.</p>
+  <p>© 2026 - EEEP Dona Creusa do Carmo Rocha</p>
+</footer>
+
+
+
+
+<script>
+  // ── TOAST ──
+  function showToast(title, message, type = 'info', duration = 4000) {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    let icon = '';
+    switch(type) {
+      case 'success': icon = '<i class="fas fa-check-circle"></i>'; break;
+      case 'error':   icon = '<i class="fas fa-exclamation-circle"></i>'; break;
+      case 'warning': icon = '<i class="fas fa-exclamation-triangle"></i>'; break;
+      default:        icon = '<i class="fas fa-info-circle"></i>';
+    }
+    toast.innerHTML = `
+      <div class="toast-icon">${icon}</div>
+      <div class="toast-content">
+        <div class="toast-title">${title}</div>
+        <div class="toast-message">${message}</div>
+      </div>
+      <button class="toast-close"><i class="fas fa-times"></i></button>`;
+    container.appendChild(toast);
+    toast.querySelector('.toast-close').addEventListener('click', () => toast.remove());
+    setTimeout(() => { if (toast.parentNode) toast.remove(); }, duration);
+  }
+
+  // ── USER MENU ──
+  function toggleUserMenu() {
+    document.getElementById('userDropdown').classList.toggle('show');
+  }
+  document.addEventListener('click', function(e) {
+    const um = document.querySelector('.user-menu');
+    const dd = document.getElementById('userDropdown');
+    if (um && !um.contains(e.target)) dd.classList.remove('show');
+  });
+  function confirmLogout(event) {
+    if (!confirm('Tem certeza que deseja sair do sistema?')) { event.preventDefault(); return false; }
+    showToast('Saindo...', 'Redirecionando para página de login', 'info', 1500);
+    return true;
+  }
+
+  // ── HAMBURGER ──
+  const hamburger = document.getElementById('hamburger');
+  const menu = document.getElementById('menu');
+  const menuOverlay = document.getElementById('menuOverlay');
+  function closeMobileMenu() {
+    if (menu) menu.classList.remove('active');
+    if (menuOverlay) menuOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+  function toggleMobileMenu() {
+    if (!menu) return;
+    const open = menu.classList.toggle('active');
+    if (menuOverlay) menuOverlay.classList.toggle('active', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+  }
+  if (hamburger) hamburger.addEventListener('click', toggleMobileMenu);
+  if (menuOverlay) menuOverlay.addEventListener('click', closeMobileMenu);
+  document.querySelectorAll('.menu a').forEach(l => l.addEventListener('click', closeMobileMenu));
+  window.addEventListener('resize', () => { if (window.innerWidth > 768) closeMobileMenu(); });
+
+  // ── NOTIFICAÇÕES ──
+  let notifCarregadas = [];
+
+  async function carregarNotificacoes() {
+    try {
+      const resp = await fetch('/notificacoes');
+      if (!resp.ok) return;
+      const data = await resp.json();
+
+      // Pega IDs já lidos do localStorage
+      const lidas = JSON.parse(localStorage.getItem('notif_lidas') || '[]');
+      const novas = data.filter(n => !lidas.includes(n.id + '-' + n.tipo));
+
+      notifCarregadas = data;
+
+      // Atualiza badge
+      const badge = document.getElementById('notifBadge');
+      if (novas.length > 0) {
+        badge.textContent = novas.length > 9 ? '9+' : novas.length;
+        badge.classList.add('show');
+      } else {
+        badge.classList.remove('show');
+      }
+
+      // Renderiza lista
+      renderNotifs(data, lidas);
+    } catch(e) {}
+  }
+
+  function renderNotifs(lista, lidas) {
+    const container = document.getElementById('notifList');
+    if (!lista.length) {
+      container.innerHTML = '<div class="notif-empty"><i class="fas fa-bell-slash"></i>Nenhuma notificação</div>';
+      return;
+    }
+    const lidas_set = new Set(lidas);
+    container.innerHTML = lista.map(n => {
+      const isLida = lidas_set.has(n.id + '-' + n.tipo);
+      const bg = isLida ? '' : 'background:rgba(28,159,211,0.06);';
+      return `<div class="notif-item" style="${bg}" onclick="irAgendamentos()">
+        <div class="notif-icon" style="background:${n.cor}22;">
+          <i class="fas ${n.icone}" style="color:${n.cor}"></i>
+        </div>
+        <div class="notif-body">
+          <div class="notif-titulo">${n.titulo}</div>
+          <div class="notif-msg">${n.mensagem}</div>
+        </div>
+        ${!isLida ? '<div style="width:8px;height:8px;border-radius:50%;background:#1c9fd3;flex-shrink:0;margin-top:4px;"></div>' : ''}
+      </div>`;
+    }).join('');
+  }
+
+  function toggleNotif() {
+    const dd = document.getElementById('notifDropdown');
+    dd.classList.toggle('show');
+    // Fecha user dropdown se aberto
+    document.getElementById('userDropdown').classList.remove('show');
+  }
+
+  function limparNotif() {
+    const ids = notifCarregadas.map(n => n.id + '-' + n.tipo);
+    localStorage.setItem('notif_lidas', JSON.stringify(ids));
+    document.getElementById('notifBadge').classList.remove('show');
+    renderNotifs(notifCarregadas, ids);
+  }
+
+  function irAgendamentos() {
+    window.location.href = '/agendamentos';
+  }
+
+  // Fecha ao clicar fora
+  document.addEventListener('click', function(e) {
+    const wrap = document.querySelector('.notif-wrap');
+    const dd = document.getElementById('notifDropdown');
+    if (wrap && !wrap.contains(e.target)) dd.classList.remove('show');
+  });
+
+  // Carrega ao iniciar e a cada 60 segundos
+  carregarNotificacoes();
+  setInterval(carregarNotificacoes, 60000);
+
+
+  // ── MODO ESCURO ──
+  function toggleDarkMode() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (isDark) {
+      document.documentElement.removeAttribute('data-theme');
+      localStorage.setItem('tema', 'light');
+      document.getElementById('darkIcon').className = 'fas fa-moon';
+    } else {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      localStorage.setItem('tema', 'dark');
+      document.getElementById('darkIcon').className = 'fas fa-sun';
+    }
+  }
+  // Aplica tema salvo ao carregar
+  (function() {
+    const tema = localStorage.getItem('tema');
+    if (tema === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      const icon = document.getElementById('darkIcon');
+      if (icon) icon.className = 'fas fa-sun';
+    }
+  })();
+
+</script>
+
+{% block extra_js %}{% endblock %}
+
+<!-- ===================== CHATBASE ===================== -->
+<script>
+  window.embeddedChatbotConfig = {
+    chatbotId: "axNmoShgpSh6_iZ6P33fh",
+    domain: "www.chatbase.co"
+  };
+</script>
+<script
+  src="https://www.chatbase.co/embed.min.js"
+  chatbotId="axNmoShgpSh6_iZ6P33fh"
+  domain="www.chatbase.co"
+  defer>
+</script>
+
+</body>
+</html>

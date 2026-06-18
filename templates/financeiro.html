@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Painel Financeiro | Saúde & Vida</title>
+
+<!-- Fontes profissionais -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- Ícones -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    :root {
+        --primary: #1c9fd3;
+        --primary-dark: #1482ae;
+        --primary-light: #e8f4fc;
+        --secondary: #0a1220;
+        --text-dark: #1e2f44;
+        --text-gray: #6a7c9e;
+        --text-light: #8d9db0;
+        --white: #ffffff;
+        --gray-bg: #f8fafc;
+        --border: #eef2f8;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --error: #ef4444;
+        --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+        --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
+
+    body {
+        font-family: 'Poppins', 'Montserrat', 'Segoe UI', sans-serif;
+        background: var(--gray-bg);
+        color: var(--text-dark);
+        overflow-x: hidden;
+        min-height: 100vh;
+    }
+
+    /* ===================== TOAST NOTIFICATIONS ===================== */
+    .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-width: 380px;
+        width: calc(100% - 40px);
+        pointer-events: none;
+    }
+
+    .toast {
+        background: var(--white);
+        border-radius: 16px;
+        padding: 14px 18px;
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        box-shadow: var(--shadow-lg);
+        pointer-events: auto;
+        cursor: pointer;
+        animation: toastSlideIn 0.3s ease forwards;
+        position: relative;
+        overflow: hidden;
+        border-left: 4px solid;
+    }
+
+    .toast::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 3px;
+        width: 100%;
+        animation: toastProgress 4s linear forwards;
+    }
+
+    @keyframes toastProgress {
+        0% { width: 100%; }
+        100% { width: 0%; }
+    }
+
+    @keyframes toastSlideIn {
+        from { opacity: 0; transform: translateX(100%); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    .toast-success { border-left-color: var(--success); }
+    .toast-success::before { background: var(--success); }
+    .toast-error { border-left-color: var(--error); }
+    .toast-error::before { background: var(--error); }
+    .toast-warning { border-left-color: var(--warning); }
+    .toast-warning::before { background: var(--warning); }
+    .toast-info { border-left-color: var(--primary); }
+    .toast-info::before { background: var(--primary); }
+
+    .toast-icon { width: 32px; height: 32px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .toast-success .toast-icon { background: rgba(16, 185, 129, 0.12); color: var(--success); }
+    .toast-error .toast-icon { background: rgba(239, 68, 68, 0.12); color: var(--error); }
+    .toast-warning .toast-icon { background: rgba(245, 158, 11, 0.12); color: var(--warning); }
+    .toast-info .toast-icon { background: rgba(28, 159, 211, 0.12); color: var(--primary); }
+
+    .toast-content { flex: 1; }
+    .toast-title { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+    .toast-message { font-size: 12px; color: var(--text-gray); line-height: 1.4; }
+    .toast-close { background: none; border: none; font-size: 14px; color: var(--text-light); cursor: pointer; padding: 4px; transition: var(--transition); }
+
+    /* ===================== HEADER PERSONALIZADO ===================== */
+    .header-financeiro {
+        background: linear-gradient(135deg, var(--primary) 0%, #0f6f97 100%);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        box-shadow: var(--shadow-md);
+    }
+
+    .container-header {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 40px;
+    }
+
+    .header-financeiro .container-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 80px;
+    }
+
+    .logo-area {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .logo {
+        width: 60px;
+        height: auto;
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+        transition: var(--transition);
+    }
+
+    .logo:hover {
+        transform: scale(1.02);
+    }
+
+    .logo-text {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .medic-name {
+        font-family: 'Poppins', 'Montserrat', sans-serif;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--white);
+        letter-spacing: -0.3px;
+    }
+
+    .financeiro-badge {
+        font-size: 0.7rem;
+        color: rgba(255, 255, 255, 0.8);
+        letter-spacing: 1px;
+    }
+
+    .header-buttons {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .btn-sair {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.15);
+        color: var(--white);
+        border: none;
+        padding: 10px 20px;
+        border-radius: 50px;
+        font-family: 'Poppins', 'Montserrat', sans-serif;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .btn-sair:hover {
+        background: rgba(255, 255, 255, 0.25);
+        transform: translateY(-2px);
+    }
+
+    /* ===================== DASHBOARD ===================== */
+    .dashboard-financeiro {
+        max-width: 1400px;
+        margin: 30px auto;
+        padding: 0 40px;
+    }
+
+    /* Banner de boas-vindas */
+    .welcome-banner {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        border-radius: 28px;
+        padding: 35px 40px;
+        margin-bottom: 30px;
+        color: var(--white);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .welcome-banner::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50%;
+    }
+
+    .welcome-banner::after {
+        content: '';
+        position: absolute;
+        bottom: -30%;
+        left: -10%;
+        width: 200px;
+        height: 200px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 50%;
+    }
+
+    .welcome-banner h1 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .welcome-banner p {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Cards de estatísticas */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 25px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: var(--white);
+        border-radius: 24px;
+        padding: 25px;
+        transition: var(--transition);
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-sm);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        background: var(--primary-light);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 15px;
+    }
+
+    .stat-icon i {
+        font-size: 24px;
+        color: var(--primary);
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--text-dark);
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+        color: var(--text-gray);
+        font-weight: 500;
+    }
+
+    .stat-trend {
+        font-size: 0.7rem;
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .trend-up {
+        color: var(--success);
+    }
+
+    .trend-down {
+        color: var(--error);
+    }
+
+    /* Gráficos */
+    .charts-section {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 25px;
+        margin-bottom: 30px;
+    }
+
+    .chart-card {
+        background: var(--white);
+        border-radius: 24px;
+        padding: 25px;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .chart-header h3 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .chart-header h3 i {
+        color: var(--primary);
+    }
+
+    .chart-header select {
+        padding: 8px 15px;
+        border: 1.5px solid var(--border);
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-family: 'Poppins', sans-serif;
+        background: var(--white);
+        cursor: pointer;
+    }
+
+    .chart-container {
+        height: 250px;
+        position: relative;
+    }
+
+    /* Tabela de Transações */
+    .transactions-section {
+        background: var(--white);
+        border-radius: 24px;
+        padding: 25px;
+        border: 1px solid var(--border);
+        margin-bottom: 30px;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .section-header h3 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .section-header h3 i {
+        color: var(--primary);
+    }
+
+    .filters {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .filters input, .filters select {
+        padding: 8px 15px;
+        border: 1.5px solid var(--border);
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .filters input:focus, .filters select:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+
+    .btn-filter {
+        background: var(--primary);
+        color: var(--white);
+        border: none;
+        padding: 8px 20px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.8rem;
+        transition: var(--transition);
+    }
+
+    .btn-filter:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+    }
+
+    /* Tabela */
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 500px;
+    }
+
+    th {
+        text-align: left;
+        padding: 12px;
+        background: var(--gray-bg);
+        color: var(--text-dark);
+        font-weight: 600;
+        font-size: 0.8rem;
+        border-bottom: 2px solid var(--border);
+    }
+
+    td {
+        padding: 12px;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-gray);
+        font-size: 0.85rem;
+    }
+
+    tr:hover {
+        background: var(--primary-light);
+    }
+
+    .status-pago {
+        background: rgba(16, 185, 129, 0.12);
+        color: var(--success);
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .status-pendente {
+        background: rgba(245, 158, 11, 0.12);
+        color: var(--warning);
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .status-cancelado {
+        background: rgba(239, 68, 68, 0.12);
+        color: var(--error);
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    /* Clientes Pendentes */
+    .clients-section {
+        background: var(--white);
+        border-radius: 24px;
+        padding: 25px;
+        border: 1px solid var(--border);
+    }
+
+    .client-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        border-bottom: 1px solid var(--border);
+        transition: var(--transition);
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .client-card:hover {
+        background: var(--primary-light);
+        transform: translateX(5px);
+    }
+
+    .client-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .client-avatar {
+        width: 45px;
+        height: 45px;
+        background: var(--primary-light);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .client-avatar i {
+        font-size: 22px;
+        color: var(--primary);
+    }
+
+    .client-details h4 {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    .client-details p {
+        font-size: 0.7rem;
+        color: var(--text-gray);
+    }
+
+    .client-plan {
+        font-weight: 600;
+        color: var(--primary);
+    }
+
+    .client-status {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .sem-pendentes {
+        text-align: center;
+        padding: 40px;
+        color: var(--text-gray);
+    }
+
+    .sem-pendentes i {
+        font-size: 48px;
+        color: var(--border);
+        margin-bottom: 15px;
+    }
+
+    /* Footer */
+    footer {
+        background: var(--primary);
+        color: var(--white);
+        text-align: center;
+        padding: 30px 20px;
+        margin-top: 50px;
+    }
+
+    footer p {
+        opacity: 0.9;
+        font-size: 0.85rem;
+    }
+
+    /* ===================== RESPONSIVIDADE APRIMORADA ===================== */
+
+    /* Dispositivos Médios (Tablets) - 992px a 1200px */
+    @media (max-width: 1200px) {
+        .dashboard-financeiro {
+            padding: 0 30px;
+        }
+        .stats-grid {
+            gap: 20px;
+        }
+        .stat-value {
+            font-size: 1.5rem;
+        }
+        .chart-container {
+            height: 220px;
+        }
+    }
+
+    /* Tablets (768px a 992px) */
+    @media (max-width: 992px) {
+        .dashboard-financeiro {
+            padding: 0 30px;
+            margin: 20px auto;
+        }
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        .charts-section {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        .container-header {
+            padding: 0 30px;
+        }
+        .welcome-banner h1 {
+            font-size: 1.6rem;
+        }
+        .welcome-banner p {
+            font-size: 0.85rem;
+        }
+        .chart-container {
+            height: 250px;
+        }
+    }
+
+    /* Mobile Grande (576px a 768px) */
+    @media (max-width: 768px) {
+        .dashboard-financeiro {
+            padding: 0 20px;
+            margin: 15px auto;
+        }
+        .welcome-banner {
+            padding: 25px;
+            border-radius: 20px;
+        }
+        .welcome-banner h1 {
+            font-size: 1.3rem;
+        }
+        .welcome-banner p {
+            font-size: 0.8rem;
+        }
+        .stats-grid {
+            gap: 15px;
+        }
+        .stat-card {
+            padding: 18px;
+        }
+        .stat-value {
+            font-size: 1.3rem;
+        }
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+        }
+        .stat-icon i {
+            font-size: 20px;
+        }
+        
+        /* Header responsivo */
+        .logo-text {
+            display: none;
+        }
+        .logo {
+            width: 50px;
+        }
+        .btn-sair span {
+            display: none;
+        }
+        .btn-sair {
+            padding: 10px 12px;
+        }
+        .btn-sair i {
+            font-size: 18px;
+            margin: 0;
+        }
+        .container-header {
+            padding: 0 20px;
+        }
+        .header-financeiro .container-header {
+            height: 65px;
+        }
+        
+        /* Seções */
+        .section-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .filters {
+            width: 100%;
+            flex-wrap: wrap;
+        }
+        .filters input,
+        .filters select,
+        .btn-filter {
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        /* Cards de clientes */
+        .client-card {
+            flex-direction: column;
+            text-align: center;
+        }
+        .client-info {
+            flex-direction: column;
+            text-align: center;
+        }
+        .client-status {
+            justify-content: center;
+        }
+        
+        /* Tabela */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+        table {
+            min-width: 500px;
+        }
+        th, td {
+            padding: 10px 8px;
+            font-size: 0.75rem;
+        }
+        
+        /* Gráficos */
+        .chart-container {
+            height: 200px;
+        }
+        .chart-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .chart-header select {
+            width: 100%;
+        }
+    }
+
+    /* Mobile Pequeno (até 576px) */
+    @media (max-width: 576px) {
+        .dashboard-financeiro {
+            padding: 0 15px;
+            margin: 10px auto;
+        }
+        .welcome-banner {
+            padding: 20px;
+        }
+        .welcome-banner h1 {
+            font-size: 1.2rem;
+        }
+        .welcome-banner p {
+            font-size: 0.7rem;
+        }
+        .stats-grid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        .stat-card {
+            padding: 15px;
+        }
+        .stat-value {
+            font-size: 1.2rem;
+        }
+        .stat-trend {
+            font-size: 0.65rem;
+        }
+        
+        .charts-section {
+            gap: 15px;
+        }
+        .chart-card {
+            padding: 18px;
+        }
+        .chart-header h3 {
+            font-size: 1rem;
+        }
+        .chart-container {
+            height: 180px;
+        }
+        
+        .transactions-section,
+        .clients-section {
+            padding: 18px;
+        }
+        .section-header h3 {
+            font-size: 1rem;
+        }
+        .filters input,
+        .filters select {
+            padding: 8px 12px;
+            font-size: 0.7rem;
+        }
+        .btn-filter {
+            padding: 8px 15px;
+            font-size: 0.7rem;
+        }
+        
+        .client-card {
+            padding: 12px;
+        }
+        .client-avatar {
+            width: 40px;
+            height: 40px;
+        }
+        .client-avatar i {
+            font-size: 18px;
+        }
+        .client-details h4 {
+            font-size: 0.85rem;
+        }
+        .client-details p {
+            font-size: 0.65rem;
+        }
+        .client-plan {
+            font-size: 0.85rem;
+        }
+        
+        .logo {
+            width: 42px;
+        }
+        .btn-sair {
+            padding: 8px 10px;
+        }
+        .btn-sair i {
+            font-size: 16px;
+        }
+        
+        footer {
+            padding: 20px;
+        }
+        footer p {
+            font-size: 0.7rem;
+        }
+    }
+
+    /* Mobile Muito Pequeno (até 380px) */
+    @media (max-width: 380px) {
+        .dashboard-financeiro {
+            padding: 0 10px;
+        }
+        .welcome-banner h1 {
+            font-size: 1rem;
+        }
+        .stat-value {
+            font-size: 1rem;
+        }
+        .stat-label {
+            font-size: 0.7rem;
+        }
+        .chart-container {
+            height: 160px;
+        }
+        th, td {
+            padding: 8px 5px;
+            font-size: 0.65rem;
+        }
+        .logo {
+            width: 38px;
+        }
+        .btn-sair {
+            padding: 6px 8px;
+        }
+    }
+
+    /* Telas Muito Grandes (acima de 1400px) */
+    @media (min-width: 1400px) {
+        .container-header {
+            max-width: 1400px;
+        }
+        .dashboard-financeiro {
+            max-width: 1400px;
+            margin: 40px auto;
+        }
+        .logo {
+            width: 75px;
+        }
+        .medic-name {
+            font-size: 1.5rem;
+        }
+        .stats-grid {
+            gap: 30px;
+        }
+        .stat-value {
+            font-size: 2.2rem;
+        }
+        .chart-container {
+            height: 300px;
+        }
+    }
+
+    /* Orientação paisagem em mobile */
+    @media (max-width: 768px) and (orientation: landscape) {
+        .dashboard-financeiro {
+            margin: 15px auto;
+        }
+        .stats-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+        .stats-grid .stat-card {
+            padding: 12px;
+        }
+        .stat-value {
+            font-size: 1rem;
+        }
+        .chart-container {
+            height: 180px;
+        }
+        .welcome-banner {
+            padding: 15px;
+        }
+        .welcome-banner h1 {
+            font-size: 1.2rem;
+        }
+    }
+</style>
+</head>
+<body>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- HEADER PERSONALIZADO DO FINANCEIRO -->
+<header class="header-financeiro">
+    <div class="container-header">
+        <div class="logo-area">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="logo">
+            <div class="logo-text">
+                <h1 class="medic-name">Saúde & Vida</h1>
+                <span class="financeiro-badge"><i class="fas fa-chart-line"></i> Painel Financeiro</span>
+            </div>
+        </div>
+        <div class="header-buttons">
+            <button class="btn-sair" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Sair</span>
+            </button>
+        </div>
+    </div>
+</header>
+
+<div class="dashboard-financeiro">
+    <!-- Banner de Boas-vindas -->
+    <div class="welcome-banner">
+        <h1><i class="fas fa-chart-line"></i> Painel Financeiro</h1>
+        <p>Gerencie receitas, despesas e acompanhe a saúde financeira da clínica</p>
+    </div>
+
+    <!-- Cards de Estatísticas -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-dollar-sign"></i>
+            </div>
+            <div class="stat-value" id="receitaTotal">R$ 0</div>
+            <div class="stat-label">Receita Total (Mês)</div>
+            <div class="stat-trend trend-up">
+                <i class="fas fa-arrow-up"></i> +12.5% em relação ao mês anterior
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-credit-card"></i>
+            </div>
+            <div class="stat-value" id="pagamentosPendentes">0</div>
+            <div class="stat-label">Pagamentos Pendentes</div>
+            <div class="stat-trend trend-down">
+                <i class="fas fa-arrow-down"></i> -5% em relação ao mês anterior
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-value" id="totalClientes">0</div>
+            <div class="stat-label">Clientes Ativos</div>
+            <div class="stat-trend trend-up">
+                <i class="fas fa-arrow-up"></i> +8 novos este mês
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-chart-simple"></i>
+            </div>
+            <div class="stat-value" id="ticketMedio">R$ 0</div>
+            <div class="stat-label">Ticket Médio</div>
+            <div class="stat-trend trend-up">
+                <i class="fas fa-arrow-up"></i> +3.2% este mês
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="charts-section">
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3><i class="fas fa-chart-line"></i> Receita Mensal</h3>
+                <select id="anoReceita">
+                    <option value="2024">2024</option>
+                    <option value="2025" selected>2025</option>
+                    <option value="2026">2026</option>
+                </select>
+            </div>
+            <div class="chart-container">
+                <canvas id="receitaChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3><i class="fas fa-chart-pie"></i> Distribuição por Plano</h3>
+                <select id="periodoPlanos">
+                    <option value="mes">Este Mês</option>
+                    <option value="trimestre">Último Trimestre</option>
+                    <option value="ano">Este Ano</option>
+                </select>
+            </div>
+            <div class="chart-container">
+                <canvas id="planosChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transações Recentes -->
+    <div class="transactions-section">
+        <div class="section-header">
+            <h3><i class="fas fa-list-ul"></i> Transações Recentes</h3>
+            <div class="filters">
+                <input type="text" id="searchTransacao" placeholder="Buscar por cliente..." onkeyup="filtrarTransacoes()">
+                <select id="filtroStatus" onchange="filtrarTransacoes()">
+                    <option value="todos">Todos os status</option>
+                    <option value="pago">Pagos</option>
+                    <option value="pendente">Pendentes</option>
+                    <option value="cancelado">Cancelados</option>
+                </select>
+                <button class="btn-filter" onclick="filtrarTransacoes()">
+                    <i class="fas fa-search"></i> Filtrar
+                </button>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table id="tabelaTransacoes">
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Plano</th>
+                        <th>Valor</th>
+                        <th>Data</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="transacoesBody">
+                    <!-- Dados carregados via JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Clientes com Pagamento Pendente -->
+    <div class="clients-section">
+        <div class="section-header">
+            <h3><i class="fas fa-clock"></i> Clientes com Pagamento Pendente</h3>
+            <button class="btn-filter" onclick="notificarPendentes()">
+                <i class="fas fa-bell"></i> Notificar Todos
+            </button>
+        </div>
+        <div id="clientesPendentes">
+            <!-- Dados carregados via JavaScript -->
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>Este projeto foi desenvolvido exclusivamente para fins escolares, com o objetivo de aplicar conhecimentos acadêmicos na prática.</p>
+    <p>© 2026 - EEEP Dona Creusa do Carmo Rocha</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Toast System
+    function showToast(title, message, type = 'info', duration = 4000) {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        let icon = '';
+        switch(type) {
+            case 'success': icon = '<i class="fas fa-check-circle"></i>'; break;
+            case 'error': icon = '<i class="fas fa-exclamation-circle"></i>'; break;
+            case 'warning': icon = '<i class="fas fa-exclamation-triangle"></i>'; break;
+            default: icon = '<i class="fas fa-info-circle"></i>';
+        }
+        toast.innerHTML = `
+            <div class="toast-icon">${icon}</div>
+            <div class="toast-content">
+                <div class="toast-title">${title}</div>
+                <div class="toast-message">${message}</div>
+            </div>
+            <button class="toast-close"><i class="fas fa-times"></i></button>
+        `;
+        container.appendChild(toast);
+        const closeBtn = toast.querySelector('.toast-close');
+        closeBtn.addEventListener('click', () => toast.remove());
+        setTimeout(() => { if (toast.parentNode) toast.remove(); }, duration);
+    }
+
+    // Dados simulados (substituir por dados do backend)
+    let transacoes = [
+        { cliente: "João Silva", plano: "Plano Básico", valor: 49.90, data: "15/04/2025", status: "pago" },
+        { cliente: "Maria Santos", plano: "Plano Médio", valor: 89.90, data: "14/04/2025", status: "pago" },
+        { cliente: "Carlos Oliveira", plano: "Plano Máximo", valor: 149.90, data: "13/04/2025", status: "pendente" },
+        { cliente: "Ana Paula", plano: "Plano Básico", valor: 49.90, data: "12/04/2025", status: "pago" },
+        { cliente: "Roberto Lima", plano: "Plano Médio", valor: 89.90, data: "11/04/2025", status: "cancelado" },
+        { cliente: "Fernanda Costa", plano: "Plano Máximo", valor: 149.90, data: "10/04/2025", status: "pago" },
+        { cliente: "Ricardo Alves", plano: "Plano Básico", valor: 49.90, data: "09/04/2025", status: "pendente" },
+        { cliente: "Patrícia Souza", plano: "Plano Médio", valor: 89.90, data: "08/04/2025", status: "pago" },
+    ];
+
+    let receitaMensal = [12500, 14200, 13800, 15500, 16800, 18200];
+    let meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'];
+
+    let planosDistribuicao = {
+        labels: ['Plano Básico', 'Plano Médio', 'Plano Máximo'],
+        dados: [45, 35, 20]
+    };
+
+    // Gráficos
+    let ctxReceita = document.getElementById('receitaChart').getContext('2d');
+    let receitaChart = new Chart(ctxReceita, {
+        type: 'line',
+        data: {
+            labels: meses,
+            datasets: [{
+                label: 'Receita (R$)',
+                data: receitaMensal,
+                borderColor: '#1c9fd3',
+                backgroundColor: 'rgba(28, 159, 211, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'top' } }
+        }
+    });
+
+    let ctxPlanos = document.getElementById('planosChart').getContext('2d');
+    let planosChart = new Chart(ctxPlanos, {
+        type: 'doughnut',
+        data: {
+            labels: planosDistribuicao.labels,
+            datasets: [{
+                data: planosDistribuicao.dados,
+                backgroundColor: ['#1c9fd3', '#1482ae', '#0f6f97'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+
+    // Atualizar estatísticas
+    function atualizarEstatisticas() {
+        let totalReceita = transacoes.filter(t => t.status === 'pago').reduce((sum, t) => sum + t.valor, 0);
+        let pendentes = transacoes.filter(t => t.status === 'pendente').length;
+        let clientesAtivos = [...new Set(transacoes.map(t => t.cliente))].length;
+        let ticketMedio = totalReceita / (transacoes.filter(t => t.status === 'pago').length || 1);
+
+        document.getElementById('receitaTotal').innerText = `R$ ${totalReceita.toFixed(2)}`;
+        document.getElementById('pagamentosPendentes').innerText = pendentes;
+        document.getElementById('totalClientes').innerText = clientesAtivos;
+        document.getElementById('ticketMedio').innerText = `R$ ${ticketMedio.toFixed(2)}`;
+    }
+
+    // Carregar transações
+    function carregarTransacoes(filtroCliente = '', filtroStatus = 'todos') {
+        let tbody = document.getElementById('transacoesBody');
+        tbody.innerHTML = '';
+
+        let filtradas = transacoes.filter(t => {
+            let matchCliente = t.cliente.toLowerCase().includes(filtroCliente.toLowerCase());
+            let matchStatus = filtroStatus === 'todos' || t.status === filtroStatus;
+            return matchCliente && matchStatus;
+        });
+
+        if (filtradas.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Nenhuma transação encontrada</td></tr>';
+            return;
+        }
+
+        filtradas.forEach(t => {
+            let statusClass = t.status === 'pago' ? 'status-pago' : (t.status === 'pendente' ? 'status-pendente' : 'status-cancelado');
+            let statusText = t.status === 'pago' ? 'Pago' : (t.status === 'pendente' ? 'Pendente' : 'Cancelado');
+
+            let row = tbody.insertRow();
+            row.insertCell(0).innerText = t.cliente;
+            row.insertCell(1).innerText = t.plano;
+            row.insertCell(2).innerText = `R$ ${t.valor.toFixed(2)}`;
+            row.insertCell(3).innerText = t.data;
+            row.insertCell(4).innerHTML = `<span class="${statusClass}">${statusText}</span>`;
+        });
+    }
+
+    // Carregar clientes pendentes
+    function carregarClientesPendentes() {
+        let container = document.getElementById('clientesPendentes');
+        container.innerHTML = '';
+
+        let pendentes = transacoes.filter(t => t.status === 'pendente');
+        let clientesUnicos = [...new Map(pendentes.map(t => [t.cliente, t])).values()];
+
+        if (clientesUnicos.length === 0) {
+            container.innerHTML = `<div class="sem-pendentes"><i class="fas fa-check-circle"></i><p>Nenhum cliente com pagamento pendente!</p></div>`;
+            return;
+        }
+
+        clientesUnicos.forEach(cliente => {
+            let div = document.createElement('div');
+            div.className = 'client-card';
+            div.innerHTML = `
+                <div class="client-info">
+                    <div class="client-avatar"><i class="fas fa-user-circle"></i></div>
+                    <div class="client-details"><h4>${cliente.cliente}</h4><p>${cliente.plano}</p></div>
+                </div>
+                <div class="client-status">
+                    <span class="status-pendente">Pagamento Pendente</span>
+                    <span class="client-plan">R$ ${cliente.valor.toFixed(2)}</span>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function filtrarTransacoes() {
+        let busca = document.getElementById('searchTransacao').value;
+        let status = document.getElementById('filtroStatus').value;
+        carregarTransacoes(busca, status);
+    }
+
+    function notificarPendentes() {
+        let pendentes = transacoes.filter(t => t.status === 'pendente').length;
+        if (pendentes > 0) {
+            showToast('Notificação enviada', `${pendentes} clientes serão notificados sobre pagamentos pendentes.`, 'success');
+        } else {
+            showToast('Sem pendentes', 'Não há clientes com pagamento pendente.', 'info');
+        }
+    }
+
+    // Logout
+    const logoutBtn = document.getElementById('logoutBtn');
+    if(logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            showToast('Saindo...', 'Redirecionando para página de login', 'info', 1500);
+            setTimeout(() => window.location.href = '/', 1500);
+        });
+    }
+
+    // Redimensionar gráficos ao mudar orientação
+    window.addEventListener('resize', function() {
+        receitaChart.resize();
+        planosChart.resize();
+    });
+
+    // Inicializar
+    atualizarEstatisticas();
+    carregarTransacoes();
+    carregarClientesPendentes();
+</script>
+
+</body>
+</html>

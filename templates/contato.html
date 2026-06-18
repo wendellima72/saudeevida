@@ -1,0 +1,407 @@
+{% extends "base.html" %}
+
+{% block title %}Central de Ajuda | Saúde & Vida{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ===================== CONTAINER PRINCIPAL ===================== */
+  .container {
+    display: flex;
+    gap: 30px;
+    max-width: 1400px;
+    margin: 40px auto;
+    padding: 0 40px;
+  }
+
+  /* MENU LATERAL */
+  .perguntas {
+    width: 300px;
+    background: var(--white);
+    padding: 25px;
+    border-radius: 24px;
+    box-shadow: var(--shadow-md);
+    flex-shrink: 0;
+    height: fit-content;
+    position: sticky;
+    top: 105px;
+  }
+
+  .perguntas p {
+    margin: 5px 0;
+    cursor: pointer;
+    color: var(--text-gray);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 12px 15px;
+    border-radius: 14px;
+    transition: var(--transition);
+    font-family: 'Poppins', 'Montserrat', sans-serif;
+  }
+
+  .perguntas p:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+    transform: translateX(5px);
+  }
+
+  .perguntas i {
+    width: 24px;
+    color: var(--primary);
+    font-size: 1.1rem;
+  }
+
+  .perguntas .ativo {
+    background: linear-gradient(135deg, var(--primary-light) 0%, #d4eaf5 100%);
+    color: var(--primary);
+    font-weight: 700;
+    border-left: 3px solid var(--primary);
+  }
+
+  /* FAQ */
+  .faq {
+    flex: 1;
+  }
+
+  .categoria {
+    display: none;
+  }
+
+  .categoria.ativa {
+    display: block;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .item {
+    background: var(--white);
+    margin-bottom: 16px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    border: 1px solid var(--border);
+  }
+
+  .item:hover {
+    box-shadow: var(--shadow-md);
+  }
+
+  .pergunta {
+    padding: 18px 22px;
+    background: var(--white);
+    cursor: pointer;
+    font-weight: 700;
+    color: var(--text-dark);
+    font-size: 1rem;
+    transition: var(--transition);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Poppins', 'Montserrat', sans-serif;
+  }
+
+  .pergunta::after {
+    content: '\f107';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    color: var(--primary);
+    transition: var(--transition);
+  }
+
+  .pergunta.active::after {
+    transform: rotate(180deg);
+  }
+
+  .pergunta:hover {
+    background: var(--primary-light);
+  }
+
+  .resposta {
+    display: none;
+    padding: 20px 22px;
+    border-top: 1px solid var(--border);
+    color: var(--text-gray);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    background: var(--gray-bg);
+    font-family: 'Poppins', 'Montserrat', sans-serif;
+  }
+
+  .resposta.show {
+    display: block;
+  }
+
+  /* HEADER DO FAQ */
+  .faq-header {
+    margin-bottom: 30px;
+  }
+
+  .faq-header h2 {
+    color: var(--primary);
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    font-family: 'Poppins', 'Montserrat', sans-serif;
+  }
+
+  .faq-header p {
+    color: var(--text-gray);
+    font-size: 0.9rem;
+  }
+
+  /* BOTÃO CHAT */
+  .chat-support {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .chat-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: var(--white);
+    border: none;
+    padding: 14px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-family: 'Poppins', 'Montserrat', sans-serif;
+  }
+
+  .chat-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Responsividade específica */
+  @media (max-width: 992px) {
+    .container { padding: 0 30px; gap: 20px; }
+  }
+
+  @media (max-width: 768px) {
+    .container {
+      flex-direction: column;
+      margin: 20px auto;
+      padding: 0 20px;
+    }
+    
+    .perguntas {
+      width: 100%;
+      position: static;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 20px;
+    }
+    
+    .perguntas p {
+      width: calc(50% - 10px);
+      margin: 0;
+      justify-content: center;
+    }
+    
+    .perguntas i { margin-right: 8px; }
+    
+    .faq-header h2 { font-size: 1.5rem; }
+  }
+
+  @media (max-width: 550px) {
+    .perguntas p {
+      width: 100%;
+      justify-content: flex-start;
+    }
+    
+    .pergunta { padding: 14px 18px; font-size: 0.9rem; }
+    .resposta { padding: 15px 18px; font-size: 0.85rem; }
+    .faq-header h2 { font-size: 1.3rem; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <!-- MENU LATERAL -->
+  <aside class="perguntas">
+    <p class="ativo" onclick="trocarCategoria('agendamento', this)">
+      <i class="fa-solid fa-calendar-check"></i> Agendamento
+    </p>
+    <p onclick="trocarCategoria('consultas', this)">
+      <i class="fa-solid fa-user-doctor"></i> Consultas
+    </p>
+    <p onclick="trocarCategoria('gerais', this)">
+      <i class="fa-solid fa-heart"></i> Gerais
+    </p>
+    <p onclick="trocarCategoria('odonto', this)">
+      <i class="fa-solid fa-tooth"></i> Odontologia
+    </p>
+    <p onclick="trocarCategoria('pagamento', this)">
+      <i class="fa-solid fa-credit-card"></i> Pagamento
+    </p>
+    <p onclick="trocarCategoria('trabalho', this)">
+      <i class="fa-solid fa-handshake"></i> Trabalhe Conosco
+    </p>
+    <p onclick="trocarCategoria('unidades', this)">
+      <i class="fa-solid fa-hospital"></i> Unidades
+    </p>
+    <div class="chat-support">
+      <button class="chat-btn" onclick="abrirChatSuporte()">
+        <i class="fa-solid fa-headset"></i> Atendimento Online
+      </button>
+    </div>
+  </aside>
+
+  <!-- FAQ -->
+  <main class="faq">
+    <div class="faq-header">
+      <h2><i class="fas fa-question-circle"></i> Central de Ajuda</h2>
+      <p>Encontre respostas para as perguntas mais frequentes</p>
+    </div>
+
+    <!-- AGENDAMENTO -->
+    <div class="categoria ativa" id="agendamento">
+      <div class="item">
+        <div class="pergunta" onclick="toggle(this)">Posso ligar diretamente para minha unidade?</div>
+        <div class="resposta">Sim, você pode entrar em contato diretamente com a unidade desejada através dos telefones disponíveis em nossa página de unidades.</div>
+      </div>
+      <div class="item">
+        <div class="pergunta" onclick="toggle(this)">Como faço para agendar uma consulta online?</div>
+        <div class="resposta">Você pode agendar sua consulta diretamente pelo site na aba "Agendamentos" ou pelo aplicativo móvel.</div>
+      </div>
+      <div class="item">
+        <div class="pergunta" onclick="toggle(this)">Preciso de encaminhamento médico para agendar?</div>
+        <div class="resposta">Para consultas com especialistas, é necessário encaminhamento médico. Para clínico geral, não.</div>
+      </div>
+    </div>
+
+    <!-- CONSULTAS -->
+    <div class="categoria" id="consultas">
+      <div class="item">
+        <div class="pergunta" onclick="toggle(this)">Como remarcar uma consulta?</div>
+        <div class="resposta">Você pode remarcar pelo sistema na aba "Minhas Consultas" ou entrando em contato com a unidade com 24h de antecedência.</div>
+      </div>
+      <div class="item">
+        <div class="pergunta" onclick="toggle(this)">Posso cancelar uma consulta?</div>
+        <div class="resposta">Sim, o cancelamento pode ser feito até 24h antes do horário agendado sem custo adicional.</div>
+      </div>
+    </div>
+
+    <!-- GERAIS -->
+    <div class="categoria" id="gerais">
+      <div class="item">
+        <div class="pergunta" onclick="toggle(this)">Quais horários de atendimento?</div>
+        <div class="resposta">Funcionamos de segunda a sexta das 07h às 20h, e sábados das 08h às 14h.</div>
+      </div>
+      <div class="item">
+        <div class="pergunta" onclick="toggle(this)">Atendem por plano de saúde?</div>
+        <div class="resposta">Sim, trabalhamos com diversos planos de saúde. Consulte nossa lista de convênios.</div>
+      </div>
+    </div>
+
+    <!-- ODONTO -->
+    <div class="categoria" id="odonto">
+      <div class="item">
+        <div class="pergunta" onclick="toggle(this)">Fazem limpeza dental?</div>
+        <div class="resposta">Sim, oferecemos limpeza dental, clareamento, ortodontia e demais serviços odontológicos.</div>
+      </div>
+      <div class="item">
+        <div class="pergunta" onclick="toggle(this)">Atendimento odontológico infantil?</div>
+        <div class="resposta">Sim, temos odontopediatras especializados em atendimento infantil.</div>
+      </div>
+    </div>
+
+    <!-- PAGAMENTO -->
+    <div class="categoria" id="pagamento">
+      <div class="item">
+        <div class="pergunta" onclick="toggle(this)">Aceitam cartão?</div>
+        <div class="resposta">Sim, aceitamos cartões de crédito e débito, PIX e dinheiro.</div>
+      </div>
+      <div class="item">
+        <div class="pergunta" onclick="toggle(this)">Parcelamento de consultas?</div>
+        <div class="resposta">Consultas particulares podem ser parceladas em até 3x no cartão de crédito.</div>
+      </div>
+    </div>
+
+    <!-- TRABALHO -->
+    <div class="categoria" id="trabalho">
+      <div class="item">
+        <div class="pergunta" onclick="toggle(this)">Como enviar currículo?</div>
+        <div class="resposta">Envie seu currículo através da aba "Trabalhe Conosco" no site ou para o e-mail rh@saudevida.com.br.</div>
+      </div>
+    </div>
+
+    <!-- UNIDADES -->
+    <div class="categoria" id="unidades">
+      <div class="item">
+        <div class="pergunta" onclick="toggle(this)">Onde ficam as unidades?</div>
+        <div class="resposta">Temos unidades em Aldeota, Messejana e Parangaba. Consulte o endereço completo em nossa página de unidades.</div>
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Toggle FAQ resposta
+  function toggle(element) {
+    const resposta = element.nextElementSibling;
+    const isActive = resposta.classList.contains('show');
+    
+    // Fecha todas as respostas
+    document.querySelectorAll('.resposta').forEach(r => {
+      r.classList.remove('show');
+    });
+    document.querySelectorAll('.pergunta').forEach(p => {
+      p.classList.remove('active');
+    });
+    
+    // Abre apenas a clicada se não estava aberta
+    if (!isActive) {
+      resposta.classList.add('show');
+      element.classList.add('active');
+    }
+  }
+
+  // Trocar categoria
+  function trocarCategoria(id, el) {
+    document.querySelectorAll('.categoria').forEach(c => {
+      c.classList.remove('ativa');
+    });
+    document.getElementById(id).classList.add('ativa');
+
+    document.querySelectorAll('.perguntas p').forEach(p => {
+      p.classList.remove('ativo');
+    });
+    el.classList.add('ativo');
+    
+    showToast('Categoria alterada', `Exibindo perguntas sobre ${el.textContent.trim()}`, 'info', 1500);
+  }
+
+  // Chat Suporte
+  function abrirChatSuporte() {
+    window.location.href = '/chat_cliente';
+  }
+
+  // Abrir primeira pergunta por padrão
+  window.addEventListener('DOMContentLoaded', () => {
+    const firstPergunta = document.querySelector('.categoria.ativa .pergunta');
+    if(firstPergunta) {
+      firstPergunta.click();
+    }
+    showToast('Bem-vindo!', 'Como podemos ajudar você hoje?', 'success', 4000);
+  });
+</script>
+{% endblock %}

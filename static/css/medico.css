@@ -1,0 +1,146 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial;
+    background: #f4f6f9;
+    margin: 0;
+}
+
+/* HEADER */
+header {
+    background: #1c9fd3;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+.login img {
+  width: 40px; /* tamanho do ícone */
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.login img:hover {
+  transform: scale(1.1);
+}
+
+
+/* MENU */
+
+
+.selecao {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+
+    padding: 10px;
+}
+
+.selecao button {
+    padding: 10px 15px;
+    border: none;
+    background: #1c9fd3;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.selecao button:hover {
+    background: #1c9fd3;
+}
+
+
+/* ABAS */
+.aba {
+    display: none;
+}
+
+.aba.ativa {
+    display: block;
+}
+
+/* SECTION */
+section {
+    max-width: 900px;
+    margin: 20px auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+/* CARD */
+.card {
+    background: #e9f3ff;
+    padding: 15px;
+    margin-top: 10px;
+    border-radius: 10px;
+}
+
+/* INPUTS */
+textarea {
+    width: 100%;
+    margin-top: 8px;
+    padding: 10px;
+    border-radius: 6px;
+}
+
+/* BOTÃO */
+button {
+    margin-top: 10px;
+    padding: 10px;
+    border: none;
+    background: #1c9fd3;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #1c9fd3;
+}
+
+/* STATUS */
+.status {
+    padding: 4px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+}
+
+.status.aguardando {
+    background: #fff3cd;
+}
+
+.status.atendimento {
+    background: #d1ecf1;
+}
+
+.status.pendente {
+    background: #f8d7da;
+}
+
+
+/* medico.css */
+*{box-sizing:border-box}
+body{font-family:Arial;background:#f4f6f9;margin:0}
+header{background:#1c9fd3;color:#fff;padding:20px;text-align:center}
+.aba{display:none}
+.aba.ativa{display:block}
+section{max-width:900px;margin:20px auto;background:#fff;padding:20px;border-radius:10px}
+.card{background:#e9f3ff;padding:15px;margin-top:10px;border-radius:10px}
+input,select,textarea{width:100%;padding:10px;margin-top:10px;border-radius:6px;border:1px solid #ccc}
+button{margin-top:10px;padding:10px;border:none;background:#1c9fd3;color:#fff;border-radius:6px;cursor:pointer}
+button:hover{background:#1c9fd3}
+
+.status{padding:5px 10px;border-radius:10px;font-size:12px;color:#000}
+.status.aguardando{background:yellow}
+.status.ematendimento{background:orange}
+.status.finalizado{background:lightgreen}
+
+.login img {
+  width: 38px;
+  cursor: pointer;
+  position: relative;
+  margin-top: 5px;
+}

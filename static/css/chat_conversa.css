@@ -1,0 +1,373 @@
+/* ===================== VARIÁVEIS ===================== */
+:root {
+    --verde: #1c9fd3;
+    --verde-claro: #e9f5ee;
+    --cinza: #f4f4f4;
+    --branco: #ffffff;
+    --texto: #ffffff;
+    --hover: #0a6a4c;
+}
+
+/* ===================== RESET ===================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+body {
+    background: var(--cinza);
+    padding-top: 70px; /* REDUZIDO de 90px para 70px */
+}
+
+/* ===================== HEADER ===================== */
+.topbar {
+    width: 100%;
+    height: 90px;
+    background: var(--verde);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+}
+
+.cont {
+    width: 95%;
+    max-width: 1300px;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.logo {
+    width: 140px;
+}
+
+.medic-name {
+    color: var(--texto);
+    font-size: 1.1rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.right-icons {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.login img {
+    width: 38px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.login img:hover {
+    transform: scale(1.1);
+}
+
+/* MENU DESKTOP */
+.menu {
+    display: flex;
+}
+
+.menu ul {
+    list-style: none;
+    display: flex;
+    gap: 25px;
+}
+
+.menu ul li a {
+    color: var(--texto);
+    text-decoration: none;
+    font-size: 1rem;
+    padding: 4px 3px;
+    transition: 0.3s;
+}
+
+.menu ul li a:hover {
+    color: #d0f5e4;
+    border-bottom: 2px solid #d0f5e4;
+}
+
+/* HAMBURGUER */
+.hamburger {
+    display: none;
+    font-size: 28px;
+    color: white;
+    cursor: pointer;
+}
+
+/* ===================== JANELA DO CHAT ===================== */
+.chat-window { 
+    max-width: 800px; 
+    margin: 10px auto 40px;  /* REDUZIDO de 20px para 10px */
+    background: white; 
+    border-radius: 15px; 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
+    overflow: hidden; 
+}
+
+/* BOTÃO VOLTAR - CORRIGIDO */
+.voltar { 
+    display: inline-block; 
+    margin: 5px 0 10px 20px;  /* REDUZIDO de 10px para 5px */
+    padding: 8px 0;
+    color: var(--verde); 
+    text-decoration: none; 
+    font-weight: 500;
+    transition: 0.3s;
+    background: transparent;
+}
+
+.voltar:hover { 
+    text-decoration: underline; 
+    opacity: 0.8;
+}
+
+.voltar i {
+    margin-right: 8px;
+}
+
+/* CABEÇALHO DO CHAT */
+.chat-header { 
+    background: linear-gradient(135deg, var(--verde), #000000);
+    color: white; 
+    padding: 20px; 
+}
+
+.chat-header h3 {
+    margin: 0;
+}
+
+/* MENSAGENS */
+.chat-messages { 
+    height: 400px; 
+    overflow-y: auto; 
+    padding: 20px; 
+    background: #f5f5f5; 
+}
+
+.message { 
+    margin-bottom: 15px; 
+    display: flex; 
+}
+
+.message.cliente { 
+    justify-content: flex-end; 
+}
+
+.message.suporte { 
+    justify-content: flex-start; 
+}
+
+.message-content { 
+    max-width: 70%; 
+    padding: 10px 15px; 
+    border-radius: 20px; 
+    word-wrap: break-word;
+}
+
+.cliente .message-content { 
+    background: #25D366; 
+    color: white; 
+    border-radius: 20px 20px 5px 20px; 
+}
+
+.suporte .message-content { 
+    background: white; 
+    border: 1px solid #ddd; 
+    border-radius: 20px 20px 20px 5px; 
+}
+
+.message-time { 
+    font-size: 10px; 
+    opacity: 0.7; 
+    margin-top: 5px; 
+    display: block; 
+}
+
+/* INPUT DO CHAT */
+.chat-input { 
+    padding: 20px; 
+    background: white; 
+    border-top: 1px solid #ddd; 
+    display: flex; 
+    gap: 10px; 
+}
+
+.chat-input input { 
+    flex: 1; 
+    padding: 12px; 
+    border: 1px solid #ddd; 
+    border-radius: 25px; 
+    outline: none; 
+    font-size: 14px;
+}
+
+.chat-input input:focus {
+    border-color: var(--verde);
+}
+
+.chat-input button { 
+    background: linear-gradient(135deg, var(--verde), #000000);
+    color: white; 
+    border: none; 
+    padding: 12px 24px; 
+    border-radius: 25px; 
+    cursor: pointer; 
+    transition: 0.3s;
+    font-weight: bold;
+}
+
+.chat-input button:hover { 
+    transform: scale(1.02);
+    opacity: 0.9;
+}
+
+/* ÁREA DE FEEDBACK */
+.feedback-area { 
+    padding: 20px; 
+    text-align: center; 
+    border-top: 1px solid #ddd; 
+}
+
+.feedback-area p {
+    margin-bottom: 10px;
+    color: #666;
+}
+
+.stars { 
+    font-size: 30px; 
+    cursor: pointer; 
+    color: #ddd; 
+    display: inline-block; 
+}
+
+.stars span {
+    transition: 0.2s;
+}
+
+.stars span:hover,
+.stars .active { 
+    color: #ffc107; 
+}
+
+
+
+/* ================= RESPONSIVO ================= */
+
+@media(max-width:820px){
+
+  .topbar{
+    height:80px;
+  }
+
+  .logo{
+    width:95px;
+  }
+
+  .medic-name{
+    font-size:1rem;
+  }
+
+  .menu ul{
+    gap:18px;
+  }
+
+}
+
+@media(max-width:768px){
+
+  .hamburger{
+    display:flex;
+    position:absolute;
+    right:58px;
+    top:50%;
+    transform:translateY(-50%);
+    font-size:24px;
+    color:white;
+    cursor:pointer;
+  }
+
+
+  
+  .menu{
+    display:none;
+    position:absolute;
+    top:90px;
+    left:0;
+    width:100%;
+    background:var(--verde);
+    flex-direction:column;
+    text-align:center;
+    padding:20px 0;
+  }
+
+  .menu ul{
+    flex-direction:column;
+    gap:20px;
+  }
+
+  .menu.active{
+    display:flex;
+  }
+
+}
+
+@media(max-width:480px){
+
+  .topbar{
+    height:70px;
+  }
+
+  .logo{
+    width:130px;
+  }
+
+  .medic-name{
+    display:none;
+  }
+
+  .menu ul{
+    gap:12px;
+  }
+
+  .menu ul li a{
+    font-size:0.9rem;
+  }
+
+  .banner h2{
+    font-size:1.7rem;
+  }
+
+}
+
+/* Celular (768px) */
+@media (max-width: 768px) {
+    .voltar { 
+        margin: 70px 0 10px 15px;  /* 70px no mobile */
+        font-size: 14px;
+    }
+}
+
+/* Celular pequeno (480px) */
+@media (max-width: 480px) {
+    .voltar { 
+        margin: 60px 0 10px 12px;  /* 60px no celular pequeno */
+        font-size: 13px;
+    }
+}

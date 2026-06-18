@@ -1,0 +1,559 @@
+{% extends "base.html" %}
+
+{% block title %}Conversa | Atendimento{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===================== CHAT CONTAINER ===================== */
+    .chat-main-container {
+        max-width: 1000px;
+        margin: 30px auto;
+        padding: 0 40px;
+    }
+
+    /* Botão Voltar */
+    .back-button {
+        margin-bottom: 25px;
+    }
+
+    .btn-voltar {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--white);
+        color: var(--primary);
+        padding: 12px 24px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: var(--transition);
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .btn-voltar:hover {
+        background: var(--primary);
+        color: var(--white);
+        transform: translateX(-5px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary);
+    }
+
+    /* Chat Window */
+    .chat-window {
+        background: var(--white);
+        border-radius: 28px;
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+        border: 1px solid var(--border);
+    }
+
+    .chat-header {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        color: var(--white);
+        padding: 20px 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .chat-header h3 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .chat-header p {
+        font-size: 0.8rem;
+        opacity: 0.9;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 5px 12px;
+        border-radius: 50px;
+    }
+
+    /* Mensagens */
+    .chat-messages {
+        height: 450px;
+        overflow-y: auto;
+        padding: 25px;
+        background: var(--gray-bg);
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .chat-messages::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .chat-messages::-webkit-scrollbar-track {
+        background: var(--border);
+        border-radius: 10px;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+        background: var(--primary);
+        border-radius: 10px;
+    }
+
+    .message {
+        display: flex;
+        animation: messageFadeIn 0.3s ease;
+    }
+
+    @keyframes messageFadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message.cliente {
+        justify-content: flex-end;
+    }
+
+    .message.suporte {
+        justify-content: flex-start;
+    }
+
+    .message-content {
+        max-width: 70%;
+        padding: 12px 18px;
+        border-radius: 20px;
+        position: relative;
+    }
+
+    .cliente .message-content {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: var(--white);
+        border-radius: 20px 20px 5px 20px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .suporte .message-content {
+        background: var(--white);
+        color: var(--text-dark);
+        border: 1px solid var(--border);
+        border-radius: 20px 20px 20px 5px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .message-time {
+        font-size: 0.65rem;
+        margin-top: 5px;
+        display: block;
+        opacity: 0.7;
+    }
+
+    .cliente .message-time {
+        text-align: right;
+    }
+
+    .suporte .message-time {
+        text-align: left;
+    }
+
+    /* Input */
+    .chat-input {
+        padding: 20px 25px;
+        background: var(--white);
+        border-top: 1px solid var(--border);
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .chat-input input {
+        flex: 1;
+        padding: 14px 20px;
+        border: 1.5px solid var(--border);
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-family: 'Poppins', 'Montserrat', sans-serif;
+        transition: var(--transition);
+    }
+
+    .chat-input input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(28, 159, 211, 0.1);
+    }
+
+    .chat-input button {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: var(--white);
+        border: none;
+        padding: 14px 28px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: var(--transition);
+    }
+
+    .chat-input button:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    /* Feedback Area */
+    .feedback-area {
+        padding: 15px 25px 25px;
+        background: var(--white);
+        border-top: 1px solid var(--border);
+        text-align: center;
+    }
+
+    .btn-finalizar {
+        background: var(--error);
+        color: var(--white);
+        border: none;
+        padding: 12px 24px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-finalizar:hover {
+        background: #c0392b;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    /* Mensagem vazia */
+    .empty-messages {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--text-gray);
+    }
+
+    .empty-messages i {
+        font-size: 64px;
+        color: var(--border);
+        margin-bottom: 15px;
+    }
+
+    /* ===================== MODAL ===================== */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background: var(--white);
+        max-width: 450px;
+        width: 90%;
+        padding: 35px;
+        border-radius: 28px;
+        text-align: center;
+        box-shadow: var(--shadow-lg);
+        animation: modalFadeIn 0.3s ease;
+    }
+
+    @keyframes modalFadeIn {
+        from { opacity: 0; transform: scale(0.9); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-content h3 {
+        color: var(--primary);
+        font-size: 1.4rem;
+        margin-bottom: 15px;
+    }
+
+    .stars {
+        font-size: 40px;
+        cursor: pointer;
+        color: #ddd;
+        display: inline-block;
+        margin: 15px 0;
+        letter-spacing: 8px;
+    }
+
+    .stars .active {
+        color: #ffc107;
+    }
+
+    .modal-content textarea {
+        width: 100%;
+        padding: 12px;
+        margin: 15px 0;
+        border: 1.5px solid var(--border);
+        border-radius: 16px;
+        font-family: 'Poppins', 'Montserrat', sans-serif;
+        resize: vertical;
+    }
+
+    .modal-content textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+
+    .btn-avaliar {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: var(--white);
+        padding: 12px 28px;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: var(--transition);
+        width: 100%;
+    }
+
+    .btn-avaliar:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    /* Responsividade específica */
+    @media (max-width: 992px) {
+        .chat-main-container { padding: 0 30px; }
+    }
+
+    @media (max-width: 768px) {
+        .chat-main-container { padding: 0 20px; margin: 20px auto; }
+        
+        .chat-header { flex-direction: column; text-align: center; }
+        .chat-messages { height: 350px; padding: 15px; }
+        
+        .message-content { max-width: 85%; }
+        
+        .chat-input { flex-wrap: wrap; }
+        .chat-input input { width: 100%; }
+        .chat-input button { width: 100%; }
+    }
+
+    @media (max-width: 480px) {
+        .chat-main-container { padding: 0 15px; }
+        .chat-messages { height: 300px; padding: 12px; }
+        .chat-header h3 { font-size: 1rem; }
+        .message-content { padding: 10px 14px; }
+        .btn-voltar { padding: 10px 18px; font-size: 0.8rem; }
+        .modal-content { padding: 25px; }
+        .stars { font-size: 32px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="chat-main-container">
+    <!-- Botão Voltar -->
+    <div class="back-button">
+        <a href="/chat_cliente" class="btn-voltar">
+            <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    <!-- Chat Window -->
+    <div class="chat-window">
+        <div class="chat-header">
+            <h3><i class="fa-solid fa-headset"></i> Conversa ao vivo</h3>
+            <p id="statusTicket">
+                <i class="fas fa-circle" style="font-size: 0.7rem;"></i> 
+                {% if ticket and ticket[2] %}
+                    {% if ticket[2] == 'aguardando_suporte' %}
+                        Aguardando atendente
+                    {% elif ticket[2] == 'aguardando_cliente' %}
+                        Aguardando sua resposta
+                    {% elif ticket[2] == 'aberto' %}
+                        Atendimento em andamento
+                    {% else %}
+                        {{ ticket[2] }}
+                    {% endif %}
+                {% else %}
+                    Atendimento ativo
+                {% endif %}
+            </p>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            {% if mensagens %}
+                {% for msg in mensagens %}
+                <div class="message {{ msg[0] }}">
+                    <div class="message-content">
+                        {{ msg[1] }}
+                        <span class="message-time">{{ msg[2] }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-messages">
+                    <i class="fas fa-comment-dots"></i>
+                    <p>Nenhuma mensagem ainda</p>
+                    <p style="font-size: 0.8rem;">Envie uma mensagem para iniciar o atendimento</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="chat-input">
+            <input type="text" id="mensagem" placeholder="Digite sua mensagem..." onkeypress="if(event.key==='Enter') enviarMensagem()">
+            <button onclick="enviarMensagem()">
+                <i class="fas fa-paper-plane"></i> Enviar
+            </button>
+        </div>
+
+        <div class="feedback-area">
+            <button class="btn-finalizar" onclick="fecharTicket()">
+                <i class="fas fa-check-circle"></i> Finalizar atendimento
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Feedback -->
+<div id="modalFeedback" class="modal">
+    <div class="modal-content">
+        <h3><i class="fas fa-star"></i> Avalie nosso atendimento</h3>
+        <div class="stars" id="stars">
+            <i class="fa-regular fa-star" data-value="1"></i>
+            <i class="fa-regular fa-star" data-value="2"></i>
+            <i class="fa-regular fa-star" data-value="3"></i>
+            <i class="fa-regular fa-star" data-value="4"></i>
+            <i class="fa-regular fa-star" data-value="5"></i>
+        </div>
+        <textarea id="comentario" placeholder="Deixe um comentário sobre o atendimento (opcional)" rows="3"></textarea>
+        <button class="btn-avaliar" onclick="enviarFeedback()">
+            <i class="fas fa-check"></i> Enviar avaliação
+        </button>
+    </div>
+</div>
+
+<!-- Dados do servidor -->
+<div id="serverData" 
+     data-ticket-id="{{ ticket[0] if ticket else 0 }}" 
+     data-mensagens-length="{{ mensagens|length }}"
+     style="display: none;">
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Variáveis globais
+    var ultimaMsg = 0;
+    var ticketId = 0;
+    var estrelaSelecionada = 0;
+
+    // Pegar dados do servidor
+    var serverData = document.getElementById('serverData');
+    ticketId = parseInt(serverData.getAttribute('data-ticket-id'));
+    ultimaMsg = parseInt(serverData.getAttribute('data-mensagens-length'));
+
+    function carregarMensagens() {
+        if(ticketId === 0) return;
+        fetch('/buscar_mensagens/' + ticketId)
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            var container = document.getElementById('chatMessages');
+            if(data.length > ultimaMsg) {
+                container.innerHTML = '';
+                for(var i = 0; i < data.length; i++) {
+                    var msg = data[i];
+                    container.innerHTML += `
+                        <div class="message ${msg.remetente}">
+                            <div class="message-content">
+                                ${msg.mensagem}
+                                <span class="message-time">${msg.data_envio}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+                ultimaMsg = data.length;
+                container.scrollTop = container.scrollHeight;
+            }
+        })
+        .catch(function(erro) {
+            console.error('Erro ao carregar mensagens:', erro);
+        });
+    }
+
+    function enviarMensagem() {
+        var msg = document.getElementById('mensagem').value;
+        if(!msg.trim() || ticketId === 0) {
+            showToast('Atenção', 'Digite uma mensagem antes de enviar', 'warning');
+            return;
+        }
+        
+        fetch('/enviar_mensagem_cliente', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'ticket_id=' + ticketId + '&mensagem=' + encodeURIComponent(msg)
+        })
+        .then(function() {
+            document.getElementById('mensagem').value = '';
+            carregarMensagens();
+        })
+        .catch(function(erro) {
+            showToast('Erro', 'Não foi possível enviar a mensagem', 'error');
+        });
+    }
+
+    function fecharTicket() {
+        document.getElementById('modalFeedback').style.display = 'flex';
+    }
+
+    function enviarFeedback() {
+        var comentario = document.getElementById('comentario').value;
+        if(estrelaSelecionada === 0) {
+            showToast('Atenção', 'Por favor, selecione uma avaliação por estrelas', 'warning');
+            return;
+        }
+        
+        fetch('/fechar_ticket_cliente/' + ticketId, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'estrelas=' + estrelaSelecionada + '&comentario=' + encodeURIComponent(comentario)
+        })
+        .then(function() {
+            showToast('Atendimento finalizado', 'Obrigado pelo seu feedback!', 'success', 1500);
+            setTimeout(function() {
+                window.location.href = '/chat_cliente';
+            }, 1500);
+        });
+    }
+
+    // Sistema de estrelas
+    var stars = document.querySelectorAll('#stars i');
+    for(var i = 0; i < stars.length; i++) {
+        stars[i].addEventListener('click', function() {
+            estrelaSelecionada = parseInt(this.dataset.value);
+            for(var j = 0; j < stars.length; j++) {
+                stars[j].className = 'fa-regular fa-star';
+            }
+            for(var j = 0; j < estrelaSelecionada; j++) {
+                stars[j].className = 'fa-solid fa-star active';
+            }
+        });
+    }
+
+    // Fechar modal ao clicar fora
+    window.onclick = function(event) {
+        var modal = document.getElementById('modalFeedback');
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    // Auto recarregar mensagens a cada 2 segundos
+    setInterval(carregarMensagens, 2000);
+    carregarMensagens();
+</script>
+{% endblock %}

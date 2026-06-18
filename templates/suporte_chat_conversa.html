@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Atendimento | Saúde & Vida</title>
+
+<!-- Fontes profissionais -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- Ícones -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    :root {
+        --primary: #1c9fd3;
+        --primary-dark: #1482ae;
+        --primary-light: #e8f4fc;
+        --secondary: #0a1220;
+        --text-dark: #1e2f44;
+        --text-gray: #6a7c9e;
+        --text-light: #8d9db0;
+        --white: #ffffff;
+        --gray-bg: #f8fafc;
+        --border: #eef2f8;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --error: #ef4444;
+        --client-msg: #e3f2fd;
+        --support-msg: #25D366;
+        --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+        --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
+
+    body {
+        font-family: 'Poppins', 'Montserrat', 'Segoe UI', sans-serif;
+        background: linear-gradient(135deg, var(--gray-bg) 0%, #eef2f8 100%);
+        color: var(--text-dark);
+        overflow-x: hidden;
+        min-height: 100vh;
+        padding: 30px;
+    }
+
+    /* ===================== TOAST NOTIFICATIONS ===================== */
+    .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-width: 380px;
+        width: calc(100% - 40px);
+        pointer-events: none;
+    }
+
+    .toast {
+        background: var(--white);
+        border-radius: 16px;
+        padding: 14px 18px;
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        box-shadow: var(--shadow-lg);
+        pointer-events: auto;
+        animation: toastSlideIn 0.3s ease forwards;
+        position: relative;
+        overflow: hidden;
+        border-left: 4px solid;
+    }
+
+    .toast::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 3px;
+        width: 100%;
+        animation: toastProgress 4s linear forwards;
+    }
+
+    @keyframes toastProgress {
+        0% { width: 100%; }
+        100% { width: 0%; }
+    }
+
+    @keyframes toastSlideIn {
+        from { opacity: 0; transform: translateX(100%); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    .toast-success { border-left-color: var(--success); }
+    .toast-success::before { background: var(--success); }
+    .toast-error { border-left-color: var(--error); }
+    .toast-error::before { background: var(--error); }
+    .toast-warning { border-left-color: var(--warning); }
+    .toast-warning::before { background: var(--warning); }
+    .toast-info { border-left-color: var(--primary); }
+    .toast-info::before { background: var(--primary); }
+
+    .toast-icon { width: 32px; height: 32px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .toast-success .toast-icon { background: rgba(16, 185, 129, 0.12); color: var(--success); }
+    .toast-error .toast-icon { background: rgba(239, 68, 68, 0.12); color: var(--error); }
+    .toast-warning .toast-icon { background: rgba(245, 158, 11, 0.12); color: var(--warning); }
+    .toast-info .toast-icon { background: rgba(28, 159, 211, 0.12); color: var(--primary); }
+
+    .toast-content { flex: 1; }
+    .toast-title { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+    .toast-message { font-size: 12px; color: var(--text-gray); line-height: 1.4; }
+    .toast-close { background: none; border: none; font-size: 14px; color: var(--text-light); cursor: pointer; padding: 4px; transition: var(--transition); }
+
+    /* ===================== CONTAINER PRINCIPAL ===================== */
+    .main-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    /* ===================== BOTÃO VOLTAR ===================== */
+    .back-button {
+        margin-bottom: 25px;
+    }
+
+    .btn-voltar {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--white);
+        color: var(--primary);
+        padding: 12px 24px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: var(--transition);
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .btn-voltar:hover {
+        background: var(--primary);
+        color: var(--white);
+        transform: translateX(-5px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary);
+    }
+
+    /* ===================== INFO CLIENTE ===================== */
+    .info-cliente {
+        background: linear-gradient(135deg, var(--white) 0%, var(--primary-light) 100%);
+        padding: 20px 25px;
+        border-radius: 24px;
+        margin-bottom: 25px;
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .cliente-detalhes {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .cliente-nome {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .cliente-nome i {
+        font-size: 1.3rem;
+    }
+
+    .cliente-info-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.85rem;
+        color: var(--text-gray);
+    }
+
+    .cliente-info-item i {
+        color: var(--primary);
+        width: 18px;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 18px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .status-aguardando_suporte {
+        background: rgba(255, 152, 0, 0.12);
+        color: #e65100;
+    }
+
+    .status-aguardando_cliente {
+        background: rgba(76, 175, 80, 0.12);
+        color: #2e7d32;
+    }
+
+    .status-aberto {
+        background: rgba(33, 150, 243, 0.12);
+        color: #1565c0;
+    }
+
+    /* ===================== CHAT CONTAINER ===================== */
+    .chat-container {
+        background: var(--white);
+        border-radius: 28px;
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+        border: 1px solid var(--border);
+    }
+
+    .chat-header {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        color: var(--white);
+        padding: 20px 25px;
+    }
+
+    .chat-header h3 {
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 5px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .chat-header p {
+        font-size: 0.8rem;
+        opacity: 0.9;
+    }
+
+    /* ===================== MENSAGENS ===================== */
+    .chat-messages {
+        height: 450px;
+        overflow-y: auto;
+        padding: 25px;
+        background: var(--gray-bg);
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .chat-messages::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .chat-messages::-webkit-scrollbar-track {
+        background: var(--border);
+        border-radius: 10px;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+        background: var(--primary);
+        border-radius: 10px;
+    }
+
+    .message {
+        display: flex;
+        animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message.cliente {
+        justify-content: flex-start;
+    }
+
+    .message.suporte {
+        justify-content: flex-end;
+    }
+
+    .message-content {
+        max-width: 70%;
+        padding: 12px 18px;
+        border-radius: 20px;
+        position: relative;
+    }
+
+    .cliente .message-content {
+        background: var(--client-msg);
+        border: 1px solid #90caf9;
+        color: var(--text-dark);
+        border-radius: 20px 20px 20px 5px;
+    }
+
+    .suporte .message-content {
+        background: linear-gradient(135deg, var(--support-msg), #20b359);
+        color: var(--white);
+        border-radius: 20px 20px 5px 20px;
+    }
+
+    .message-remetente {
+        font-weight: 700;
+        font-size: 0.75rem;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .cliente .message-remetente {
+        color: var(--primary);
+    }
+
+    .suporte .message-remetente {
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .message-text {
+        font-size: 0.9rem;
+        line-height: 1.5;
+        word-wrap: break-word;
+    }
+
+    .message-time {
+        font-size: 0.65rem;
+        margin-top: 5px;
+        display: block;
+        opacity: 0.7;
+    }
+
+    .cliente .message-time {
+        text-align: left;
+    }
+
+    .suporte .message-time {
+        text-align: right;
+    }
+
+    /* ===================== INPUT CHAT ===================== */
+    .chat-input {
+        padding: 20px 25px;
+        background: var(--white);
+        border-top: 1px solid var(--border);
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .chat-input input {
+        flex: 1;
+        padding: 14px 20px;
+        border: 1.5px solid var(--border);
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-family: 'Poppins', 'Montserrat', sans-serif;
+        transition: var(--transition);
+    }
+
+    .chat-input input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(28, 159, 211, 0.1);
+    }
+
+    .btn-enviar {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: var(--white);
+        border: none;
+        padding: 14px 28px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-enviar:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-fechar {
+        background: linear-gradient(135deg, var(--error), #c0392b);
+        color: var(--white);
+        border: none;
+        padding: 14px 28px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-fechar:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    /* ===================== MODAL AVALIAÇÃO ===================== */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background: var(--white);
+        max-width: 450px;
+        width: 90%;
+        padding: 35px;
+        border-radius: 28px;
+        text-align: center;
+        box-shadow: var(--shadow-lg);
+        animation: modalFadeIn 0.3s ease;
+    }
+
+    @keyframes modalFadeIn {
+        from { opacity: 0; transform: scale(0.9); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-content h3 {
+        color: var(--primary);
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+    }
+
+    .stars {
+        font-size: 45px;
+        cursor: pointer;
+        color: #ddd;
+        display: inline-block;
+        margin: 15px 0;
+        letter-spacing: 5px;
+    }
+
+    .stars .active {
+        color: #ffc107;
+    }
+
+    .modal-content textarea {
+        width: 100%;
+        padding: 12px;
+        margin: 15px 0;
+        border: 1.5px solid var(--border);
+        border-radius: 16px;
+        font-family: 'Poppins', 'Montserrat', sans-serif;
+        resize: vertical;
+    }
+
+    .modal-content textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+
+    .btn-avaliar {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: var(--white);
+        padding: 12px 28px;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: var(--transition);
+    }
+
+    .btn-avaliar:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    /* Mensagem vazia */
+    .empty-messages {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--text-gray);
+    }
+
+    .empty-messages i {
+        font-size: 64px;
+        color: var(--border);
+        margin-bottom: 15px;
+    }
+
+    /* ===================== RESPONSIVIDADE ===================== */
+    @media (max-width: 768px) {
+        body { padding: 15px; }
+        
+        .info-cliente { flex-direction: column; align-items: flex-start; }
+        
+        .chat-messages { height: 350px; padding: 15px; }
+        
+        .message-content { max-width: 85%; }
+        
+        .chat-input { flex-wrap: wrap; }
+        .chat-input input { width: 100%; }
+        .btn-enviar, .btn-fechar { flex: 1; justify-content: center; }
+        
+        .cliente-nome { font-size: 1rem; }
+        .cliente-info-item { font-size: 0.75rem; }
+    }
+
+    @media (max-width: 480px) {
+        body { padding: 10px; padding-bottom: env(safe-area-inset-bottom, 10px); }
+        
+        .btn-voltar { padding: 10px 18px; font-size: 0.8rem; width: 100%; justify-content: center; }
+        
+        .info-cliente { padding: 15px; }
+        
+        .chat-header { padding: 15px 20px; }
+        .chat-header h3 { font-size: 1.1rem; }
+        
+        .chat-messages { height: 300px; padding: 12px; }
+        
+        .message-content { padding: 10px 14px; }
+        .message-text { font-size: 0.85rem; }
+        
+        .btn-enviar, .btn-fechar { padding: 12px 20px; font-size: 0.8rem; }
+        
+        .modal-content { padding: 25px; }
+        .stars { font-size: 35px; }
+    }
+</style>
+</head>
+<body>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="main-container">
+    <!-- Botão Voltar -->
+    <div class="back-button">
+        <a href="/suporte_chat" class="btn-voltar">
+            <i class="fas fa-arrow-left"></i> Voltar para atendimentos
+        </a>
+    </div>
+
+    <!-- Info Cliente -->
+    <div class="info-cliente">
+        <div class="cliente-detalhes">
+            <div class="cliente-nome">
+                <i class="fas fa-user-circle"></i>
+                {{ ticket[1] }}
+            </div>
+            <div class="cliente-info-item">
+                <i class="fas fa-envelope"></i>
+                {{ ticket[2] }}
+            </div>
+            <div class="cliente-info-item">
+                <i class="fas fa-tag"></i>
+                Motivo: {{ ticket[3] }}
+            </div>
+        </div>
+        <div>
+            <span class="status-badge status-{{ ticket[4] if ticket[4] else ticket[6] }}">
+                {% set status_raw = ticket[6] if ticket[6] else ticket[4] %}
+                {% if status_raw == 'aguardando_suporte' %}
+                    <i class="fas fa-hourglass-half"></i> Aguardando Suporte
+                {% elif status_raw == 'aguardando_cliente' %}
+                    <i class="fas fa-reply-all"></i> Aguardando Cliente
+                {% elif status_raw == 'aberto' %}
+                    <i class="fas fa-inbox"></i> Aberto
+                {% else %}
+                    {{ ticket[4] }}
+                {% endif %}
+            </span>
+        </div>
+    </div>
+
+    <!-- Chat Container -->
+    <div class="chat-container">
+        <div class="chat-header">
+            <h3>
+                <i class="fas fa-comments"></i>
+                Conversa ao vivo
+            </h3>
+            <p>Atendimento #{{ ticket[0] }}</p>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            {% if mensagens %}
+                {% for msg in mensagens %}
+                <div class="message {{ msg[0] }}">
+                    <div class="message-content">
+                        <span class="message-remetente">
+                            <i class="fas {{ 'fa-user' if msg[0] == 'cliente' else 'fa-headset' }}"></i>
+                            {{ 'Cliente' if msg[0] == 'cliente' else 'Suporte' }}
+                        </span>
+                        <div class="message-text">{{ msg[1] }}</div>
+                        <span class="message-time">
+                            <i class="far fa-clock"></i> {{ msg[2] }}
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-messages">
+                    <i class="fas fa-comment-dots"></i>
+                    <p>Nenhuma mensagem ainda</p>
+                    <p style="font-size: 0.8rem;">Envie uma mensagem para iniciar o atendimento</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="chat-input">
+            <input type="text" id="mensagem" placeholder="Digite sua resposta..." onkeypress="if(event.key==='Enter') enviarMensagem()">
+            <button class="btn-enviar" onclick="enviarMensagem()">
+                <i class="fas fa-paper-plane"></i> Enviar
+            </button>
+            <button class="btn-fechar" onclick="fecharTicket()">
+                <i class="fas fa-check-circle"></i> Finalizar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Avaliação -->
+<div id="modalAvaliacao" class="modal">
+    <div class="modal-content">
+        <h3><i class="fas fa-star"></i> Avalie o atendimento</h3>
+        <div class="stars" id="stars">
+            <i class="fas fa-star" data-value="1"></i>
+            <i class="fas fa-star" data-value="2"></i>
+            <i class="fas fa-star" data-value="3"></i>
+            <i class="fas fa-star" data-value="4"></i>
+            <i class="fas fa-star" data-value="5"></i>
+        </div>
+        <textarea id="comentario" rows="3" placeholder="Deixe um comentário sobre o atendimento (opcional)"></textarea>
+        <button class="btn-avaliar" onclick="enviarAvaliacao()">
+            <i class="fas fa-check"></i> Enviar avaliação
+        </button>
+    </div>
+</div>
+
+<!-- Dados do servidor -->
+<div id="serverData" 
+     data-ticket-id="{{ ticket[0] }}" 
+     data-mensagens-length="{{ mensagens|length }}"
+     style="display: none;">
+</div>
+
+<script>
+    // Toast System
+    function showToast(title, message, type = 'info', duration = 4000) {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        let icon = '';
+        switch(type) {
+            case 'success': icon = '<i class="fas fa-check-circle"></i>'; break;
+            case 'error': icon = '<i class="fas fa-exclamation-circle"></i>'; break;
+            case 'warning': icon = '<i class="fas fa-exclamation-triangle"></i>'; break;
+            default: icon = '<i class="fas fa-info-circle"></i>';
+        }
+        toast.innerHTML = `
+            <div class="toast-icon">${icon}</div>
+            <div class="toast-content">
+                <div class="toast-title">${title}</div>
+                <div class="toast-message">${message}</div>
+            </div>
+            <button class="toast-close"><i class="fas fa-times"></i></button>
+        `;
+        container.appendChild(toast);
+        const closeBtn = toast.querySelector('.toast-close');
+        closeBtn.addEventListener('click', () => toast.remove());
+        setTimeout(() => { if (toast.parentNode) toast.remove(); }, duration);
+    }
+
+    var serverDataDiv = document.getElementById('serverData');
+    var ticketId = parseInt(serverDataDiv.getAttribute('data-ticket-id'));
+    var ultimaMsg = parseInt(serverDataDiv.getAttribute('data-mensagens-length'));
+    var modalAberto = false;
+
+    // Sistema de estrelas
+    var avaliacao = 0;
+    var stars = document.querySelectorAll('.stars i');
+    stars.forEach(function(star) {
+        star.addEventListener('click', function() {
+            avaliacao = parseInt(this.getAttribute('data-value'));
+            stars.forEach(function(s, index) {
+                if (index < avaliacao) {
+                    s.classList.add('active');
+                } else {
+                    s.classList.remove('active');
+                }
+            });
+        });
+    });
+
+    function carregarMensagens() {
+        if(ticketId === 0) return;
+        
+        fetch('/buscar_mensagens/' + ticketId)
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            var container = document.getElementById('chatMessages');
+            if(data.length > ultimaMsg) {
+                container.innerHTML = '';
+                for(var i = 0; i < data.length; i++) {
+                    var msg = data[i];
+                    var remetenteNome = (msg.remetente === 'cliente') ? 'Cliente' : 'Suporte';
+                    var icone = (msg.remetente === 'cliente') ? 'fa-user' : 'fa-headset';
+                    container.innerHTML += `
+                        <div class="message ${msg.remetente}">
+                            <div class="message-content">
+                                <span class="message-remetente">
+                                    <i class="fas ${icone}"></i>
+                                    ${remetenteNome}
+                                </span>
+                                <div class="message-text">${msg.mensagem}</div>
+                                <span class="message-time">
+                                    <i class="far fa-clock"></i> ${msg.data_envio}
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                }
+                ultimaMsg = data.length;
+                container.scrollTop = container.scrollHeight;
+            }
+        })
+        .catch(function(erro) {
+            console.error('Erro ao carregar mensagens:', erro);
+        });
+    }
+
+    function enviarMensagem() {
+        var msg = document.getElementById('mensagem').value;
+        if(!msg.trim()) return;
+        
+        fetch('/enviar_mensagem_suporte', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'ticket_id=' + ticketId + '&mensagem=' + encodeURIComponent(msg)
+        })
+        .then(function() {
+            document.getElementById('mensagem').value = '';
+            carregarMensagens();
+        })
+        .catch(function(erro) {
+            showToast('Erro', 'Não foi possível enviar a mensagem', 'error');
+        });
+    }
+
+    function fecharTicket() {
+        if(confirm('Deseja finalizar este atendimento?')) {
+            fetch('/fechar_ticket_suporte/' + ticketId, { method: 'POST' })
+            .then(function() {
+                modalAberto = true;
+                document.getElementById('modalAvaliacao').style.display = 'flex';
+            });
+        }
+    }
+
+    function enviarAvaliacao() {
+        var comentario = document.getElementById('comentario').value;
+        
+        fetch('/avaliar_atendimento', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'ticket_id=' + ticketId + '&nota=' + avaliacao + '&comentario=' + encodeURIComponent(comentario)
+        })
+        .then(function() {
+            document.getElementById('modalAvaliacao').style.display = 'none';
+            showToast('Atendimento finalizado', 'Obrigado por avaliar o atendimento!', 'success', 2000);
+            setTimeout(function() {
+                window.location.href = '/suporte_chat';
+            }, 2000);
+        });
+    }
+
+    // Auto recarregar mensagens a cada 1.5 segundos
+    setInterval(carregarMensagens, 1500);
+    carregarMensagens();
+
+    // Fechar modal ao clicar fora
+    window.onclick = function(event) {
+        var modal = document.getElementById('modalAvaliacao');
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    }
+</script>
+
+</body>
+</html>

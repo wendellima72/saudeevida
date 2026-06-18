@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Central de Suporte | Saúde & Vida</title>
+
+<!-- Fontes profissionais -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- Ícones -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    :root {
+        --primary: #1c9fd3;
+        --primary-dark: #1482ae;
+        --primary-light: #e8f4fc;
+        --secondary: #0a1220;
+        --text-dark: #1e2f44;
+        --text-gray: #6a7c9e;
+        --text-light: #8d9db0;
+        --white: #ffffff;
+        --gray-bg: #f8fafc;
+        --border: #eef2f8;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --error: #ef4444;
+        --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+        --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
+
+    body {
+        font-family: 'Poppins', 'Montserrat', 'Segoe UI', sans-serif;
+        background: var(--gray-bg);
+        color: var(--text-dark);
+        overflow-x: hidden;
+    }
+
+    /* ===================== TOAST NOTIFICATIONS ===================== */
+    .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-width: 380px;
+        width: calc(100% - 40px);
+        pointer-events: none;
+    }
+
+    .toast {
+        background: var(--white);
+        border-radius: 16px;
+        padding: 14px 18px;
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        box-shadow: var(--shadow-lg);
+        pointer-events: auto;
+        animation: toastSlideIn 0.3s ease forwards;
+        position: relative;
+        overflow: hidden;
+        border-left: 4px solid;
+    }
+
+    .toast::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 3px;
+        width: 100%;
+        animation: toastProgress 4s linear forwards;
+    }
+
+    @keyframes toastProgress {
+        0% { width: 100%; }
+        100% { width: 0%; }
+    }
+
+    @keyframes toastSlideIn {
+        from { opacity: 0; transform: translateX(100%); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    .toast-success { border-left-color: var(--success); }
+    .toast-success::before { background: var(--success); }
+    .toast-error { border-left-color: var(--error); }
+    .toast-error::before { background: var(--error); }
+    .toast-warning { border-left-color: var(--warning); }
+    .toast-warning::before { background: var(--warning); }
+    .toast-info { border-left-color: var(--primary); }
+    .toast-info::before { background: var(--primary); }
+
+    .toast-icon { width: 32px; height: 32px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .toast-success .toast-icon { background: rgba(16, 185, 129, 0.12); color: var(--success); }
+    .toast-error .toast-icon { background: rgba(239, 68, 68, 0.12); color: var(--error); }
+    .toast-warning .toast-icon { background: rgba(245, 158, 11, 0.12); color: var(--warning); }
+    .toast-info .toast-icon { background: rgba(28, 159, 211, 0.12); color: var(--primary); }
+
+    .toast-content { flex: 1; }
+    .toast-title { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+    .toast-message { font-size: 12px; color: var(--text-gray); line-height: 1.4; }
+    .toast-close { background: none; border: none; font-size: 14px; color: var(--text-light); cursor: pointer; padding: 4px; transition: var(--transition); }
+
+    /* ===================== HEADER PERSONALIZADO ===================== */
+    .header-suporte {
+        background: linear-gradient(135deg, var(--primary) 0%, #0f6f97 100%);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        box-shadow: var(--shadow-md);
+    }
+
+    .container-header {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 40px;
+    }
+
+    .header-suporte .container-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 80px;
+    }
+
+    .logo-area {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .logo {
+        width: 60px;
+        height: auto;
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+        transition: var(--transition);
+    }
+
+    .logo:hover {
+        transform: scale(1.02);
+    }
+
+    .logo-text {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .medic-name {
+        font-family: 'Poppins', 'Montserrat', sans-serif;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--white);
+        letter-spacing: -0.3px;
+    }
+
+    .suporte-badge {
+        font-size: 0.7rem;
+        color: rgba(255, 255, 255, 0.8);
+        letter-spacing: 1px;
+    }
+
+    .header-buttons {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .btn-sair {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.15);
+        color: var(--white);
+        border: none;
+        padding: 10px 20px;
+        border-radius: 50px;
+        font-family: 'Poppins', 'Montserrat', sans-serif;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .btn-sair:hover {
+        background: rgba(255, 255, 255, 0.25);
+        transform: translateY(-2px);
+    }
+
+    .btn-voltar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--white);
+        border: none;
+        padding: 10px 20px;
+        border-radius: 50px;
+        font-family: 'Poppins', 'Montserrat', sans-serif;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: var(--transition);
+        text-decoration: none;
+    }
+
+    .btn-voltar:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+    }
+
+    /* ===================== BANNER ===================== */
+    .banner-suporte {
+        background: linear-gradient(135deg, var(--primary-light) 0%, #d4eaf5 100%);
+        padding: 50px 40px;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .banner-suporte h1 {
+        font-size: 2.2rem;
+        color: var(--primary);
+        margin-bottom: 15px;
+        font-weight: 700;
+    }
+
+    .banner-suporte p {
+        color: var(--text-gray);
+        font-size: 1rem;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    /* ===================== DASHBOARD ===================== */
+    .dashboard {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 25px;
+        padding: 0 40px 30px;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .box {
+        background: var(--white);
+        padding: 25px;
+        border-radius: 24px;
+        text-align: center;
+        transition: var(--transition);
+        cursor: default;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-sm);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .box::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+        opacity: 0;
+        transition: var(--transition);
+    }
+
+    .box:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--primary);
+    }
+
+    .box:hover::before { opacity: 1; }
+
+    .icon {
+        color: var(--primary);
+        font-size: 32px;
+        margin-bottom: 12px;
+    }
+
+    .box p {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    /* ===================== TABS ===================== */
+    .tabs-container {
+        padding: 0 40px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .tabs {
+        background: var(--white);
+        border-radius: 60px;
+        padding: 6px;
+        display: flex;
+        gap: 10px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border);
+    }
+
+    .tabs button {
+        padding: 12px 28px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border-radius: 50px;
+        transition: var(--transition);
+        color: var(--text-gray);
+        font-family: 'Poppins', 'Montserrat', sans-serif;
+    }
+
+    .tabs button:hover {
+        background: var(--primary-light);
+        color: var(--primary);
+    }
+
+    .tabs button.active {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: var(--white);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .tabs button.active:hover {
+        color: var(--white);
+        background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+    }
+
+    /* ===================== SEARCH ===================== */
+    .search-container {
+        padding: 0 40px 20px;
+    }
+
+    .search-box {
+        background: var(--white);
+        border-radius: 20px;
+        padding: 15px 20px;
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        flex-wrap: wrap;
+        border: 1px solid var(--border);
+    }
+
+    .search-box input {
+        flex: 1;
+        min-width: 250px;
+        padding: 14px 18px;
+        border: 1.5px solid var(--border);
+        border-radius: 16px;
+        font-size: 0.9rem;
+        font-family: 'Poppins', 'Montserrat', sans-serif;
+        transition: var(--transition);
+    }
+
+    .search-box input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(28, 159, 211, 0.1);
+    }
+
+    .btn-buscar, .btn-limpar {
+        padding: 14px 24px;
+        border: none;
+        border-radius: 16px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: var(--transition);
+        font-family: 'Poppins', 'Montserrat', sans-serif;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-buscar {
+        background: var(--primary);
+        color: var(--white);
+    }
+
+    .btn-buscar:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+    }
+
+    .btn-limpar {
+        background: var(--text-gray);
+        color: var(--white);
+    }
+
+    .btn-limpar:hover {
+        background: #7f8c8d;
+        transform: translateY(-2px);
+    }
+
+    /* ===================== HEADER ACTIONS ===================== */
+    .header-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 40px;
+        background: var(--white);
+        border-radius: 20px;
+        margin: 0 40px 20px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border);
+    }
+
+    .page-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .page-title i {
+        color: var(--primary);
+        font-size: 1.3rem;
+    }
+
+    .btn-criar-usuario {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: var(--white);
+        padding: 12px 24px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-criar-usuario:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    /* ===================== SEÇÕES ===================== */
+    .secao {
+        display: none;
+        padding: 0 40px 40px;
+    }
+
+    .secao.ativa {
+        display: block;
+        animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+        background: var(--white);
+        padding: 25px;
+        border-radius: 24px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border);
+    }
+
+    .card h3 {
+        color: var(--primary);
+        font-size: 1.3rem;
+        margin-bottom: 20px;
+        font-weight: 700;
+    }
+
+    /* ===================== USUÁRIOS ===================== */
+    .lista-usuarios {
+        max-height: 250px;
+        overflow-y: auto;
+        margin-bottom: 20px;
+    }
+
+    .lista-usuarios::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .lista-usuarios::-webkit-scrollbar-track {
+        background: var(--border);
+        border-radius: 10px;
+    }
+
+    .lista-usuarios::-webkit-scrollbar-thumb {
+        background: var(--primary);
+        border-radius: 10px;
+    }
+
+    .user {
+        padding: 15px;
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .user:hover {
+        background: var(--primary-light);
+    }
+
+    .user strong {
+        color: var(--text-dark);
+    }
+
+    .user span {
+        display: block;
+        font-size: 0.75rem;
+        color: var(--text-gray);
+    }
+
+    .user-actions {
+        display: flex;
+        gap: 8px;
+        flex-shrink: 0;
+        flex-wrap: wrap;
+    }
+
+    .btn-user-action {
+        padding: 8px 14px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: var(--transition);
+        white-space: nowrap;
+    }
+
+    .btn-user-edit { background: var(--primary); color: var(--white); }
+    .btn-user-edit:hover { background: var(--primary-dark); transform: translateY(-1px); }
+    .btn-user-delete { background: var(--error); color: var(--white); }
+    .btn-user-delete:hover { filter: brightness(0.92); transform: translateY(-1px); }
+
+    .user-click { flex: 1; min-width: 0; cursor: pointer; }
+
+    .perfil {
+        background: linear-gradient(135deg, var(--gray-bg) 0%, var(--primary-light) 100%);
+        padding: 20px;
+        border-radius: 20px;
+        margin-top: 20px;
+        border: 1px solid var(--border);
+    }
+
+    .perfil h4 {
+        color: var(--primary);
+        margin-bottom: 15px;
+    }
+
+    .perfil p {
+        margin: 10px 0;
+        color: var(--text-gray);
+    }
+
+    /* ===================== TABELAS ===================== */
+    .table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        margin-top: 12px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 520px;
+    }
+
+    th {
+        background: var(--primary);
+        color: var(--white);
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    td {
+        padding: 12px;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-gray);
+        font-size: 0.85rem;
+    }
+
+    tr:hover td { background: var(--primary-light); }
+
+    .filtros-consultas {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .filtros-consultas select,
+    .filtros-consultas input {
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1.5px solid var(--border);
+        font-family: 'Poppins', 'Montserrat', sans-serif;
+        font-size: 0.85rem;
+        flex: 1;
+        min-width: 140px;
+    }
+
+    .filtros-consultas select:focus,
+    .filtros-consultas input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(28, 159, 211, 0.1);
+    }
+
+    .search-container,
+    .tabs-container,
+    .header-actions,
+    .secao {
+        max-width: 1400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* ===================== CHAT CARD ===================== */
+    .chat-card {
+        background: var(--white);
+        border-radius: 28px;
+        padding: 50px 40px;
+        text-align: center;
+        box-shadow: var(--shadow-md);
+        transition: var(--transition);
+        max-width: 500px;
+        margin: 0 auto;
+        border: 1px solid var(--border);
+    }
+
+    .chat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .chat-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .chat-icon i {
+        font-size: 36px;
+        color: var(--white);
+    }
+
+    .chat-card h3 {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+    }
+
+    .btn-chat-central {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: var(--white);
+        padding: 16px 32px;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 700;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 25px;
+    }
+
+    .btn-chat-central:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    /* ===================== FOOTER ===================== */
+    footer {
+        background: linear-gradient(135deg, var(--secondary) 0%, #0f172a 100%);
+        color: var(--white);
+        text-align: center;
+        padding: 30px 20px;
+        margin-top: 40px;
+    }
+
+    footer p {
+        opacity: 0.8;
+        font-size: 0.85rem;
+    }
+
+    /* ===================== RESPONSIVIDADE ===================== */
+    @media (max-width: 1200px) {
+        .dashboard { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 992px) {
+        .container-header { padding: 0 30px; }
+        .dashboard { padding: 0 30px 20px; gap: 20px; }
+        .tabs-container { padding: 0 30px; }
+        .search-container { padding: 0 30px 15px; }
+        .header-actions { margin: 0 30px 20px; padding: 15px 25px; }
+        .secao { padding: 0 30px 30px; }
+        .banner-suporte { padding: 40px 30px; }
+        .banner-suporte h1 { font-size: 1.8rem; }
+        .tabs { width: 100%; justify-content: center; flex-wrap: wrap; }
+    }
+
+    @media (max-width: 768px) {
+        .container-header { padding: 0 20px; }
+        .header-suporte .container-header { height: 70px; }
+        
+        .medic-name { font-size: 1rem; }
+        .logo { width: 50px; }
+        .suporte-badge { font-size: 0.6rem; }
+        
+        .btn-voltar span, .btn-sair span { display: none; }
+        .btn-voltar, .btn-sair { padding: 10px 12px; }
+        .btn-voltar i, .btn-sair i { font-size: 18px; margin: 0; }
+        
+        .dashboard { grid-template-columns: repeat(2, 1fr); padding: 0 20px 20px; gap: 15px; }
+        .box { padding: 20px; }
+        
+        .tabs-container { padding: 0 20px; }
+        .tabs button { padding: 8px 16px; font-size: 0.8rem; }
+        
+        .search-container { padding: 0 20px 15px; }
+        .search-box { flex-direction: column; }
+        .search-box input, .btn-buscar, .btn-limpar { width: 100%; }
+        
+        .header-actions { flex-direction: column; gap: 15px; margin: 0 20px 20px; padding: 20px; }
+        .header-actions .btn-criar-usuario { width: 100%; justify-content: center; }
+        
+        .secao { padding: 0 20px 20px; }
+        
+        .banner-suporte { padding: 30px 20px; }
+        .banner-suporte h1 { font-size: 1.5rem; }
+        .banner-suporte p { font-size: 0.85rem; }
+        
+        .chat-card { padding: 35px 25px; margin: 0 20px; }
+        .chat-card h3 { font-size: 1.3rem; }
+        .btn-chat-central { padding: 14px 28px; font-size: 0.9rem; }
+        
+        table { font-size: 0.8rem; min-width: 480px; }
+        th, td { padding: 8px 10px; }
+
+        .user { flex-wrap: wrap; gap: 12px; }
+        .user-actions { width: 100%; justify-content: flex-end; }
+        .filtros-consultas select,
+        .filtros-consultas input { width: 100%; min-width: 0; }
+        .toast-container { top: auto; bottom: 16px; left: 16px; right: 16px; max-width: none; }
+    }
+
+    @media (max-width: 480px) {
+        .dashboard { grid-template-columns: 1fr; }
+        .tabs { flex-wrap: wrap; justify-content: center; border-radius: 20px; padding: 8px; }
+        .tabs button { flex: 1 1 calc(50% - 8px); min-width: 0; padding: 10px 12px; font-size: 0.75rem; }
+        .logo-text .medic-name { display: none; }
+        .logo { width: 45px; }
+        .suporte-badge { display: inline-flex; align-items: center; gap: 4px; }
+        
+        .user { flex-direction: column; align-items: stretch; text-align: left; }
+        .user-actions { justify-content: stretch; }
+        .btn-user-action { flex: 1; justify-content: center; }
+        
+        .chat-icon { width: 60px; height: 60px; }
+        .chat-icon i { font-size: 28px; }
+        .page-title { font-size: 1rem; }
+        .card { padding: 18px; border-radius: 18px; }
+        .banner-suporte h1 { font-size: 1.25rem; }
+    }
+
+    @media (max-width: 380px) {
+        .header-actions .btn-criar-usuario { font-size: 0.78rem; padding: 12px 16px; }
+    }
+
+    @media (min-width: 1400px) {
+        .container-header { max-width: 1400px; }
+        .dashboard { max-width: 1400px; }
+    }
+</style>
+</head>
+<body>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- HEADER PERSONALIZADO DO SUPORTE -->
+<header class="header-suporte">
+    <div class="container-header">
+        <div class="logo-area">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="logo">
+            <div class="logo-text">
+                <h1 class="medic-name">Saúde & Vida</h1>
+                <span class="suporte-badge"><i class="fas fa-headset"></i> Central de Suporte</span>
+            </div>
+        </div>
+        <div class="header-buttons">
+            <button class="btn-sair" id="logoutBtn" type="button">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Sair</span>
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- BANNER SUPORTE -->
+<div class="banner-suporte">
+    <h1><i class="fas fa-headset"></i> Central de Atendimento</h1>
+    <p>Gerencie usuários, consultas e atendimentos em um só lugar</p>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard">
+    <div class="box">
+        <div class="icon"><i class="fa-solid fa-users"></i></div>
+        <p id="total_usuarios">{{ total_usuarios }} Usuários</p>
+    </div>
+    <div class="box">
+        <div class="icon"><i class="fa-solid fa-calendar-check"></i></div>
+        <p id="consultas_hoje">{{ consultas_hoje }} Consultas Hoje</p>
+    </div>
+    <div class="box">
+        <div class="icon"><i class="fa-solid fa-comments"></i></div>
+        <p id="total_mensagens_chat">0 Mensagens</p>
+    </div>
+    <div class="box">
+        <div class="icon"><i class="fa-solid fa-clock"></i></div>
+        <p id="total_pendentes_chat">0 Pendentes</p>
+    </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-container">
+    <div class="tabs">
+        <button type="button" class="active" data-tab="usuarios" onclick="mostrar('usuarios', this)">Usuários</button>
+        <button type="button" data-tab="consultas" onclick="mostrar('consultas', this); carregarTodasConsultas()">Consultas</button>
+        <button type="button" data-tab="chat" onclick="mostrar('chat', this)">Atendimentos</button>
+    </div>
+</div>
+
+<!-- SEARCH -->
+<div class="search-container">
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Digite nome, email ou CPF (mínimo 2 caracteres)">
+        <button onclick="buscarUsuarios()" class="btn-buscar">
+            <i class="fas fa-search"></i> Buscar
+        </button>
+        <button onclick="limparBusca()" class="btn-limpar">
+            <i class="fas fa-eraser"></i> Limpar
+        </button>
+    </div>
+</div>
+
+<!-- HEADER ACTIONS -->
+<div class="header-actions">
+    <div class="page-title">
+        <i class="fas fa-users-gear"></i>
+        <span>Gerenciamento de Usuários</span>
+    </div>
+    <a href="/criar_usuario" class="btn-criar-usuario">
+        <i class="fas fa-user-plus"></i>
+        Criar Novo Usuário
+        <i class="fas fa-arrow-right"></i>
+    </a>
+</div>
+
+<!-- ================= USUÁRIOS ================= -->
+<section id="usuarios" class="secao ativa">
+    <div class="card">
+        <h3><i class="fas fa-users"></i> Usuários Cadastrados</h3>
+        <div class="lista-usuarios" id="listaUsuarios">
+            {% for u in usuarios %}
+            <div class="user">
+                <div class="user-click" onclick="carregarUsuario('{{ u[0] }}')">
+                    <strong>{{ u[1] }}</strong>
+                    <span>{{ u[6] if u[6] else 'Sem plano' }} • {{ u[2] }}</span>
+                </div>
+                <div class="user-actions">
+                    <a href="/editar_usuario/{{ u[0] }}" class="btn-user-action btn-user-edit" onclick="event.stopPropagation()">
+                        <i class="fas fa-edit"></i> Editar
+                    </a>
+                    <a href="/deletar_usuario/{{ u[0] }}" class="btn-user-action btn-user-delete" onclick="event.stopPropagation(); return confirm('Tem certeza que deseja deletar este usuário?')">
+                        <i class="fas fa-trash"></i> Deletar
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="perfil">
+            <h4><i class="fas fa-id-card"></i> Perfil Completo</h4>
+            <p><strong>Nome:</strong> <span id="nome">---</span></p>
+            <p><strong>Email:</strong> <span id="email">---</span></p>
+            <p><strong>Telefone:</strong> <span id="telefone">---</span></p>
+            <p><strong>CPF:</strong> <span id="cpf">---</span></p>
+            <p><strong>Plano:</strong> <span id="plano">---</span></p>
+            <p><strong>Gênero:</strong> <span id="genero">---</span></p>
+        </div>
+
+        <h4><i class="fas fa-calendar-alt"></i> Consultas do Usuário</h4>
+        <div class="table-wrap">
+            <table id="consultas-usuario">
+                <tr><th>Médico</th><th>Especialidade</th><th>Data</th><th>Hora</th><th>Status</th></tr>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- ================= CONSULTAS ================= -->
+<section id="consultas" class="secao">
+    <div class="card">
+        <h3><i class="fas fa-calendar-check"></i> Todas as Consultas</h3>
+        
+        <div class="filtros-consultas">
+            <select id="filtroData" onchange="filtrarConsultasCompleto()">
+                <option value="todas">Todas as datas</option>
+                <option value="futuras">Futuras</option>
+                <option value="passadas">Passadas</option>
+            </select>
+            <input type="text" id="filtroPaciente" placeholder="Filtrar por paciente..." onkeyup="filtrarConsultasCompleto()">
+            <input type="text" id="filtroMedico" placeholder="Filtrar por médico..." onkeyup="filtrarConsultasCompleto()">
+            <button type="button" onclick="limparFiltrosConsultas()" class="btn-limpar">
+                <i class="fas fa-eraser"></i> Limpar
+            </button>
+        </div>
+
+        <div class="table-wrap">
+            <table id="tabela-consultas">
+                <tr><th>Paciente</th><th>Médico</th><th>Especialidade</th><th>Data</th><th>Hora</th><th>Status</th></tr>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- ================= CHAT ================= -->
+<section id="chat" class="secao">
+    <div class="chat-card">
+        <div class="chat-icon">
+            <i class="fas fa-headset"></i>
+        </div>
+        <h3>Atendimento Online</h3>
+        <p>Responda as mensagens dos clientes em tempo real</p>
+        <button onclick="window.location.href='/suporte_chat'" class="btn-chat-central">
+            <i class="fas fa-comments"></i> Acessar Central
+            <i class="fas fa-arrow-right"></i>
+        </button>
+    </div>
+</section>
+
+<footer>
+    <p>Este projeto foi desenvolvido exclusivamente para fins escolares, com o objetivo de aplicar conhecimentos acadêmicos na prática.</p>
+    <p>© 2026 - EEEP Dona Creusa do Carmo Rocha</p>
+</footer>
+
+<script>
+    function showToast(title, message, type = 'info', duration = 4000) {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        let icon = '';
+        switch(type) {
+            case 'success': icon = '<i class="fas fa-check-circle"></i>'; break;
+            case 'error': icon = '<i class="fas fa-exclamation-circle"></i>'; break;
+            case 'warning': icon = '<i class="fas fa-exclamation-triangle"></i>'; break;
+            default: icon = '<i class="fas fa-info-circle"></i>';
+        }
+        toast.innerHTML = `
+            <div class="toast-icon">${icon}</div>
+            <div class="toast-content">
+                <div class="toast-title">${title}</div>
+                <div class="toast-message">${message}</div>
+            </div>
+            <button class="toast-close"><i class="fas fa-times"></i></button>
+        `;
+        container.appendChild(toast);
+        const closeBtn = toast.querySelector('.toast-close');
+        closeBtn.addEventListener('click', () => toast.remove());
+        setTimeout(() => { if (toast.parentNode) toast.remove(); }, duration);
+    }
+
+    function carregarEstatisticasChat() {
+        fetch('/estatisticas_chat')
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('total_mensagens_chat').innerHTML = data.total_mensagens + ' Mensagens';
+            document.getElementById('total_pendentes_chat').innerHTML = data.total_pendentes + ' Pendentes';
+        })
+        .catch(erro => console.error('Erro:', erro));
+    }
+
+    function mostrar(secao, btn) {
+        document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa'));
+        document.getElementById(secao).classList.add('ativa');
+        document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+        else {
+            const match = document.querySelector('.tabs button[data-tab="' + secao + '"]');
+            if (match) match.classList.add('active');
+        }
+        const searchBox = document.querySelector('.search-container');
+        const headerActions = document.querySelector('.header-actions');
+        if (searchBox) searchBox.style.display = secao === 'usuarios' ? '' : 'none';
+        if (headerActions) headerActions.style.display = secao === 'usuarios' ? '' : 'none';
+        if(secao === 'chat') carregarEstatisticasChat();
+    }
+
+    function buscarUsuarios() {
+        let termo = document.getElementById('searchInput').value.trim();
+        if(termo.length < 2) {
+            showToast('Atenção', 'Digite pelo menos 2 caracteres para buscar', 'warning');
+            return;
+        }
+        fetch(`/pesquisar_usuarios?q=${encodeURIComponent(termo)}`)
+        .then(res => res.json())
+        .then(data => {
+            let lista = document.getElementById('listaUsuarios');
+            lista.innerHTML = '';
+            if(data.length === 0) {
+                lista.innerHTML = '<div class="user">Nenhum usuário encontrado</div>';
+                return;
+            }
+            data.forEach(u => {
+                lista.innerHTML += `
+                    <div class="user">
+                        <div class="user-click" onclick="carregarUsuario('${u[0]}')">
+                            <strong>${u[1]}</strong>
+                            <span>${u[6] || 'Sem plano'} • ${u[2]}</span>
+                        </div>
+                        <div class="user-actions">
+                            <a href="/editar_usuario/${u[0]}" class="btn-user-action btn-user-edit" onclick="event.stopPropagation()">
+                                <i class="fas fa-edit"></i> Editar
+                            </a>
+                            <a href="/deletar_usuario/${u[0]}" class="btn-user-action btn-user-delete" onclick="event.stopPropagation(); return confirm('Tem certeza que deseja deletar este usuário?')">
+                                <i class="fas fa-trash"></i> Deletar
+                            </a>
+                        </div>
+                    </div>
+                `;
+            });
+        });
+    }
+
+    function limparBusca() {
+        document.getElementById('searchInput').value = '';
+        location.reload();
+    }
+
+    function carregarUsuario(userId) {
+        fetch(`/usuario_detalhes/${userId}`)
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("nome").innerText = data.nome || '---';
+            document.getElementById("email").innerText = data.email || '---';
+            document.getElementById("telefone").innerText = data.telefone || '---';
+            document.getElementById("cpf").innerText = data.cpf || '---';
+            document.getElementById("plano").innerText = data.plano || 'Sem plano';
+            document.getElementById("genero").innerText = data.genero || '---';
+        });
+        fetch(`/consultas_usuario/${userId}`)
+        .then(res => res.json())
+        .then(data => {
+            let tabela = document.getElementById("consultas-usuario");
+            tabela.innerHTML = `<tr><th>Médico</th><th>Especialidade</th><th>Data</th><th>Hora</th><th>Status</th></tr>`;
+            if(data.length === 0) {
+                tabela.innerHTML += '<tr><td colspan="5" style="text-align: center;">Nenhuma consulta encontrada</td></tr>';
+            } else {
+                data.forEach(c => {
+                    tabela.innerHTML += `<tr><td>${c.medico || '---'}</td><td>${c.especialidade || '---'}</td><td>${c.data || '---'}</td><td>${c.hora || '---'}</td><td>${c.status || '---'}</td></tr>`;
+                });
+            }
+        });
+        const tabBtn = document.querySelector('.tabs button[data-tab="usuarios"]');
+        mostrar('usuarios', tabBtn);
+    }
+
+    var consultasDataOriginal = [];
+    function carregarTodasConsultas() {
+        fetch('/todas_consultas')
+        .then(res => res.json())
+        .then(data => {
+            consultasDataOriginal = data;
+            renderConsultas(data);
+        });
+    }
+
+    function renderConsultas(lista) {
+        let tabela = document.getElementById("tabela-consultas");
+        tabela.innerHTML = `<tr><th>Paciente</th><th>Médico</th><th>Especialidade</th><th>Data</th><th>Hora</th><th>Status</th></tr>`;
+        if(lista.length === 0) {
+            tabela.innerHTML += '<tr><td colspan="6" style="text-align: center;">Nenhuma consulta encontrada</td></tr>';
+        } else {
+            lista.forEach(c => {
+                tabela.innerHTML += `<tr><td>${c[0] || '---'}</td><td>${c[1] || '---'}</td><td>${c[2] || '---'}</td><td>${c[3] || '---'}</td><td>${c[5] || '---'}</td><td>${c[4] || '---'}</td></tr>`;
+            });
+        }
+    }
+
+    function filtrarConsultasCompleto() {
+        if (consultasDataOriginal.length === 0) return;
+        var filtroData = document.getElementById('filtroData').value;
+        var filtroPaciente = document.getElementById('filtroPaciente').value.toLowerCase().trim();
+        var filtroMedico = document.getElementById('filtroMedico').value.toLowerCase().trim();
+        var hoje = new Date().toISOString().split('T')[0];
+        var dadosFiltrados = [];
+        for(var i = 0; i < consultasDataOriginal.length; i++) {
+            var consulta = consultasDataOriginal[i];
+            var paciente = (consulta[0] || '').toLowerCase();
+            var medico = (consulta[1] || '').toLowerCase();
+            var dataConsulta = consulta[3];
+            if (filtroPaciente !== '' && !paciente.includes(filtroPaciente)) continue;
+            if (filtroMedico !== '' && !medico.includes(filtroMedico)) continue;
+            if (filtroData === 'futuras' && dataConsulta < hoje) continue;
+            if (filtroData === 'passadas' && dataConsulta >= hoje) continue;
+            dadosFiltrados.push(consulta);
+        }
+        renderConsultas(dadosFiltrados);
+    }
+
+    function limparFiltrosConsultas() {
+        document.getElementById('filtroData').value = 'todas';
+        document.getElementById('filtroPaciente').value = '';
+        document.getElementById('filtroMedico').value = '';
+        renderConsultas(consultasDataOriginal);
+    }
+
+    // Logout
+    const logoutBtn = document.getElementById('logoutBtn');
+    if(logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            showToast('Saindo...', 'Redirecionando para página de login', 'info', 1500);
+            setTimeout(() => window.location.href = '/', 1500);
+        });
+    }
+
+    carregarEstatisticasChat();
+    setInterval(carregarEstatisticasChat, 30000);
+    window.addEventListener('DOMContentLoaded', () => {
+        showToast('Bem-vindo!', 'Central de Suporte do Saúde & Vida', 'success', 4000);
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,408 @@
+{% extends "base.html" %}
+
+{% block title %}Meu Perfil | Saúde & Vida{% endblock %}
+
+{% block extra_css %}
+<style>
+  :root {
+    --brand: var(--primary);
+    --brand-dark: var(--primary-dark);
+    --brand-light: var(--primary-light);
+    --bg-page: var(--gray-bg);
+    --bg-card: var(--white);
+    --border: #eef2f8;
+    --text-primary: var(--text-dark);
+    --text-secondary: var(--text-gray);
+    --text-muted: var(--text-light);
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --shadow-sm: var(--shadow-sm);
+    --shadow-md: var(--shadow-md);
+  }
+
+  [data-theme="dark"] { --bg-page:#0f1923; --bg-card:#1a2332; --border:#1e2f44; --text-primary:#e8eef5; --text-secondary:#94a8bf; --text-muted:#6a7c9e; }
+  [data-theme="dark"] .perfil-card, [data-theme="dark"] .form-control, [data-theme="dark"] .tab-btn { background:#1a2332 !important; border-color:#1e2f44 !important; color:#e8eef5 !important; }
+  [data-theme="dark"] .tab-btn.active { background:#0f1923 !important; }
+  [data-theme="dark"] .avatar-wrap { background: linear-gradient(135deg,#0d2a3a,#1c3a5e); }
+  [data-theme="dark"] .info-row { border-color:#1e2f44; }
+  [data-theme="dark"] .consulta-item { border-color:#1e2f44; }
+  [data-theme="dark"] .consulta-name { color:#e8eef5; }
+
+  .page-wrap { max-width: 1000px; margin: 0 auto; padding: 36px 24px 60px; }
+
+  /* ── HERO PERFIL ── */
+  .perfil-hero {
+    background: linear-gradient(135deg, var(--brand) 0%, #0d6fa8 100%);
+    border-radius: var(--radius-lg);
+    padding: 36px 40px;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .perfil-hero::before {
+    content: '';
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 220px; height: 220px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 50%;
+  }
+  .perfil-hero::after {
+    content: '';
+    position: absolute;
+    right: 60px; bottom: -80px;
+    width: 180px; height: 180px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50%;
+  }
+  .avatar-wrap {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    border: 3px solid rgba(255,255,255,0.3);
+    font-size: 36px; color: #fff;
+  }
+  .perfil-hero-info h2 { color: #fff; font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .perfil-hero-info p { color: rgba(255,255,255,0.8); font-size: 14px; }
+  .perfil-badges { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+  .perfil-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.18);
+    color: #fff; font-size: 12px; font-weight: 500;
+    padding: 4px 12px; border-radius: 20px;
+    font-family: 'Poppins', 'Montserrat', sans-serif;
+  }
+
+  /* ── CARDS ── */
+  .perfil-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 20px;
+  }
+  .card-title {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 16px; font-weight: 700;
+    color: var(--text-primary);
+    font-family: 'Poppins', 'Montserrat', sans-serif;
+    margin-bottom: 20px;
+  }
+  .card-title i { color: var(--brand); font-size: 18px; }
+
+  /* ── TABS ── */
+  .tabs { display: flex; gap: 4px; background: var(--bg-page); border-radius: var(--radius-md); padding: 4px; margin-bottom: 24px; }
+  .tab-btn {
+    flex: 1; padding: 11px; text-align: center;
+    font-size: 0.9rem; font-weight: 600; border-radius: 10px;
+    cursor: pointer; border: none;
+    background: transparent; color: var(--text-secondary);
+    font-family: 'Poppins', 'Montserrat', sans-serif; transition: all 0.2s;
+  }
+  .tab-btn.active { background: var(--bg-card); color: var(--brand); box-shadow: var(--shadow-sm); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── FORM ── */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  .form-group.full { grid-column: 1 / -1; }
+  .form-label { font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-family: 'Poppins', 'Montserrat', sans-serif; }
+  .form-control {
+    width: 100%; padding: 12px 16px;
+    border: 1.5px solid var(--border); border-radius: var(--radius-md);
+    font-size: 0.95rem; font-family: 'Poppins', 'Montserrat', sans-serif;
+    color: var(--text-primary); background: var(--bg-page);
+    outline: none; transition: all 0.2s; appearance: none;
+  }
+  .form-control:focus { border-color: var(--brand); background: var(--bg-card); box-shadow: 0 0 0 3px rgba(28,159,211,0.12); }
+  .form-control:disabled { opacity: 0.55; cursor: not-allowed; }
+  select.form-control {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238d9db0' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 14px center; padding-right: 38px;
+  }
+
+  /* ── INFO ROWS (readonly) ── */
+  .info-list { display: flex; flex-direction: column; gap: 0; }
+  .info-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 0; border-bottom: 1px solid var(--border);
+    font-size: 13px; font-family: 'Poppins', 'Montserrat', sans-serif;
+  }
+  .info-row:last-child { border-bottom: none; }
+  .info-key { color: var(--text-secondary); display: flex; align-items: center; gap: 8px; }
+  .info-key i { color: var(--brand); width: 16px; text-align: center; }
+  .info-val { font-weight: 600; color: var(--text-primary); }
+
+  /* ── BOTÕES ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 24px; border-radius: 50px;
+    font-size: 0.9rem; font-weight: 700; font-family: 'Poppins', 'Montserrat', sans-serif;
+    cursor: pointer; transition: all 0.2s; border: none; text-decoration: none;
+  }
+  .btn-primary { background: var(--brand); color: #fff; }
+  .btn-primary:hover { background: var(--brand-dark); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(28,159,211,0.35); }
+  .btn-ghost { background: transparent; color: var(--text-secondary); border: 1.5px solid var(--border); }
+  .btn-ghost:hover { background: var(--bg-page); }
+  .btn-danger { background: #fcebeb; color: #791f1f; border: 1.5px solid #f09595; }
+  .btn-danger:hover { background: #f7c1c1; }
+  .btn-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; }
+
+  /* ── BADGES ── */
+  .badge { display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; font-family: 'Poppins', 'Montserrat', sans-serif; }
+  .badge-success { background: #eaf3de; color: #27500a; }
+  .badge-warning { background: #faeeda; color: #633806; }
+  .badge-info { background: #e6f1fb; color: #0c447c; }
+  .badge-danger { background: #fcebeb; color: #791f1f; }
+
+  /* ── CONSULTAS ── */
+  .consulta-item { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .consulta-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .consulta-avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--brand-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .consulta-avatar i { color: var(--brand); font-size: 18px; }
+  .consulta-body { flex: 1; }
+  .consulta-name { font-size: 13px; font-weight: 600; color: var(--text-primary); font-family: 'Poppins', 'Montserrat', sans-serif; }
+  .consulta-meta { font-size: 12px; color: var(--text-secondary); margin-top: 3px; display: flex; gap: 12px; flex-wrap: wrap; font-family: 'Poppins', 'Montserrat', sans-serif; }
+  .consulta-meta span { display: flex; align-items: center; gap: 4px; }
+  .consulta-meta i { color: var(--brand); font-size: 11px; }
+  .empty-state { text-align: center; padding: 36px; color: var(--text-muted); }
+  .empty-state i { font-size: 40px; display: block; margin-bottom: 12px; opacity: 0.3; }
+  .empty-state p { font-size: 13px; font-family: 'Poppins', 'Montserrat', sans-serif; }
+
+  /* ── SENHA ── */
+  .senha-strength { height: 4px; border-radius: 4px; margin-top: 6px; background: var(--border); overflow: hidden; }
+  .senha-strength-bar { height: 100%; border-radius: 4px; transition: all 0.3s; width: 0; }
+
+  .tabs-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 24px; }
+  .tabs-scroll .tabs { min-width: min(100%, 520px); margin-bottom: 0; }
+  .tab-btn i { margin-right: 6px; }
+
+  @media (max-width: 992px) {
+    .page-wrap { padding: 28px 20px 50px; }
+    .perfil-card { padding: 24px; }
+  }
+  @media (max-width: 768px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .perfil-hero { flex-direction: column; text-align: center; padding: 28px 20px; gap: 20px; }
+    .perfil-hero-info h2 { font-size: 1.25rem; }
+    .avatar-wrap { width: 76px; height: 76px; font-size: 30px; }
+    .perfil-badges { justify-content: center; }
+    .page-wrap { padding: 20px 16px 40px; }
+    .perfil-card { padding: 20px 18px; border-radius: 16px; }
+    .tabs { flex-wrap: nowrap; }
+    .tab-btn { font-size: 0.78rem; padding: 10px 8px; white-space: nowrap; }
+    .info-row { flex-direction: column; align-items: flex-start; gap: 6px; padding: 12px 0; }
+    .info-val { word-break: break-word; }
+    .consulta-item { flex-wrap: wrap; gap: 10px; }
+    .consulta-item .badge { margin-left: auto; }
+    .btn-actions { flex-direction: column; }
+    .btn-actions .btn { width: 100%; justify-content: center; }
+  }
+  @media (max-width: 480px) {
+    .perfil-hero { padding: 24px 16px; }
+    .perfil-badge { font-size: 11px; }
+    .card-title { font-size: 15px; }
+    .tab-btn span-label { display: none; }
+    .tab-btn { flex: 1; min-width: 0; }
+    .tab-btn i { margin-right: 0; font-size: 1rem; }
+    .consulta-meta { flex-direction: column; gap: 4px; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+
+  <!-- Hero -->
+  <div class="perfil-hero">
+    <div class="avatar-wrap">
+      <i class="fas fa-user-circle"></i>
+    </div>
+    <div class="perfil-hero-info">
+      <h2>{{ usuario[1] if usuario else 'Usuário' }}</h2>
+      <p>{{ usuario[2] if usuario else '' }}</p>
+      <div class="perfil-badges">
+        {% if usuario %}
+          <span class="perfil-badge"><i class="fas fa-id-badge"></i> {{ usuario[10] | capitalize }}</span>
+          {% if usuario[7] %}
+            <span class="perfil-badge"><i class="fas fa-shield-heart"></i> {{ usuario[7] }}</span>
+          {% endif %}
+          {% if usuario[9] %}
+            <span class="perfil-badge"><i class="fas fa-calendar-plus"></i> Desde {{ usuario[9][:10] if usuario[9] else '' }}</span>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs-scroll">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="abrirTab('dados', this)"><i class="fas fa-user"></i> <span class="span-label">Dados pessoais</span></button>
+      <button class="tab-btn" onclick="abrirTab('senha', this)"><i class="fas fa-lock"></i> <span class="span-label">Alterar senha</span></button>
+      <button class="tab-btn" onclick="abrirTab('consultas', this)"><i class="fas fa-calendar-check"></i> <span class="span-label">Histórico</span></button>
+    </div>
+  </div>
+
+  <!-- ── TAB DADOS ── -->
+  <div class="tab-panel active" id="tab-dados">
+    <div class="perfil-card">
+      <div class="card-title"><i class="fas fa-user-edit"></i> Editar informações</div>
+
+      <!-- Info readonly -->
+      <div class="info-list" style="margin-bottom:24px">
+        <div class="info-row">
+          <span class="info-key"><i class="fas fa-envelope"></i> E-mail</span>
+          <span class="info-val">{{ usuario[2] if usuario else '—' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key"><i class="fas fa-id-card"></i> CPF</span>
+          <span class="info-val">{{ usuario[4] if usuario and usuario[4] else '—' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key"><i class="fas fa-shield-heart"></i> Plano</span>
+          <span class="info-val">
+            {% if usuario and usuario[7] %}
+              <span class="badge badge-success">{{ usuario[7] }}</span>
+            {% else %}
+              <span class="badge badge-warning">Sem plano</span>
+            {% endif %}
+          </span>
+        </div>
+      </div>
+
+      <!-- Form editável -->
+      <form method="POST" action="/editar_perfil">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Nome completo</label>
+            <input class="form-control" type="text" name="nome" value="{{ usuario[1] if usuario else '' }}" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Telefone</label>
+            <input class="form-control" type="text" name="telefone" value="{{ usuario[3] if usuario and usuario[3] else '' }}" placeholder="(85) 9 0000-0000" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Gênero</label>
+            <select class="form-control" name="genero">
+              <option value="">Selecione...</option>
+              <option value="Masculino" {% if usuario and usuario[5] == 'Masculino' %}selected{% endif %}>Masculino</option>
+              <option value="Feminino" {% if usuario and usuario[5] == 'Feminino' %}selected{% endif %}>Feminino</option>
+              <option value="Outro" {% if usuario and usuario[5] == 'Outro' %}selected{% endif %}>Outro</option>
+              <option value="Prefiro não informar" {% if usuario and usuario[5] == 'Prefiro não informar' %}selected{% endif %}>Prefiro não informar</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Data de nascimento</label>
+            <input class="form-control" type="date" name="nascimento" value="{{ usuario[6] if usuario and usuario[6] else '' }}" />
+          </div>
+        </div>
+        <div class="btn-actions">
+          <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Salvar alterações</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── TAB SENHA ── -->
+  <div class="tab-panel" id="tab-senha">
+    <div class="perfil-card">
+      <div class="card-title"><i class="fas fa-lock"></i> Alterar senha</div>
+      <form method="POST" action="/alterar_senha">
+        <div class="form-group">
+          <label class="form-label">Senha atual</label>
+          <input class="form-control" type="password" name="senha_atual" placeholder="Digite sua senha atual" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nova senha</label>
+          <input class="form-control" type="password" name="nova_senha" id="novaSenha" placeholder="Mínimo 6 caracteres" required oninput="verificarSenha()" />
+          <div class="senha-strength"><div class="senha-strength-bar" id="senhaBar"></div></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirmar nova senha</label>
+          <input class="form-control" type="password" name="confirmar_senha" id="confirmarSenha" placeholder="Repita a nova senha" required oninput="verificarConfirmacao()" />
+        </div>
+        <div class="btn-actions">
+          <button type="submit" class="btn btn-primary"><i class="fas fa-key"></i> Alterar senha</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── TAB HISTÓRICO ── -->
+  <div class="tab-panel" id="tab-consultas">
+    <div class="perfil-card">
+      <div class="card-title"><i class="fas fa-clock-rotate-left"></i> Histórico de consultas</div>
+      {% if consultas %}
+        {% for c in consultas %}
+        <div class="consulta-item">
+          <div class="consulta-avatar"><i class="fas fa-user-doctor"></i></div>
+          <div class="consulta-body">
+            <div class="consulta-name">{{ c[1] }} — {{ c[2] }}</div>
+            <div class="consulta-meta">
+              <span><i class="fas fa-calendar"></i> {{ c[3] }}</span>
+              <span><i class="fas fa-clock"></i> {{ c[4] }}</span>
+            </div>
+          </div>
+          {% if c[5] == 'Finalizado' %}
+            <span class="badge badge-success">{{ c[5] }}</span>
+          {% elif c[5] == 'Aguardando' %}
+            <span class="badge badge-warning">{{ c[5] }}</span>
+          {% elif c[5] == 'Cancelado' %}
+            <span class="badge badge-danger">{{ c[5] }}</span>
+          {% else %}
+            <span class="badge badge-info">{{ c[5] }}</span>
+          {% endif %}
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <i class="fas fa-calendar-xmark"></i>
+          <p>Nenhuma consulta no histórico ainda.</p>
+          <a href="/agendamentos" class="btn btn-primary" style="margin-top:16px"><i class="fas fa-calendar-plus"></i> Agendar consulta</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function abrirTab(id, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  function verificarSenha() {
+    const val = document.getElementById('novaSenha').value;
+    const bar = document.getElementById('senhaBar');
+    let forca = 0;
+    if (val.length >= 6) forca++;
+    if (val.length >= 10) forca++;
+    if (/[A-Z]/.test(val)) forca++;
+    if (/[0-9]/.test(val)) forca++;
+    if (/[^A-Za-z0-9]/.test(val)) forca++;
+    const cores = ['#ef4444','#f59e0b','#f59e0b','#10b981','#10b981'];
+    const larguras = ['20%','40%','60%','80%','100%'];
+    bar.style.background = cores[forca - 1] || '#eef2f8';
+    bar.style.width = larguras[forca - 1] || '0%';
+  }
+
+  function verificarConfirmacao() {
+    const nova = document.getElementById('novaSenha').value;
+    const conf = document.getElementById('confirmarSenha');
+    conf.style.borderColor = conf.value === nova ? '#10b981' : '#ef4444';
+  }
+</script>
+{% endblock %}

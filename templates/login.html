@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Centro Médico Saúde & Vida | Login</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="split-layout">
+  <div class="hero-side">
+    <div class="grid-pattern"></div>
+    <div class="hero-content">
+      <div class="logo-wrapper">
+        <img src="/static/img/logo.png" alt="Saúde & Vida" class="logo-large" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 200 200\'%3E%3Ccircle cx=\'100\' cy=\'100\' r=\'90\' fill=\'%231c9fd3\' opacity=\'0.3\'/%3E%3Cpath d=\'M70 80 L130 80 L120 130 L80 130 Z\' fill=\'%231c9fd3\' stroke=\'white\' stroke-width=\'2\'/%3E%3C/svg%3E'">
+      </div>
+      <h1 class="hero-title">Saúde & Vida</h1>
+      <div class="hero-tagline">Cuidado que transforma</div>
+      <p class="hero-subtitle">Plataforma inteligente para gestão de exames e consultas. Acesso rápido, segurança total e inovação em saúde.</p>
+      
+      <div class="feature-list">
+        <div class="feature-item"><i class="fas fa-shield-alt"></i> <span>Segurança e conformidade total</span></div>
+        <div class="feature-item"><i class="fas fa-calendar-check"></i> <span>Agendamento em tempo real</span></div>
+        <div class="feature-item"><i class="fas fa-chart-line"></i> <span>Histórico médico completo</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-side">
+    <div class="form-container">
+      <div class="form-header">
+        <span class="badge"><i class="fas fa-stethoscope"></i> Área do Paciente</span>
+        <h2>Acesse sua conta</h2>
+        <p>Informe suas credenciais para entrar no sistema</p>
+      </div>
+
+      <div class="toggle-group">
+        <button type="button" id="toggleLoginBtn" class="toggle-btn active" onclick="showLoginPanel()">Entrar</button>
+        <button type="button" id="toggleRegBtn" class="toggle-btn" onclick="showRegisterPanel()">Registrar</button>
+      </div>
+
+      <div class="divider-custom">
+        <div class="divider-line"></div>
+        <span>acesse com e-mail</span>
+        <div class="divider-line"></div>
+      </div>
+
+      <!-- PAINEL LOGIN -->
+      <div id="loginPanelContainer">
+        <form id="loginForm">
+          <div class="input-group">
+            <label class="input-label">E-mail</label>
+            <input type="email" name="email" id="loginEmail" class="input-field" placeholder="seu@email.com" required autocomplete="email">
+            <div class="hint-text"><i class="fas fa-envelope"></i> Digite seu e-mail de acesso</div>
+          </div>
+          <div class="input-group">
+            <label class="input-label">Senha</label>
+            <input type="password" name="senha" id="loginSenha" class="input-field" placeholder="••••••••" required>
+            <div class="hint-text"><i class="fas fa-lock"></i> Informe sua senha</div>
+          </div>
+          <button type="submit" class="btn-primary"><i class="fas fa-arrow-right-to-bracket"></i> Entrar no painel</button>
+        </form>
+        <div class="link-footer">
+          <span>Esqueceu a senha? </span><a href="#" id="forgotPasswordLink">Recuperar acesso</a> &nbsp;|&nbsp;
+          <span>Não tem conta? </span><button type="button" class="fake-link" onclick="showRegisterPanel()">Cadastre-se</button>
+        </div>
+      </div>
+
+      <!-- PAINEL REGISTRO -->
+      <div id="registerPanelContainer" style="display: none;">
+        <div style="text-align: center; margin-bottom: 12px;">
+          <span style="font-weight: 800; font-size: 22px; color:#0a1220;">Criar conta</span>
+          <div class="hint-text" style="justify-content: center;">Preencha os dados abaixo</div>
+        </div>
+
+        <form id="registerForm">
+          <div class="input-group">
+            <input type="text" name="nome" id="regNome" class="input-field" placeholder="Nome completo" required>
+          </div>
+          <div class="row-2cols">
+            <div class="input-group">
+              <input type="text" name="cpf" id="cpfInput" class="input-field" placeholder="CPF" required maxlength="14">
+              <div class="hint-text"><i class="fas fa-id-card"></i> CPF único por usuário</div>
+            </div>
+            <div class="input-group">
+              <input type="text" name="telefone" id="telefoneInput" class="input-field" placeholder="Telefone" required maxlength="15">
+              <div class="hint-text"><i class="fas fa-phone"></i> Telefone único por usuário</div>
+            </div>
+          </div>
+          <div class="row-2cols">
+            <div class="input-group">
+              <input type="date" name="nascimento" id="regNascimento" class="input-field" required>
+            </div>
+            <div class="input-group">
+              <select name="genero" id="regGenero" class="input-field" required>
+                <option value="">Gênero</option>
+                <option value="Masculino">Masculino</option>
+                <option value="Feminino">Feminino</option>
+                <option value="Outro">Outro</option>
+              </select>
+            </div>
+          </div>
+          <div class="input-group">
+            <input type="email" name="email" id="regEmail" class="input-field" placeholder="E-mail" required autocomplete="email">
+            <div class="hint-text"><i class="fas fa-envelope"></i> E-mail único por usuário</div>
+          </div>
+          <div class="row-2cols">
+            <div class="input-group">
+              <input type="password" name="senha" id="regSenha" class="input-field" placeholder="Senha" required>
+              <div class="hint-text"><i class="fas fa-info-circle"></i> Mínimo de 6 caracteres</div>
+            </div>
+            <div class="input-group">
+              <input type="password" id="confirmPasswordReg" class="input-field" placeholder="Confirmar senha" required>
+            </div>
+          </div>
+          <button type="submit" class="btn-primary"><i class="fas fa-user-plus"></i> Criar conta</button>
+        </form>
+        <div class="link-footer">
+          <button type="button" class="fake-link" onclick="showLoginPanel()"><i class="fas fa-sign-in-alt"></i> Já possui conta? Faça login</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Sistema de notificações
+  function showToast(title, message, type = 'info', duration = 4000) {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    
+    let icon = '';
+    switch(type) {
+      case 'success': icon = '<i class="fas fa-check-circle"></i>'; break;
+      case 'error': icon = '<i class="fas fa-exclamation-circle"></i>'; break;
+      case 'warning': icon = '<i class="fas fa-exclamation-triangle"></i>'; break;
+      default: icon = '<i class="fas fa-info-circle"></i>';
+    }
+    
+    toast.innerHTML = `
+      <div class="toast-icon">${icon}</div>
+      <div class="toast-content">
+        <div class="toast-title">${title}</div>
+        <div class="toast-message">${message}</div>
+      </div>
+      <button class="toast-close"><i class="fas fa-times"></i></button>
+    `;
+    
+    container.appendChild(toast);
+    
+    const closeBtn = toast.querySelector('.toast-close');
+    closeBtn.addEventListener('click', () => {
+      toast.classList.add('toast-hide');
+      setTimeout(() => toast.remove(), 300);
+    });
+    
+    setTimeout(() => {
+      if (toast.parentNode) {
+        toast.classList.add('toast-hide');
+        setTimeout(() => toast.remove(), 300);
+      }
+    }, duration);
+  }
+
+  // Validação de email
+  function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  // Validação de senha
+  function isValidPassword(password) {
+    return password.length >= 6;
+  }
+
+  // Validação de CPF
+  function isValidCPF(cpf) {
+    cpf = cpf.replace(/\D/g, '');
+    if (cpf.length !== 11) return false;
+    if (/^(\d)\1{10}$/.test(cpf)) return false;
+    
+    let sum = 0;
+    for (let i = 0; i < 9; i++) sum += parseInt(cpf.charAt(i)) * (10 - i);
+    let rev = 11 - (sum % 11);
+    if (rev === 10 || rev === 11) rev = 0;
+    if (rev !== parseInt(cpf.charAt(9))) return false;
+    
+    sum = 0;
+    for (let i = 0; i < 10; i++) sum += parseInt(cpf.charAt(i)) * (11 - i);
+    rev = 11 - (sum % 11);
+    if (rev === 10 || rev === 11) rev = 0;
+    return rev === parseInt(cpf.charAt(10));
+  }
+
+  // Validação de telefone
+  function isValidPhone(phone) {
+    const phoneDigits = phone.replace(/\D/g, '');
+    return phoneDigits.length >= 10 && phoneDigits.length <= 11;
+  }
+
+  // Máscaras
+  function mascaraCPF(cpf) {
+    cpf = cpf.replace(/\D/g, '');
+    if (cpf.length <= 3) return cpf;
+    if (cpf.length <= 6) return cpf.replace(/(\d{3})(\d)/, '$1.$2');
+    if (cpf.length <= 9) return cpf.replace(/(\d{3})(\d{3})(\d)/, '$1.$2.$3');
+    return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
+  }
+
+  function mascaraTelefone(telefone) {
+    telefone = telefone.replace(/\D/g, '');
+    if (telefone.length <= 2) return telefone;
+    if (telefone.length <= 6) return telefone.replace(/(\d{2})(\d)/, '($1) $2');
+    if (telefone.length <= 10) return telefone.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+    return telefone.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+  }
+
+  // Eventos de máscara
+  const cpfField = document.getElementById('cpfInput');
+  const telefoneField = document.getElementById('telefoneInput');
+  
+  if (cpfField) {
+    cpfField.addEventListener('input', function(e) {
+      e.target.value = mascaraCPF(e.target.value);
+    });
+  }
+  
+  if (telefoneField) {
+    telefoneField.addEventListener('input', function(e) {
+      e.target.value = mascaraTelefone(e.target.value);
+    });
+  }
+
+  // Validação visual de confirmação de senha
+  const regSenha = document.getElementById('regSenha');
+  const confirmSenha = document.getElementById('confirmPasswordReg');
+  
+  function validatePasswordMatch() {
+    if (regSenha && confirmSenha) {
+      const senha = regSenha.value;
+      const confirm = confirmSenha.value;
+      
+      if (confirm.length > 0 && senha !== confirm) {
+        confirmSenha.classList.add('error');
+        confirmSenha.classList.remove('success');
+      } else if (confirm.length > 0 && senha === confirm) {
+        confirmSenha.classList.remove('error');
+        confirmSenha.classList.add('success');
+      } else {
+        confirmSenha.classList.remove('error');
+        confirmSenha.classList.remove('success');
+      }
+    }
+  }
+  
+  if (regSenha) {
+    regSenha.addEventListener('input', validatePasswordMatch);
+  }
+  if (confirmSenha) {
+    confirmSenha.addEventListener('input', validatePasswordMatch);
+  }
+
+  // Validação em tempo real para CPF e telefone
+  async function checkFieldUniqueness(field, value, fieldName) {
+    if (!value || value.length < (field === 'cpf' ? 11 : 10)) return;
+    
+    try {
+      const response = await fetch(`/verificar_${field}?valor=${encodeURIComponent(value)}`);
+      const data = await response.json();
+      
+      const inputElement = document.getElementById(`${field}Input`);
+      if (data.exists) {
+        inputElement.classList.add('error');
+        inputElement.classList.remove('success');
+        showToast(`${fieldName} já cadastrado`, `Este ${fieldName.toLowerCase()} já está em uso.`, 'warning', 3000);
+      } else {
+        inputElement.classList.remove('error');
+        inputElement.classList.add('success');
+      }
+    } catch (error) {
+      console.error('Erro ao verificar:', error);
+    }
+  }
+
+  if (cpfField) {
+    cpfField.addEventListener('blur', function() {
+      const cpfLimpo = this.value.replace(/\D/g, '');
+      if (cpfLimpo.length === 11) {
+        checkFieldUniqueness('cpf', cpfLimpo, 'CPF');
+      }
+    });
+  }
+
+  if (telefoneField) {
+    telefoneField.addEventListener('blur', function() {
+      const telefoneLimpo = this.value.replace(/\D/g, '');
+      if (telefoneLimpo.length >= 10) {
+        checkFieldUniqueness('telefone', telefoneLimpo, 'Telefone');
+      }
+    });
+  }
+
+  // ========== LOGIN ==========
+  const loginForm = document.getElementById('loginForm');
+  if (loginForm) {
+    loginForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const email = document.getElementById('loginEmail').value.trim();
+      const senha = document.getElementById('loginSenha').value;
+      
+      if (!email || !senha) {
+        showToast('Campos obrigatórios', 'Preencha todos os campos para continuar.', 'warning');
+        return;
+      }
+      
+      if (!isValidEmail(email)) {
+        showToast('E-mail inválido', 'Por favor, insira um endereço de e-mail válido.', 'error');
+        return;
+      }
+      
+      const submitBtn = loginForm.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando...';
+      submitBtn.disabled = true;
+      
+      try {
+        const formData = new URLSearchParams();
+        formData.append('email', email);
+        formData.append('senha', senha);
+        
+        const response = await fetch('/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: formData.toString()
+        });
+        
+        if (response.redirected) {
+          showToast('Login realizado!', 'Redirecionando para o painel...', 'success', 1500);
+          setTimeout(() => {
+            window.location.href = response.url;
+          }, 1500);
+        } else {
+          showToast('Erro de autenticação', 'E-mail ou senha incorretos. Verifique suas credenciais.', 'error');
+        }
+      } catch (error) {
+        console.error('Erro:', error);
+        showToast('Erro de conexão', 'Não foi possível conectar ao servidor. Tente novamente.', 'error');
+      } finally {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+      }
+    });
+  }
+
+  // REGISTRO
+  const registerForm = document.getElementById('registerForm');
+  if (registerForm) {
+    registerForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const nome = document.getElementById('regNome').value.trim();
+      const cpf = document.getElementById('cpfInput').value;
+      const telefone = document.getElementById('telefoneInput').value;
+      const nascimento = document.getElementById('regNascimento').value;
+      const genero = document.getElementById('regGenero').value;
+      const email = document.getElementById('regEmail').value.trim();
+      const senha = document.getElementById('regSenha').value;
+      const confirm = document.getElementById('confirmPasswordReg').value;
+      
+      if (!nome || !cpf || !telefone || !nascimento || !genero || !email || !senha) {
+        showToast('Campos incompletos', 'Por favor, preencha todos os campos obrigatórios.', 'warning');
+        return;
+      }
+      
+      if (nome.length < 3) {
+        showToast('Nome inválido', 'O nome completo deve ter pelo menos 3 caracteres.', 'error');
+        return;
+      }
+      
+      if (!isValidCPF(cpf)) {
+        showToast('CPF inválido', 'Por favor, insira um CPF válido.', 'error');
+        return;
+      }
+      
+      if (!isValidPhone(telefone)) {
+        showToast('Telefone inválido', 'Insira um número de telefone válido com DDD.', 'error');
+        return;
+      }
+      
+      if (!isValidEmail(email)) {
+        showToast('E-mail inválido', 'Por favor, insira um endereço de e-mail válido.', 'error');
+        return;
+      }
+      
+      if (!isValidPassword(senha)) {
+        showToast('Senha inválida', 'A senha deve ter no mínimo 6 caracteres.', 'error');
+        return;
+      }
+      
+      if (senha !== confirm) {
+        showToast('Senhas não conferem', 'As senhas digitadas não são iguais.', 'error');
+        return;
+      }
+      
+      const cpfRaw = cpf.replace(/\D/g, '');
+      const telefoneRaw = telefone.replace(/\D/g, '');
+      
+      const submitBtn = registerForm.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cadastrando...';
+      submitBtn.disabled = true;
+      
+      try {
+        const formData = new URLSearchParams();
+        formData.append('nome', nome);
+        formData.append('cpf', cpfRaw);
+        formData.append('telefone', telefoneRaw);
+        formData.append('nascimento', nascimento);
+        formData.append('genero', genero);
+        formData.append('email', email);
+        formData.append('senha', senha);
+        
+        const response = await fetch('/cadastrar', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: formData.toString()
+        });
+        
+        const text = await response.text();
+        
+        if (response.status === 409) {
+          if (text.includes("CPF")) {
+            showToast('CPF já cadastrado', 'Este CPF já está sendo usado por outra conta.', 'error');
+          } else if (text.includes("Telefone")) {
+            showToast('Telefone já cadastrado', 'Este telefone já está sendo usado por outra conta.', 'error');
+          } else if (text.includes("e-mail")) {
+            showToast('E-mail já cadastrado', 'Este e-mail já está sendo usado por outra conta.', 'error');
+          } else {
+            showToast('Erro no cadastro', text, 'error');
+          }
+        } else if (response.ok || text.includes("sucesso")) {
+          showToast('Cadastro realizado!', 'Sua conta foi criada com sucesso!', 'success', 2500);
+          setTimeout(() => {
+            registerForm.reset();
+            if (regSenha) regSenha.value = '';
+            if (confirmSenha) confirmSenha.value = '';
+            showLoginPanel();
+            showToast('Faça login', 'Agora faça login com sua nova conta.', 'info', 3000);
+          }, 2500);
+        } else {
+          showToast('Erro no cadastro', text || 'Não foi possível criar sua conta.', 'error');
+        }
+      } catch (error) {
+        console.error('Erro:', error);
+        showToast('Erro de conexão', 'Não foi possível conectar ao servidor.', 'error');
+      } finally {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+      }
+    });
+  }
+
+  // Funções de toggle
+  function showLoginPanel() {
+    document.getElementById('loginPanelContainer').style.display = 'block';
+    document.getElementById('registerPanelContainer').style.display = 'none';
+    document.getElementById('toggleLoginBtn').classList.add('active');
+    document.getElementById('toggleRegBtn').classList.remove('active');
+  }
+  
+  function showRegisterPanel() {
+    document.getElementById('loginPanelContainer').style.display = 'none';
+    document.getElementById('registerPanelContainer').style.display = 'block';
+    document.getElementById('toggleRegBtn').classList.add('active');
+    document.getElementById('toggleLoginBtn').classList.remove('active');
+  }
+
+  // Esqueceu a senha
+  const forgotLink = document.getElementById('forgotPasswordLink');
+  if(forgotLink) {
+    forgotLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      showToast('Recuperação de senha', 'Enviaremos um link de recuperação para seu e-mail cadastrado.', 'info', 4000);
+    });
+  }
+
+  // Verificar se há mensagem de erro na URL (para redirecionamentos)
+  window.addEventListener('DOMContentLoaded', () => {
+    showLoginPanel();
+    
+    // Verificar se veio com erro na URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get('error');
+    if (error) {
+      showToast('Erro de acesso', error, 'error');
+    }
+    
+    setTimeout(() => {
+      showToast('Bem-vindo', 'Plataforma Saúde & Vida - Sua saúde em primeiro lugar.', 'success', 4000);
+    }, 500);
+  });
+</script>
+
+</body>
+</html>

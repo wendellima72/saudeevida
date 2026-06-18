@@ -1,0 +1,243 @@
+body {
+    margin: 0;
+    font-family: Arial;
+    background: #f5f5f5;
+}
+
+/* HEADER */
+.topbar{
+  width:100%;
+  height:90px;                 /* aumentei */
+  background:var(--verde);
+  position:sticky;
+  top:0;
+  z-index:1000;
+  box-shadow:0 2px 6px rgba(0,0,0,0.15);
+  display:flex;
+  align-items:center;
+}
+
+/* container central */
+.cont{
+  width:95%;
+  max-width:1300px;
+  margin:auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  height:100%;
+}
+
+/* logo + nome */
+.logo-area{
+  display:flex;
+  align-items:center;
+  gap:18px;
+}
+
+.logo{
+  width:140px;               /* aumentei */
+}
+
+.medic-name{
+  color:var(--texto);
+  font-size:1.1rem;          /* aumentei */
+  font-weight:500;
+  white-space:nowrap;
+  line-height:1.2;
+}
+
+.login img {
+  width: 40px; /* tamanho do ícone */
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.login img:hover {
+  transform: scale(1.1);
+}
+
+
+/* MENU LATERAL */
+.perguntas {
+    width: 280px;
+    background: #f0f0f0;
+    padding: 25px;
+    border-radius: 10px;
+}
+
+/* ITENS DO MENU */
+.perguntas p {
+    margin: 18px 0;
+    cursor: pointer;
+    color: #777;
+    display: flex;
+    align-items: center;
+    font-size: 16px; /* 🔥 maior */
+    padding: 10px;
+    border-radius: 8px;
+    transition: 0.2s;
+}
+
+/* HOVER BONITO */
+.perguntas p:hover {
+    background: #e0f4ff;
+    color: #0077aa;
+}
+
+/* ÍCONES */
+.perguntas i {
+    margin-right: 12px;
+    color: #00a8cc;
+    font-size: 18px; /* 🔥 maior */
+}
+
+/* ATIVO */
+.perguntas .ativo {
+    background: #d6f0ff;
+    color: #0077aa;
+    font-weight: bold;
+}
+
+/* FAQ */
+.faq {
+    flex: 1;
+}
+
+/* CATEGORIAS */
+.categoria {
+    display: none;
+}
+
+.categoria.ativa {
+    display: block;
+}
+
+/* CARD DAS PERGUNTAS */
+.item {
+    background: #fff;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05); /* 🔥 mais profissional */
+}
+
+/* PERGUNTA */
+.pergunta {
+    padding: 18px;
+    background: #e9f1f4;
+    cursor: pointer;
+    font-weight: bold;
+    color: #0077aa;
+    font-size: 16px;
+}
+
+/* RESPOSTA */
+.resposta {
+    display: none;
+    padding: 18px;
+    border-top: 1px solid #ccc;
+    color: #555;
+    font-size: 15px;
+}
+
+/* ===================== RESPONSIVO ===================== */
+
+/* tablet */
+@media(max-width:820px){
+
+  .topbar{
+    height:80px;
+  }
+
+  .logo{
+    width:95px;
+  }
+
+  .medic-name{
+    font-size:1rem;
+  }
+
+  .menu ul{
+    gap:18px;
+  }
+}
+
+/* celular */
+@media(max-width:480px){
+
+  .topbar{
+    height:70px;
+  }
+
+  .logo{
+    width:130px;
+  }
+
+.hamburger{
+  margin-right: -2.8px;
+}
+  .medic-name{
+    display:none;
+  }
+
+  .menu ul{
+    gap:12px;
+  }
+
+  .menu ul li a{
+    font-size:0.9rem;
+  }
+
+  .banner h2{
+    font-size:1.7rem;
+  }
+}
+
+
+.container{
+    display: flex;
+    gap: 20px;
+    width: 95%;
+    margin: 20px auto;
+}
+
+/* garante que o menu não estique */
+.perguntas{
+    width: 280px;
+    flex-shrink: 0;
+}
+
+/* faz o conteúdo ocupar o resto */
+.faq{
+    flex: 1;
+}
+
+@media(max-width: 768px){
+  .container{
+    flex-direction: column;
+  }
+
+  .perguntas{
+    width: 100%;
+  }
+
+  .faq{
+    width: 100%;
+  }
+}
+
+.right-icons {
+  display: flex;
+  align-items: center; /* ESSENCIAL */
+  gap: 12px;
+}
+
+.login img {
+  width: 38px;
+  cursor: pointer;
+  position: relative;
+  margin-top: 5px;
+}
+
+

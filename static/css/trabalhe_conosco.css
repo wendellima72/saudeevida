@@ -1,0 +1,264 @@
+/* ================= VARIÁVEIS ================= */
+
+:root{
+  --cor-principal:#1c9fd3;
+  --cor-principal-hover:#1487b4;
+  --cor-fundo:#ffffff;
+  --cor-borda:#e5e5e5;
+  --sombra-card:0 8px 25px rgba(0,0,0,0.08);
+  --sombra-hover:0 10px 30px rgba(0,0,0,0.12);
+}
+
+/* ================= BASE ================= */
+
+body{
+  margin:0;
+  font-family: Arial, Helvetica, sans-serif;
+  background:var(--cor-fundo);
+  color:#333;
+}
+
+/* ================= HEADER ================= */
+
+.login img{
+  width:38px;
+  cursor:pointer;
+  transition:.25s;
+}
+
+.login img:hover{
+  transform:scale(1.1);
+}
+
+
+/* ================= ESCOLHA ================= */
+
+.escolha{
+  text-align:center;
+  margin:10px 0 30px 0; /* mais perto do cabeçalho */
+}
+
+.cards{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:25px;
+}
+
+/* ================= CARD ================= */
+
+.card{
+  background:#fff;
+  padding:25px;
+  border-radius:14px;
+  width:220px;
+  cursor:pointer;
+  transition:all .3s ease;
+  border:2px solid transparent;
+  box-shadow:var(--sombra-card);
+}
+
+.card i{
+  font-size:34px;
+  color:var(--cor-principal);
+  margin-bottom:10px;
+}
+
+.card:hover{
+  transform:translateY(-6px);
+  box-shadow:var(--sombra-hover);
+}
+
+.card.ativo{
+  border:2px solid var(--cor-principal);
+  box-shadow:0 8px 25px rgba(28,159,211,0.25);
+}
+
+/* ================= FORM ================= */
+
+.form{
+  display:none;
+  width:90%;
+  max-width:700px;
+  margin:10px auto; /* formulário mais perto também */
+  background:#fff;
+  padding:28px;
+  border-radius:14px;
+  box-shadow:var(--sombra-card);
+}
+
+.form.ativo{
+  display:block;
+}
+
+.form input,
+.form select{
+  width:100%;
+  padding:12px;
+  margin:10px 0;
+  border-radius:6px;
+  border:1px solid var(--cor-borda);
+  transition:.2s;
+}
+
+/* foco moderno */
+
+.form input:focus,
+.form select:focus{
+  outline:none;
+  border-color:var(--cor-principal);
+  box-shadow:0 0 0 2px rgba(28,159,211,0.15);
+}
+
+/* ================= CHECKBOX E RADIO ================= */
+
+.form input[type="checkbox"],
+.form input[type="radio"]{
+  appearance:none;
+  -webkit-appearance:none;
+  width:18px;
+  height:18px;
+  border:2px solid #1c9fd3;
+  border-radius:4px;
+  display:inline-block;
+  position:relative;
+  cursor:pointer;
+  transition:0.25s;
+  margin-right:8px;
+  vertical-align:middle;
+}
+
+/* ================= CHECKBOX ================= */
+
+.form input[type="checkbox"]:hover{
+  transform:scale(1.1);
+  box-shadow:0 0 6px rgba(28,159,211,0.5);
+}
+
+.form input[type="checkbox"]:checked{
+  background:#1c9fd3;
+  border-color:#1c9fd3;
+}
+
+.form input[type="checkbox"]:checked::after{
+  content:"✔";
+  color:white;
+  font-size:12px;
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* ================= RADIO ================= */
+
+.form input[type="radio"]{
+  width:22px;
+  height:22px;
+  border-radius:50%;
+}
+
+.form input[type="radio"]:hover{
+  transform:scale(1.1);
+  box-shadow:0 0 6px rgba(28,159,211,0.5);
+}
+
+.form input[type="radio"]:checked{
+  background:#1c9fd3;
+  border-color:#1c9fd3;
+}
+
+.form input[type="radio"]:checked::after{
+  content:"✔";
+  color:white;
+  font-size:13px;
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* ================= LABEL ================= */
+
+.form label{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin:8px 0;
+  font-size:15px;
+  cursor:pointer;
+}
+
+/* ================= BOTÃO ================= */
+
+.form button{
+  width:100%;
+  padding:13px;
+  background:var(--cor-principal);
+  color:#fff;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  margin-top:15px;
+  font-size:15px;
+  font-weight:600;
+  transition:.3s;
+}
+
+.form button:hover{
+  background:var(--cor-principal-hover);
+  transform:translateY(-2px);
+  box-shadow:0 6px 18px rgba(28,159,211,0.35);
+}
+
+/* ================= RESPONSIVO ================= */
+
+@media(max-width:820px){
+
+  .topbar{
+    height:80px;
+  }
+
+  .logo{
+    width:95px;
+  }
+
+  .medic-name{
+    font-size:1rem;
+  }
+
+  .menu ul{
+    gap:18px;
+  }
+
+}
+
+@media(max-width:480px){
+
+  .topbar{
+    height:70px;
+  }
+
+  .logo{
+    width:130px;
+  }
+
+  .medic-name{
+    display:none;
+  }
+
+  .menu ul{
+    gap:12px;
+  }
+
+  .menu ul li a{
+    font-size:0.9rem;
+  }
+
+  .banner h2{
+    font-size:1.7rem;
+  }
+
+}

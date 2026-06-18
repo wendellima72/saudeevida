@@ -1,0 +1,544 @@
+{% extends "base.html" %}
+
+{% block title %}Painel do Cliente | Saúde & Vida{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ===================== SLIDESHOW ===================== */
+  .slideshow { width: 100%; height: 500px; position: relative; overflow: hidden; }
+  .slide { width: 100%; height: 100%; position: relative; }
+  .slide img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.85); }
+  .slide-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); padding: 60px 40px 40px; }
+  .slide-text { max-width: 600px; }
+  .slide-text h2 { color: var(--white); font-size: 2.5rem; font-weight: 700; font-family: 'Poppins','Montserrat',sans-serif; margin-bottom: 10px; }
+  .slide-text p { color: rgba(255,255,255,0.9); font-size: 1rem; font-family: 'Poppins','Montserrat',sans-serif; }
+  .slideshow button { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; width: 45px; height: 45px; border-radius: 50%; font-size: 20px; cursor: pointer; z-index: 10; transition: var(--transition); }
+  .slideshow button:hover { background: var(--primary); transform: translateY(-50%) scale(1.05); }
+  .prev { left: 20px; } .next { right: 20px; }
+
+  .slideshow { width: 100%; position: relative; overflow: hidden; }
+  @media (min-width: 992px) { .slideshow { height: 550px; } .slide { width: 100%; height: 100%; } .slide img { width: 100%; height: 100%; object-fit: cover; object-position: center center; } }
+  @media (max-width: 991px) and (min-width: 769px) { .slideshow { height: 400px; } .slide img { width: 100%; height: 100%; object-fit: cover; } }
+  @media (max-width: 768px) {
+    .slideshow { height: auto !important; min-height: 280px; }
+    .slide { position: relative; width: 100%; padding: 0; margin: 0; }
+    .slide img { position: relative !important; width: 100% !important; height: auto !important; min-height: 250px; max-height: 350px; object-fit: contain !important; display: block; }
+    .slide-overlay { position: relative; background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.3)); padding: 15px 20px; margin-top: -5px; }
+    .slide-text { position: relative; text-align: center; }
+    .slide-text h2 { font-size: 1.3rem !important; margin-bottom: 5px; }
+    .slide-text p { font-size: 0.8rem !important; }
+  }
+  @media (max-width: 480px) { .slide img { min-height: 200px; max-height: 280px; } .slide-text h2 { font-size: 1.1rem !important; } }
+  @media (max-width: 380px) { .slide img { min-height: 180px; max-height: 250px; } }
+  @media (max-width: 768px) and (orientation: landscape) { .slide img { max-height: 250px; min-height: 180px; } }
+
+
+  /* ===================== DARK MODE - PAINEL ===================== */
+  [data-theme="dark"] .cards-section,
+  [data-theme="dark"] .valores-section,
+  [data-theme="dark"] .tutoriais-section { background: #141e2a; }
+  [data-theme="dark"] .sobre-section,
+  [data-theme="dark"] .unidades-section { background: #0f1923; }
+  [data-theme="dark"] .card,
+  [data-theme="dark"] .valor-card,
+  [data-theme="dark"] .unidade-card,
+  [data-theme="dark"] .tutorial-card { background: #1a2332; border-color: #1e2f44; }
+  [data-theme="dark"] .card h3,
+  [data-theme="dark"] .valor-card h3,
+  [data-theme="dark"] .section-title h2 { color: #e8eef5; }
+  [data-theme="dark"] .sobre-content p,
+  [data-theme="dark"] .valor-card p,
+  [data-theme="dark"] .section-title p { color: #94a8bf; }
+  [data-theme="dark"] .tutorial-body { background: #1a2332; }
+  [data-theme="dark"] .tutorial-titulo { color: #e8eef5; }
+  [data-theme="dark"] .tutorial-desc { color: #94a8bf; }
+  [data-theme="dark"] .unidade-card h3 { color: var(--primary); }
+  [data-theme="dark"] .unidade-card p { color: #94a8bf; }
+  [data-theme="dark"] .modal-video-box { background: #1a2332; }
+  [data-theme="dark"] .modal-video-header { background: #141e2a; border-color: #1e2f44; }
+  [data-theme="dark"] .modal-video-titulo { color: #e8eef5; }
+
+  /* ===================== BOTÃO HERO ===================== */
+  .hero-cta {
+    margin-top: 24px;
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .btn-hero {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--primary);
+    color: #fff;
+    padding: 16px 32px;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 700;
+    text-decoration: none;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s;
+    box-shadow: 0 8px 24px rgba(28,159,211,0.45);
+    position: relative;
+    overflow: hidden;
+    animation: heroPulse 2.5s ease-in-out infinite;
+  }
+  .btn-hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+  }
+  .btn-hero:hover::before { left: 100%; }
+  .btn-hero:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(28,159,211,0.6); background: var(--primary-dark); }
+  .btn-hero i { font-size: 18px; }
+  @keyframes heroPulse {
+    0%, 100% { box-shadow: 0 8px 24px rgba(28,159,211,0.45); }
+    50% { box-shadow: 0 8px 32px rgba(28,159,211,0.75), 0 0 0 8px rgba(28,159,211,0.1); }
+  }
+  .btn-hero-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    padding: 16px 28px;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s;
+    border: 2px solid rgba(255,255,255,0.4);
+    backdrop-filter: blur(4px);
+  }
+  .btn-hero-outline:hover { background: rgba(255,255,255,0.25); transform: translateY(-3px); }
+  @media (max-width: 768px) {
+    .btn-hero, .btn-hero-outline { padding: 13px 22px; font-size: 0.9rem; }
+    .hero-cta { justify-content: center; }
+  }
+
+  /* ===================== CARDS ===================== */
+  .cards-section { padding: 60px 0; background: var(--white); }
+  .section-title { text-align: center; margin-bottom: 50px; }
+  .section-title h2 { font-size: 2rem; font-weight: 700; color: var(--text-dark); font-family: 'Poppins','Montserrat',sans-serif; }
+  .section-title p { color: var(--text-gray); margin-top: 8px; font-family: 'Poppins','Montserrat',sans-serif; }
+  .cards-container { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
+  .card { background: var(--white); width: 220px; padding: 35px 25px; border-radius: 20px; text-align: center; box-shadow: var(--shadow-sm); transition: var(--transition); border: 1px solid var(--border); cursor: pointer; text-decoration: none; }
+  .card:hover { transform: translateY(-8px); box-shadow: var(--shadow-lg); border-color: var(--primary); }
+  .card i { font-size: 48px; color: var(--primary); margin-bottom: 20px; }
+  .card h3 { font-size: 1rem; font-weight: 700; color: var(--text-dark); letter-spacing: 1px; font-family: 'Poppins','Montserrat',sans-serif; }
+
+  /* ===================== SOBRE ===================== */
+  .sobre-section { background: var(--gray-bg); padding: 70px 0; }
+  .sobre-content { max-width: 900px; margin: 0 auto; text-align: center; }
+  .sobre-content p { color: var(--text-gray); line-height: 1.8; margin-bottom: 20px; font-family: 'Poppins','Montserrat',sans-serif; }
+
+  /* ===================== VALORES ===================== */
+  .valores-section { padding: 70px 0; background: var(--white); }
+  .valores-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; }
+  .valor-card { background: var(--white); border-radius: 20px; padding: 35px 25px; text-align: center; width: 250px; transition: var(--transition); border: 1px solid var(--border); cursor: default; }
+  .valor-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: var(--primary); }
+  .valor-icon { width: 75px; height: 75px; background: linear-gradient(135deg, var(--primary-light) 0%, #d4eaf5 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+  .valor-icon i { font-size: 32px; color: var(--primary); }
+  .valor-card h3 { color: var(--text-dark); font-size: 1.2rem; margin-bottom: 10px; font-weight: 700; font-family: 'Poppins','Montserrat',sans-serif; }
+  .valor-card p { color: var(--text-gray); font-size: 0.85rem; line-height: 1.5; font-family: 'Poppins','Montserrat',sans-serif; }
+
+  /* ===================== UNIDADES ===================== */
+  .unidades-section { background: var(--gray-bg); padding: 70px 0; }
+  .unidades-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
+  .unidade-card { background: var(--white); border-radius: 20px; padding: 30px; transition: var(--transition); border: 1px solid var(--border); }
+  .unidade-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
+  .unidade-card h3 { color: var(--primary); font-size: 1.3rem; margin-bottom: 20px; font-weight: 700; font-family: 'Poppins','Montserrat',sans-serif; }
+  .unidade-card p { margin: 12px 0; color: var(--text-gray); font-size: 0.9rem; line-height: 1.6; font-family: 'Poppins','Montserrat',sans-serif; }
+  .unidade-card p i { width: 25px; color: var(--primary); margin-right: 8px; }
+  .botao-maps { display: inline-flex; align-items: center; gap: 8px; background: var(--primary); color: var(--white); padding: 12px 24px; text-decoration: none; border-radius: 50px; font-weight: 600; font-size: 0.85rem; transition: var(--transition); margin-top: 15px; font-family: 'Poppins','Montserrat',sans-serif; }
+  .botao-maps:hover { background: var(--primary-dark); transform: translateY(-2px); }
+
+  /* ===================== TUTORIAIS ===================== */
+  .tutoriais-section { padding: 70px 0; background: var(--white); }
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 30px; }
+
+  .tutoriais-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+  }
+
+  .tutorial-card {
+    background: var(--white);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    cursor: pointer;
+  }
+  .tutorial-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); border-color: var(--primary); }
+
+  .tutorial-thumb {
+    position: relative;
+    background: linear-gradient(135deg, #0a1220 0%, #1c3a5e 100%);
+    aspect-ratio: 16/9;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  .tutorial-thumb-icon { font-size: 48px; color: rgba(255,255,255,0.15); }
+  .tutorial-play {
+    position: absolute;
+    width: 52px; height: 52px;
+    background: var(--primary);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 20px;
+    box-shadow: 0 4px 16px rgba(28,159,211,0.5);
+    transition: var(--transition);
+  }
+  .tutorial-card:hover .tutorial-play { transform: scale(1.12); background: var(--primary-dark); }
+  .tutorial-duracao {
+    position: absolute; bottom: 8px; right: 10px;
+    background: rgba(0,0,0,0.7); color: #fff;
+    font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px;
+    font-family: 'Poppins', sans-serif;
+  }
+  .tutorial-num {
+    position: absolute; top: 10px; left: 10px;
+    background: var(--primary); color: #fff;
+    font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .tutorial-body { padding: 18px 20px; }
+  .tutorial-titulo { font-size: 14px; font-weight: 700; color: var(--text-dark); margin-bottom: 6px; font-family: 'Poppins', sans-serif; line-height: 1.4; }
+  .tutorial-desc { font-size: 12px; color: var(--text-gray); line-height: 1.5; font-family: 'Poppins', sans-serif; }
+  .tutorial-tag {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--primary-light); color: var(--primary);
+    font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 20px;
+    margin-top: 10px; font-family: 'Poppins', sans-serif;
+  }
+
+  /* Modal vídeo */
+  .modal-video-overlay {
+    display: none; position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85); backdrop-filter: blur(6px);
+    z-index: 99998; justify-content: center; align-items: center;
+  }
+  .modal-video-overlay.show { display: flex; }
+  .modal-video-box {
+    width: 90%; max-width: 800px;
+    background: #0a1220; border-radius: 20px;
+    overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+    animation: slideUp 0.3s ease;
+  }
+  .modal-video-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 20px; background: #0d1e35;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .modal-video-titulo { font-size: 14px; font-weight: 600; color: #fff; font-family: 'Poppins', sans-serif; }
+  .modal-video-close {
+    background: rgba(255,255,255,0.1); border: none; color: #fff;
+    width: 32px; height: 32px; border-radius: 50%; font-size: 16px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+  .modal-video-close:hover { background: rgba(255,255,255,0.2); }
+  .modal-video-iframe-wrap { position: relative; aspect-ratio: 16/9; background: #000; }
+  .modal-video-iframe-wrap iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+  /* placeholder quando não tem vídeo */
+  .sem-video {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    aspect-ratio: 16/9; color: rgba(255,255,255,0.4);
+    font-family: 'Poppins', sans-serif;
+  }
+  .sem-video i { font-size: 48px; margin-bottom: 12px; }
+  .sem-video p { font-size: 13px; }
+
+  @media (max-width: 992px) { .slideshow { height: 400px; } .slide-text h2 { font-size: 2rem; } }
+  @media (max-width: 768px) {
+    .slideshow { height: 350px; } .slide-text h2 { font-size: 1.5rem; } .slide-text p { font-size: 0.85rem; } .slide-overlay { padding: 40px 20px 20px; }
+    .cards-container { gap: 20px; } .card { width: calc(50% - 20px); min-width: 150px; padding: 25px 15px; } .card i { font-size: 36px; }
+    .valor-card { width: calc(50% - 20px); min-width: 200px; } .unidades-grid { grid-template-columns: 1fr; }
+    .tutoriais-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px) {
+    .cards-container { gap: 15px; } .card { width: calc(50% - 10px); min-width: 140px; padding: 20px 12px; } .card i { font-size: 30px; } .card h3 { font-size: 0.85rem; }
+    .valor-card { width: 100%; } .section-title h2 { font-size: 1.5rem; }
+    .slideshow button { width: 35px; height: 35px; font-size: 16px; } .prev { left: 10px; } .next { right: 10px; }
+    .cards-section, .sobre-section, .valores-section, .unidades-section, .tutoriais-section { padding: 40px 0; }
+    .section-title { margin-bottom: 32px; padding: 0 16px; }
+  }
+  @media (max-width: 360px) {
+    .card { width: 100%; max-width: 280px; }
+  }
+  @media (min-width: 1400px) { .slideshow { height: 600px; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Slideshow -->
+<div class="slideshow">
+  <button class="prev" onclick="trocarSlide(-1)">❮</button>
+  <div class="slide" id="slide">
+    <img id="slide-img" src="" alt="Slide">
+    <div class="slide-overlay">
+      <div class="slide-text">
+        <h2 id="slide-title"></h2>
+        <p id="slide-desc"></p>
+        <div class="hero-cta">
+          <a href="/agendamentos" class="btn-hero">
+            <i class="fas fa-calendar-plus"></i> Agendar consulta agora
+          </a>
+          <a href="/planos" class="btn-hero-outline">
+            <i class="fas fa-shield-heart"></i> Ver planos
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="next" onclick="trocarSlide(1)">❯</button>
+</div>
+
+<!-- Cards Section -->
+<section class="cards-section">
+  <div class="container">
+    <div class="section-title">
+      <h2>Nossos Serviços</h2>
+      <p>O que você precisa, estamos aqui para oferecer</p>
+    </div>
+    <div class="cards-container">
+      <a href="/agendamentos" class="card"><i class="fas fa-calendar-alt"></i><h3>AGENDAMENTO</h3></a>
+      <a href="/trabalhe_conosco" class="card"><i class="fas fa-user-md"></i><h3>TRABALHE CONOSCO</h3></a>
+      <a href="/planos" class="card"><i class="fas fa-file-invoice-dollar"></i><h3>PLANOS</h3></a>
+      <a href="/contato" class="card"><i class="fas fa-headset"></i><h3>ATENDIMENTO</h3></a>
+    </div>
+  </div>
+</section>
+
+<!-- Sobre -->
+<section class="sobre-section">
+  <div class="container">
+    <div class="section-title"><h2>Quem Somos</h2><p>Conheça nossa história e missão</p></div>
+    <div class="sobre-content">
+      <p>O <strong style="color: var(--primary);">Centro Médico Saúde & Vida</strong> foi criado com o propósito de oferecer atendimento de excelência, unindo profissionalismo, tecnologia e cuidado humanizado.</p>
+      <p>O hospital conta com uma equipe altamente qualificada, formada por médicos especialistas, enfermeiros e profissionais da saúde treinados constantemente para atuar com ética, responsabilidade e precisão.</p>
+      <p>Além disso, o Centro Médico Saúde & Vida investe continuamente em maquinários modernos e equipamentos de última geração, como aparelhos de diagnóstico por imagem, laboratório completo e centro cirúrgico equipado com tecnologia avançada.</p>
+      <p>Reconhecido pelo padrão de qualidade e organização, o Centro Médico Saúde & Vida se destaca pelo atendimento eficiente, ambiente estruturado e compromisso permanente com a excelência na área da saúde.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Valores -->
+<section class="valores-section">
+  <div class="container">
+    <div class="section-title"><h2>Nossos Valores</h2><p>Priorizando sempre aquilo que nos move</p></div>
+    <div class="valores-grid">
+      <div class="valor-card"><div class="valor-icon"><i class="fas fa-heart"></i></div><h3>Amor</h3><p>em tudo que fazemos.</p></div>
+      <div class="valor-card"><div class="valor-icon"><i class="fas fa-hand-holding-heart"></i></div><h3>Cuidado</h3><p>que transforma vidas.</p></div>
+      <div class="valor-card"><div class="valor-icon"><i class="fas fa-search"></i></div><h3>Transparência</h3><p>em todas as relações.</p></div>
+      <div class="valor-card"><div class="valor-icon"><i class="fas fa-users"></i></div><h3>Pessoas</h3><p>nosso maior patrimônio.</p></div>
+      <div class="valor-card"><div class="valor-icon"><i class="fas fa-lightbulb"></i></div><h3>Inovação</h3><p>constante e responsável.</p></div>
+      <div class="valor-card"><div class="valor-icon"><i class="fas fa-globe"></i></div><h3>Responsabilidade Social</h3><p>compromisso com a comunidade.</p></div>
+      <div class="valor-card"><div class="valor-icon"><i class="fas fa-medal"></i></div><h3>Qualidade</h3><p>excelência em tudo.</p></div>
+      <div class="valor-card"><div class="valor-icon"><i class="fas fa-universal-access"></i></div><h3>Acessibilidade</h3><p>para todos.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TUTORIAIS ===================== -->
+<section class="tutoriais-section">
+  <div class="container">
+    <div class="section-title">
+      <h2>Central de Tutoriais</h2>
+      <p>Aprenda a usar o sistema com nossos vídeos explicativos</p>
+    </div>
+    <div class="tutoriais-grid">
+
+      <!-- Card 1 -->
+      <div class="tutorial-card" onclick="abrirVideo('', 'Como agendar uma consulta')">
+        <div class="tutorial-thumb">
+          <i class="fas fa-calendar-check tutorial-thumb-icon"></i>
+          <div class="tutorial-play"><i class="fas fa-play" style="margin-left:3px"></i></div>
+          <span class="tutorial-num">01</span>
+          <span class="tutorial-duracao">Em breve</span>
+        </div>
+        <div class="tutorial-body">
+          <div class="tutorial-titulo">Como agendar uma consulta</div>
+          <div class="tutorial-desc">Veja o passo a passo para marcar sua consulta de forma rápida e simples pelo sistema.</div>
+          <span class="tutorial-tag"><i class="fas fa-calendar-alt"></i> Agendamento</span>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="tutorial-card" onclick="abrirVideo('', 'Como cancelar uma consulta')">
+        <div class="tutorial-thumb">
+          <i class="fas fa-calendar-xmark tutorial-thumb-icon"></i>
+          <div class="tutorial-play"><i class="fas fa-play" style="margin-left:3px"></i></div>
+          <span class="tutorial-num">02</span>
+          <span class="tutorial-duracao">Em breve</span>
+        </div>
+        <div class="tutorial-body">
+          <div class="tutorial-titulo">Como cancelar uma consulta</div>
+          <div class="tutorial-desc">Aprenda a cancelar um agendamento existente diretamente pelo painel do paciente.</div>
+          <span class="tutorial-tag"><i class="fas fa-xmark"></i> Agendamento</span>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="tutorial-card" onclick="abrirVideo('', 'Como visualizar exames e prontuários')">
+        <div class="tutorial-thumb">
+          <i class="fas fa-file-medical tutorial-thumb-icon"></i>
+          <div class="tutorial-play"><i class="fas fa-play" style="margin-left:3px"></i></div>
+          <span class="tutorial-num">03</span>
+          <span class="tutorial-duracao">Em breve</span>
+        </div>
+        <div class="tutorial-body">
+          <div class="tutorial-titulo">Como visualizar exames e prontuários</div>
+          <div class="tutorial-desc">Saiba onde encontrar seus resultados de exames e prontuários médicos no sistema.</div>
+          <span class="tutorial-tag"><i class="fas fa-flask"></i> Exames</span>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="tutorial-card" onclick="abrirVideo('', 'Como assinar um plano de saúde')">
+        <div class="tutorial-thumb">
+          <i class="fas fa-file-invoice-dollar tutorial-thumb-icon"></i>
+          <div class="tutorial-play"><i class="fas fa-play" style="margin-left:3px"></i></div>
+          <span class="tutorial-num">04</span>
+          <span class="tutorial-duracao">Em breve</span>
+        </div>
+        <div class="tutorial-body">
+          <div class="tutorial-titulo">Como assinar um plano de saúde</div>
+          <div class="tutorial-desc">Conheça os planos disponíveis e veja como contratar o ideal para você e sua família.</div>
+          <span class="tutorial-tag"><i class="fas fa-shield-heart"></i> Planos</span>
+        </div>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="tutorial-card" onclick="abrirVideo('', 'Como atualizar meu perfil')">
+        <div class="tutorial-thumb">
+          <i class="fas fa-id-card tutorial-thumb-icon"></i>
+          <div class="tutorial-play"><i class="fas fa-play" style="margin-left:3px"></i></div>
+          <span class="tutorial-num">05</span>
+          <span class="tutorial-duracao">Em breve</span>
+        </div>
+        <div class="tutorial-body">
+          <div class="tutorial-titulo">Como atualizar meu perfil</div>
+          <div class="tutorial-desc">Veja como editar seus dados pessoais, telefone e informações cadastrais no sistema.</div>
+          <span class="tutorial-tag"><i class="fas fa-user"></i> Perfil</span>
+        </div>
+      </div>
+
+      <!-- Card 6 -->
+      <div class="tutorial-card" onclick="abrirVideo('', 'Como usar o chat de suporte')">
+        <div class="tutorial-thumb">
+          <i class="fas fa-robot tutorial-thumb-icon"></i>
+          <div class="tutorial-play"><i class="fas fa-play" style="margin-left:3px"></i></div>
+          <span class="tutorial-num">06</span>
+          <span class="tutorial-duracao">Em breve</span>
+        </div>
+        <div class="tutorial-body">
+          <div class="tutorial-titulo">Como usar o chat de suporte com I.A.</div>
+          <div class="tutorial-desc">Aprenda a tirar dúvidas rapidamente com nosso assistente virtual disponível 24h.</div>
+          <span class="tutorial-tag"><i class="fas fa-robot"></i> Suporte</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Unidades -->
+<section class="unidades-section">
+  <div class="container">
+    <div class="section-title"><h2>Nossas Unidades</h2><p>Atendimento de qualidade perto de você</p></div>
+    <div class="unidades-grid">
+      <div class="unidade-card">
+        <h3><i class="fas fa-map-marker-alt"></i> Unidade Aldeota</h3>
+        <p><i class="fas fa-phone"></i> (85) 3224-7812</p>
+        <p><i class="fas fa-location-dot"></i> Rua Barão do Rio Branco, 845 - Centro, Fortaleza-CE</p>
+        <p><i class="fas fa-clock"></i> SEG a SEX: 08h às 18h | SÁB: 08h às 12h</p>
+        <a href="https://www.google.com/maps" target="_blank" class="botao-maps"><i class="fas fa-map"></i> Ver no Google Maps</a>
+      </div>
+      <div class="unidade-card">
+        <h3><i class="fas fa-map-marker-alt"></i> Unidade Messejana</h3>
+        <p><i class="fas fa-phone"></i> (85) 98765-4321</p>
+        <p><i class="fas fa-location-dot"></i> Avenida Dom Luís, 2300 - Aldeota, Fortaleza-CE</p>
+        <p><i class="fas fa-clock"></i> SEG a SEX: 09h às 19h | SÁB: 08h às 13h</p>
+        <a href="https://www.google.com/maps" target="_blank" class="botao-maps"><i class="fas fa-map"></i> Ver no Google Maps</a>
+      </div>
+      <div class="unidade-card">
+        <h3><i class="fas fa-map-marker-alt"></i> Unidade Parangaba</h3>
+        <p><i class="fas fa-phone"></i> (85) 98765-4321</p>
+        <p><i class="fas fa-location-dot"></i> Avenida Dom Luís, 2300 - Aldeota, Fortaleza-CE</p>
+        <p><i class="fas fa-clock"></i> SEG a SEX: 09h às 19h | SÁB: 08h às 13h</p>
+        <a href="https://www.google.com/maps" target="_blank" class="botao-maps"><i class="fas fa-map"></i> Ver no Google Maps</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Modal Vídeo -->
+<div class="modal-video-overlay" id="modalVideo">
+  <div class="modal-video-box">
+    <div class="modal-video-header">
+      <span class="modal-video-titulo" id="modalVideoTitulo">Tutorial</span>
+      <button class="modal-video-close" onclick="fecharVideo()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-video-iframe-wrap" id="modalVideoConteudo"></div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const slides = [
+    { img: "{{ url_for('static', filename='img/med1.png') }}", title: "Bem-vindo ao Saúde & Vida", desc: "Excelência em cuidados médicos com tecnologia de ponta" },
+    { img: "{{ url_for('static', filename='img/med2.png') }}", title: "Equipe Especializada", desc: "Profissionais qualificados para o seu bem-estar" }
+  ];
+  let currentSlide = 0;
+  function mostrarSlide() {
+    const slide = slides[currentSlide];
+    document.getElementById('slide-img').src = slide.img;
+    document.getElementById('slide-title').innerText = slide.title;
+    document.getElementById('slide-desc').innerText = slide.desc;
+  }
+  function trocarSlide(d) {
+    currentSlide += d;
+    if (currentSlide >= slides.length) currentSlide = 0;
+    if (currentSlide < 0) currentSlide = slides.length - 1;
+    mostrarSlide();
+  }
+  window.trocarSlide = trocarSlide;
+  mostrarSlide();
+  setInterval(() => trocarSlide(1), 5000);
+  window.addEventListener('DOMContentLoaded', () => {
+    showToast('Bem-vindo!', 'Que bom ter você novamente no Saúde & Vida', 'success', 4000);
+  });
+
+  // ── TUTORIAIS ──
+  function abrirVideo(youtubeId, titulo) {
+    document.getElementById('modalVideoTitulo').textContent = titulo;
+    const wrap = document.getElementById('modalVideoConteudo');
+    if (youtubeId) {
+      wrap.innerHTML = `<iframe src="https://www.youtube.com/embed/${youtubeId}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+    } else {
+      wrap.innerHTML = `<div class="sem-video"><i class="fas fa-video-slash"></i><p>Vídeo em produção — em breve disponível!</p></div>`;
+    }
+    document.getElementById('modalVideo').classList.add('show');
+  }
+  function fecharVideo() {
+    document.getElementById('modalVideo').classList.remove('show');
+    document.getElementById('modalVideoConteudo').innerHTML = '';
+  }
+  document.getElementById('modalVideo').addEventListener('click', function(e) {
+    if (e.target === this) fecharVideo();
+  });
+</script>
+{% endblock %}

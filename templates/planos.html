@@ -1,0 +1,412 @@
+{% extends "base.html" %}
+
+{% block title %}Planos | Saúde & Vida{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ===================== PLANOS ===================== */
+  .planos {
+    text-align: center;
+    padding: 60px 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .planos h2 {
+    color: var(--primary);
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 50px;
+    font-family: 'Poppins', 'Montserrat', sans-serif;
+    position: relative;
+    display: inline-block;
+  }
+
+  .planos h2::after {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: var(--primary);
+    border-radius: 2px;
+  }
+
+  .planos-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+  }
+
+  /* Cards de planos modernos */
+  .plano {
+    background: var(--white);
+    width: 320px;
+    padding: 35px 25px;
+    border-radius: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
+  }
+
+  .plano::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+  }
+
+  .plano:hover {
+    transform: translateY(-12px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary);
+  }
+
+  .plano h3 {
+    color: var(--primary);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+    font-family: 'Poppins', 'Montserrat', sans-serif;
+  }
+
+  .plano p {
+    color: var(--text-gray);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .preco {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin: 10px 0;
+    font-family: 'Poppins', 'Montserrat', sans-serif;
+  }
+
+  .preco small {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-gray);
+  }
+
+  .btn {
+    background: var(--primary);
+    border: none;
+    padding: 14px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--white);
+    transition: var(--transition);
+    margin-top: 10px;
+    font-family: 'Poppins', 'Montserrat', sans-serif;
+  }
+
+  .btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* Plano destaque */
+  .plano.destaque {
+    border: 2px solid var(--primary);
+    transform: scale(1.02);
+  }
+
+  .plano.destaque::before {
+    background: var(--primary);
+  }
+
+  /* ===================== MODAL ===================== */
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .modal-content {
+    background: var(--white);
+    max-width: 420px;
+    width: 90%;
+    padding: 35px;
+    border-radius: 28px;
+    text-align: center;
+    position: relative;
+    box-shadow: var(--shadow-lg);
+    animation: modalFadeIn 0.3s ease;
+  }
+
+  @keyframes modalFadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .fechar {
+    position: absolute;
+    top: 18px;
+    right: 22px;
+    font-size: 28px;
+    cursor: pointer;
+    color: var(--text-gray);
+    transition: var(--transition);
+  }
+
+  .fechar:hover {
+    color: var(--error);
+  }
+
+  .modal-content h3 {
+    color: var(--primary);
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    font-weight: 700;
+  }
+
+  .modal-content p {
+    color: var(--text-gray);
+    margin-bottom: 25px;
+  }
+
+  .btn-pagamento {
+    background: var(--primary);
+    color: var(--white);
+    padding: 14px 24px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 10px 0;
+    width: 100%;
+    transition: var(--transition);
+    font-family: 'Poppins', 'Montserrat', sans-serif;
+  }
+
+  .btn-pagamento:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+  }
+
+  .btn-pagamento:first-of-type {
+    margin-top: 0;
+  }
+
+  .loading {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border: 3px solid var(--border);
+    border-top: 3px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-top: 15px;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  #loadingArea p {
+    margin-bottom: 10px;
+    color: var(--primary);
+  }
+
+  /* Responsividade específica dos planos */
+  @media (max-width: 992px) {
+    .planos { padding: 50px 20px; }
+    .planos h2 { font-size: 1.8rem; }
+  }
+
+  @media (max-width: 768px) {
+    .planos h2 { font-size: 1.5rem; margin-bottom: 35px; }
+    .plano { width: calc(100% - 40px); max-width: 350px; margin: 0 auto; }
+  }
+
+  @media (max-width: 576px) {
+    .planos-container { flex-direction: column; align-items: center; }
+    .plano { width: 100%; max-width: 100%; }
+  }
+
+  @media (max-width: 480px) {
+    .planos { padding: 40px 15px; }
+    .planos h2 { font-size: 1.3rem; }
+    .plano { padding: 25px 20px; }
+    .plano h3 { font-size: 1.3rem; }
+    .preco { font-size: 1.5rem; }
+    .btn { padding: 12px; width: 100%; }
+    .modal-content { padding: 20px; margin: 16px; max-width: calc(100% - 32px); }
+    .btn-pagamento { padding: 12px; font-size: 0.9rem; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="planos">
+  <h2><i class="fas fa-tags"></i> Nossos Planos</h2>
+
+  <div class="planos-container">
+    <div class="plano">
+      <h3>Plano Básico</h3>
+      <p>Plano voltado para atendimentos essenciais de saúde, oferecendo consultas médicas em clínicas gerais, exames laboratoriais simples e atendimento de urgência.</p>
+      <div class="preco">R$ 49,90 <small>/mês</small></div>
+      <button onclick="abrirPagamento('basico')" class="btn">ASSINAR PLANO</button>
+    </div>
+
+    <div class="plano destaque">
+      <h3>Plano Médio</h3>
+      <p>Plano intermediário com ampla cobertura assistencial, incluindo consultas com especialistas, exames de média complexidade e internações.</p>
+      <div class="preco">R$ 89,90 <small>/mês</small></div>
+      <button onclick="abrirPagamento('medio')" class="btn">ASSINAR PLANO</button>
+    </div>
+
+    <div class="plano">
+      <h3>Plano Máximo</h3>
+      <p>Plano completo com cobertura abrangente, incluindo consultas ilimitadas, exames de alta complexidade e internações especiais.</p>
+      <div class="preco">R$ 149,90 <small>/mês</small></div>
+      <button onclick="abrirPagamento('premium')" class="btn">ASSINAR PLANO</button>
+    </div>
+  </div>
+</section>
+
+<!-- MODAL -->
+<div id="modalPagamento" class="modal">
+  <div class="modal-content">
+    <span class="fechar" onclick="fecharModal()">&times;</span>
+    <h3 id="planoEscolhido"></h3>
+    <p>Escolha a forma de pagamento:</p>
+    <button class="btn-pagamento" onclick="pagarComPix()">
+      <i class="fas fa-qrcode"></i> Pagar com Pix
+    </button>
+    <button class="btn-pagamento" onclick="pagarComCartao()">
+      <i class="fas fa-credit-card"></i> Pagar com Cartão
+    </button>
+    <div id="loadingArea" style="display: none; text-align: center; margin-top: 15px;">
+      <p>Processando...</p>
+      <div class="loading"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  let planoSelecionado = "";
+
+  function abrirPagamento(planoKey) {
+    planoSelecionado = planoKey;
+    let planoNome = "";
+    
+    if (planoKey === 'basico') planoNome = "Plano Básico - R$ 49,90/mês";
+    else if (planoKey === 'medio') planoNome = "Plano Médio - R$ 89,90/mês";
+    else if (planoKey === 'premium') planoNome = "Plano Máximo - R$ 149,90/mês";
+    
+    document.getElementById("planoEscolhido").innerHTML = '<i class="fas fa-file-invoice-dollar"></i> ' + planoNome;
+    document.getElementById("modalPagamento").style.display = "flex";
+  }
+
+  function fecharModal() {
+    document.getElementById("modalPagamento").style.display = "none";
+    document.getElementById("loadingArea").style.display = "none";
+  }
+
+  function pagarComPix() {
+    document.getElementById("loadingArea").style.display = "block";
+    
+    fetch('/criar_pagamento', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: `plano=${planoSelecionado}&metodo_pagamento=pix`
+    })
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("loadingArea").style.display = "none";
+      
+      if (data.sucesso) {
+        showToast('Redirecionando', 'Você será direcionado para o pagamento', 'success', 1500);
+        setTimeout(() => {
+          window.location.href = data.init_point;
+        }, 1500);
+      } else {
+        showToast('Erro', 'Erro ao gerar pagamento: ' + (data.erro || 'Tente novamente'), 'error');
+      }
+    })
+    .catch(error => {
+      document.getElementById("loadingArea").style.display = "none";
+      showToast('Erro', 'Erro ao processar pagamento: ' + error, 'error');
+    });
+  }
+
+  function pagarComCartao() {
+    document.getElementById("loadingArea").style.display = "block";
+    
+    fetch('/criar_pagamento', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: `plano=${planoSelecionado}&metodo_pagamento=cartao`
+    })
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("loadingArea").style.display = "none";
+      
+      if (data.sucesso) {
+        showToast('Redirecionando', 'Você será direcionado para o pagamento', 'success', 1500);
+        setTimeout(() => {
+          window.location.href = data.init_point;
+        }, 1500);
+      } else {
+        showToast('Erro', 'Erro ao gerar pagamento: ' + (data.erro || 'Tente novamente'), 'error');
+      }
+    })
+    .catch(error => {
+      document.getElementById("loadingArea").style.display = "none";
+      showToast('Erro', 'Erro ao processar pagamento: ' + error, 'error');
+    });
+  }
+
+  // Fechar modal ao clicar fora
+  window.onclick = function(event) {
+    const modal = document.getElementById("modalPagamento");
+    if (event.target == modal) {
+      fecharModal();
+    }
+  }
+
+  // Boas-vindas
+  window.addEventListener('DOMContentLoaded', () => {
+    showToast('Bem-vindo!', 'Conheça nossos planos e escolha o melhor para você', 'success', 4000);
+  });
+</script>
+{% endblock %}

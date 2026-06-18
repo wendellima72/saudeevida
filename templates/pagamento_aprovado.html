@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Pagamento Aprovado</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+
+<style>
+body {
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    background:#f5f7fa;
+    font-family: Arial;
+}
+
+.box {
+    background:white;
+    padding:40px;
+    border-radius:12px;
+    text-align:center;
+    box-shadow:0 0 15px rgba(0,0,0,0.1);
+}
+
+h1 {
+    color:green;
+}
+
+button {
+    margin-top:20px;
+    padding:10px 25px;
+    border:none;
+    background:#007bff;
+    color:white;
+    border-radius:8px;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+    <h1>✅ Pagamento Aprovado!</h1>
+    <p>Seu plano foi ativado com sucesso.</p>
+
+    <button onclick="window.location.href='/painel_cliente'">
+        Ir para o início
+    </button>
+</div>
+
+</body>
+</html>

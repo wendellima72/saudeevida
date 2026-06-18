@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Painel do Médico | Saúde & Vida</title>
+
+<!-- Fontes profissionais -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- Ícones -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    :root {
+        --primary: #1c9fd3;
+        --primary-dark: #1482ae;
+        --primary-light: #e8f4fc;
+        --secondary: #0a1220;
+        --text-dark: #1e2f44;
+        --text-gray: #6a7c9e;
+        --text-light: #8d9db0;
+        --white: #ffffff;
+        --gray-bg: #f8fafc;
+        --border: #eef2f8;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --error: #ef4444;
+        --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+        --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
+
+    body {
+        font-family: 'Poppins', 'Montserrat', 'Segoe UI', sans-serif;
+        background: var(--gray-bg);
+        color: var(--text-dark);
+        overflow-x: hidden;
+        min-height: 100vh;
+    }
+
+    /* ===================== TOAST NOTIFICATIONS ===================== */
+    .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-width: 380px;
+        width: calc(100% - 40px);
+        pointer-events: none;
+    }
+
+    .toast {
+        background: var(--white);
+        border-radius: 16px;
+        padding: 14px 18px;
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        box-shadow: var(--shadow-lg);
+        pointer-events: auto;
+        cursor: pointer;
+        animation: toastSlideIn 0.3s ease forwards;
+        position: relative;
+        overflow: hidden;
+        border-left: 4px solid;
+    }
+
+    .toast::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 3px;
+        width: 100%;
+        animation: toastProgress 4s linear forwards;
+    }
+
+    @keyframes toastProgress {
+        0% { width: 100%; }
+        100% { width: 0%; }
+    }
+
+    @keyframes toastSlideIn {
+        from { opacity: 0; transform: translateX(100%); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    .toast-success { border-left-color: var(--success); }
+    .toast-success::before { background: var(--success); }
+    .toast-error { border-left-color: var(--error); }
+    .toast-error::before { background: var(--error); }
+    .toast-warning { border-left-color: var(--warning); }
+    .toast-warning::before { background: var(--warning); }
+    .toast-info { border-left-color: var(--primary); }
+    .toast-info::before { background: var(--primary); }
+
+    .toast-icon { width: 32px; height: 32px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .toast-success .toast-icon { background: rgba(16, 185, 129, 0.12); color: var(--success); }
+    .toast-error .toast-icon { background: rgba(239, 68, 68, 0.12); color: var(--error); }
+    .toast-warning .toast-icon { background: rgba(245, 158, 11, 0.12); color: var(--warning); }
+    .toast-info .toast-icon { background: rgba(28, 159, 211, 0.12); color: var(--primary); }
+
+    .toast-content { flex: 1; }
+    .toast-title { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+    .toast-message { font-size: 12px; color: var(--text-gray); line-height: 1.4; }
+    .toast-close { background: none; border: none; font-size: 14px; color: var(--text-light); cursor: pointer; padding: 4px; transition: var(--transition); }
+
+    /* ===================== HEADER PERSONALIZADO ===================== */
+    .header-medico {
+        background: linear-gradient(135deg, var(--primary) 0%, #0f6f97 100%);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        box-shadow: var(--shadow-md);
+    }
+
+    .container-header {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 40px;
+    }
+
+    .header-medico .container-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 80px;
+    }
+
+    .logo-area {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .logo {
+        width: 60px;
+        height: auto;
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+        transition: var(--transition);
+    }
+
+    .logo:hover {
+        transform: scale(1.02);
+    }
+
+    .logo-text {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .medic-name {
+        font-family: 'Poppins', 'Montserrat', sans-serif;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--white);
+        letter-spacing: -0.3px;
+    }
+
+    .medico-badge {
+        font-size: 0.7rem;
+        color: rgba(255, 255, 255, 0.8);
+        letter-spacing: 1px;
+    }
+
+    .header-buttons {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .btn-sair {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.15);
+        color: var(--white);
+        border: none;
+        padding: 10px 20px;
+        border-radius: 50px;
+        font-family: 'Poppins', 'Montserrat', sans-serif;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .btn-sair:hover {
+        background: rgba(255, 255, 255, 0.25);
+        transform: translateY(-2px);
+    }
+
+    /* ===================== MENU DE ABAS ===================== */
+    .tabs-container {
+        max-width: 1400px;
+        margin: 30px auto 0;
+        padding: 0 40px;
+    }
+
+    .tabs-nav {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        background: var(--white);
+        padding: 10px;
+        border-radius: 60px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border);
+    }
+
+    .tab-btn {
+        flex: 1;
+        padding: 14px 20px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border-radius: 50px;
+        transition: var(--transition);
+        color: var(--text-gray);
+        font-family: 'Poppins', 'Montserrat', sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .tab-btn i {
+        font-size: 1rem;
+    }
+
+    .tab-btn:hover {
+        background: var(--primary-light);
+        color: var(--primary);
+    }
+
+    .tab-btn.active {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: var(--white);
+        box-shadow: var(--shadow-sm);
+    }
+
+    /* ===================== CONTEÚDO DAS ABAS ===================== */
+    .aba {
+        display: none;
+        padding: 30px 40px;
+        max-width: 1400px;
+        margin: 0 auto;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .aba.ativa {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .aba h2 {
+        color: var(--primary);
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* Busca */
+    .search-box {
+        margin-bottom: 25px;
+    }
+
+    .search-box input {
+        width: 100%;
+        max-width: 400px;
+        padding: 14px 20px;
+        border: 1.5px solid var(--border);
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-family: 'Poppins', 'Montserrat', sans-serif;
+        transition: var(--transition);
+    }
+
+    .search-box input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(28, 159, 211, 0.1);
+    }
+
+    /* Cards */
+    .cards-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .card {
+        background: var(--white);
+        border-radius: 24px;
+        padding: 25px;
+        transition: var(--transition);
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .card:hover {
+        transform: translateX(5px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary);
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+
+    .card-header h3 {
+        color: var(--primary);
+        font-size: 1.2rem;
+        font-weight: 700;
+    }
+
+    .status {
+        display: inline-block;
+        padding: 5px 14px;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+
+    .status-Aguardando {
+        background: rgba(245, 158, 11, 0.12);
+        color: var(--warning);
+    }
+
+    .status-Em_atendimento {
+        background: rgba(33, 150, 243, 0.12);
+        color: #1565c0;
+    }
+
+    .status-Finalizado {
+        background: rgba(16, 185, 129, 0.12);
+        color: var(--success);
+    }
+
+    .card-body {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .card-body p {
+        color: var(--text-gray);
+        font-size: 0.85rem;
+    }
+
+    .card-body p strong {
+        color: var(--text-dark);
+    }
+
+    .card-footer {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .card-footer select {
+        padding: 10px 15px;
+        border: 1.5px solid var(--border);
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-family: 'Poppins', 'Montserrat', sans-serif;
+    }
+
+    .btn-update {
+        background: var(--primary);
+        color: var(--white);
+        border: none;
+        padding: 10px 25px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.8rem;
+        transition: var(--transition);
+    }
+
+    .btn-update:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+    }
+
+    /* Formulários */
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 8px;
+    }
+
+    .form-group select,
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 14px 18px;
+        border: 1.5px solid var(--border);
+        border-radius: 16px;
+        font-size: 0.9rem;
+        font-family: 'Poppins', 'Montserrat', sans-serif;
+        transition: var(--transition);
+    }
+
+    .form-group select:focus,
+    .form-group input:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(28, 159, 211, 0.1);
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: var(--white);
+        border: none;
+        padding: 14px 30px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 1rem;
+        transition: var(--transition);
+        width: 100%;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    /* Sem resultados */
+    .empty-state {
+        text-align: center;
+        padding: 60px;
+        background: var(--white);
+        border-radius: 24px;
+        color: var(--text-gray);
+        border: 1px solid var(--border);
+    }
+
+    .empty-state i {
+        font-size: 64px;
+        color: var(--border);
+        margin-bottom: 15px;
+    }
+
+    /* Footer */
+    footer {
+        background: var(--primary);
+        color: var(--white);
+        text-align: center;
+        padding: 30px 20px;
+        margin-top: 50px;
+    }
+
+    footer p {
+        opacity: 0.9;
+        font-size: 0.85rem;
+    }
+
+    /* ===================== RESPONSIVIDADE ===================== */
+    @media (max-width: 992px) {
+        .container-header { padding: 0 30px; }
+        .tabs-container { padding: 0 30px; }
+        .aba { padding: 20px 30px; }
+    }
+
+    @media (max-width: 768px) {
+        .container-header { padding: 0 20px; }
+        .header-medico .container-header { height: 70px; }
+        
+        .logo-text { display: none; }
+        .logo { width: 50px; }
+        .btn-sair span { display: none; }
+        .btn-sair { padding: 10px 12px; }
+        .btn-sair i { font-size: 18px; margin: 0; }
+        
+        .tabs-container { padding: 0 20px; margin-top: 20px; }
+        .tabs-nav { border-radius: 20px; }
+        .tab-btn { padding: 10px 12px; font-size: 0.75rem; }
+        .tab-btn i { font-size: 0.8rem; }
+        
+        .aba { padding: 20px; }
+        .aba h2 { font-size: 1.3rem; }
+        
+        .card-body { grid-template-columns: 1fr; }
+        .card-footer { flex-direction: column; align-items: stretch; }
+        .card-footer select { width: 100%; }
+        .btn-update { width: 100%; text-align: center; }
+    }
+
+    @media (max-width: 480px) {
+        .tabs-nav { flex-wrap: wrap; }
+        .tab-btn { width: calc(50% - 8px); }
+        .aba { padding: 15px; }
+        .aba h2 { font-size: 1.1rem; }
+        .card { padding: 18px; }
+        .logo { width: 45px; }
+        .search-box input { max-width: 100%; }
+    }
+
+    @media (min-width: 1400px) {
+        .container-header { max-width: 1400px; }
+        .tabs-container { max-width: 1400px; }
+        .aba { max-width: 1400px; }
+        .logo { width: 70px; }
+        .medic-name { font-size: 1.5rem; }
+    }
+</style>
+</head>
+<body>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- HEADER PERSONALIZADO DO MÉDICO -->
+<header class="header-medico">
+    <div class="container-header">
+        <div class="logo-area">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="logo">
+            <div class="logo-text">
+                <h1 class="medic-name">Saúde & Vida</h1>
+                <span class="medico-badge"><i class="fas fa-user-md"></i> Painel do Médico</span>
+            </div>
+        </div>
+        <div class="header-buttons">
+            <button class="btn-sair" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Sair</span>
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- MENU DE ABAS -->
+<div class="tabs-container">
+    <div class="tabs-nav">
+        <button class="tab-btn active" onclick="trocarAba('agenda')">
+            <i class="fas fa-calendar-alt"></i> Agenda
+        </button>
+        <button class="tab-btn" onclick="trocarAba('prontuario')">
+            <i class="fas fa-file-medical"></i> Prontuário
+        </button>
+        <button class="tab-btn" onclick="trocarAba('exames')">
+            <i class="fas fa-flask"></i> Exames
+        </button>
+        <button class="tab-btn" onclick="trocarAba('historico')">
+            <i class="fas fa-history"></i> Histórico
+        </button>
+    </div>
+</div>
+
+<!-- ================= AGENDA ================= -->
+<section id="agenda" class="aba ativa">
+    <h2><i class="fas fa-calendar-check"></i> Agenda de Consultas</h2>
+
+    <div class="search-box">
+        <input type="text" id="busca" placeholder="🔍 Buscar paciente por nome..." onkeyup="filtrarPaciente()">
+    </div>
+
+    <div id="listaAgenda" class="cards-grid">
+        {% if consultas %}
+            {% for c in consultas %}
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-user-circle"></i> {{ c[1] }}</h3>
+                    <span class="status status-{{ c[9].replace(' ', '_') if c[9] else 'Aguardando' }}">{{ c[9] if c[9] else 'Aguardando' }}</span>
+                </div>
+                <div class="card-body">
+                    <p><strong><i class="fas fa-envelope"></i> Email:</strong> {{ c[2] }}</p>
+                    <p><strong><i class="fas fa-stethoscope"></i> Especialidade:</strong> {{ c[4] }}</p>
+                    <p><strong><i class="fas fa-user-md"></i> Médico:</strong> {{ c[5] }}</p>
+                    <p><strong><i class="fas fa-calendar-day"></i> Data:</strong> {{ c[6] }}</p>
+                    <p><strong><i class="fas fa-clock"></i> Hora:</strong> {{ c[7] }}</p>
+                    <p><strong><i class="fas fa-map-marker-alt"></i> Tipo:</strong> {{ c[3] }}</p>
+                    {% if c[3] == 'Presencial' %}
+                    <p><strong><i class="fas fa-building"></i> Unidade:</strong> {{ c[8] }}</p>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <form action="/atualizar_status" method="POST" style="display: flex; gap: 10px; flex-wrap: wrap; width: 100%;">
+                        <input type="hidden" name="id" value="{{ c[0] }}">
+                        <select name="status" style="flex: 1;">
+                            <option value="Aguardando" {% if c[9] == 'Aguardando' %}selected{% endif %}>Aguardando</option>
+                            <option value="Em atendimento" {% if c[9] == 'Em atendimento' %}selected{% endif %}>Em atendimento</option>
+                            <option value="Finalizado" {% if c[9] == 'Finalizado' %}selected{% endif %}>Finalizado</option>
+                        </select>
+                        <button type="submit" class="btn-update"><i class="fas fa-sync-alt"></i> Atualizar</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-calendar-times"></i>
+                <p>Nenhuma consulta agendada</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- ================= PRONTUÁRIO ================= -->
+<section id="prontuario" class="aba">
+    <h2><i class="fas fa-file-medical"></i> Prontuário do Paciente</h2>
+
+    <form action="{{ url_for('agendamento.salvar_prontuario') }}" method="POST">
+        <div class="form-group">
+            <label><i class="fas fa-user"></i> Selecionar Paciente</label>
+            <select id="select_paciente_prontuario" required onchange="preencherPacienteProntuario()">
+                <option value="">Selecione um paciente</option>
+                {% for p in pacientes %}
+                <option value="{{ p[0] }}|{{ p[1] }}">{{ p[0] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <input type="hidden" name="paciente_nome" id="paciente_nome_prontuario">
+        <input type="hidden" name="paciente_email" id="paciente_email_prontuario">
+
+        <div class="form-group">
+            <label><i class="fas fa-notes-medical"></i> Observações</label>
+            <textarea name="observacoes" placeholder="Registre as observações do paciente..." required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label><i class="fas fa-stethoscope"></i> Diagnóstico</label>
+            <textarea name="diagnostico" placeholder="Descreva o diagnóstico..." required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label><i class="fas fa-prescription-bottle"></i> Prescrição</label>
+            <textarea name="prescricao" placeholder="Informe a prescrição médica..." required></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Salvar Prontuário</button>
+    </form>
+</section>
+
+<!-- ================= EXAMES ================= -->
+<section id="exames" class="aba">
+    <h2><i class="fas fa-flask"></i> Solicitação de Exames</h2>
+
+    <form action="{{ url_for('agendamento.solicitar_exame') }}" method="POST">
+        <div class="form-group">
+            <label><i class="fas fa-user"></i> Selecionar Paciente</label>
+            <select id="select_paciente_exame" required onchange="preencherPacienteExame()">
+                <option value="">Selecione um paciente</option>
+                {% for p in pacientes %}
+                <option value="{{ p[0] }}|{{ p[1] }}">{{ p[0] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <input type="hidden" name="paciente_nome" id="paciente_nome_exame">
+        <input type="hidden" name="paciente_email" id="paciente_email_exame">
+
+        <div class="form-group">
+            <label><i class="fas fa-vial"></i> Nome do Exame</label>
+            <input type="text" name="exame" placeholder="Ex: Hemograma, Raio-X, Ultrassom..." required>
+        </div>
+
+        <div class="form-group">
+            <label><i class="fas fa-clipboard-list"></i> Detalhes Clínicos</label>
+            <textarea name="detalhes" placeholder="Informe os detalhes e justificativas para o exame..." required></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit"><i class="fas fa-paper-plane"></i> Solicitar Exame</button>
+    </form>
+</section>
+
+<!-- ================= HISTÓRICO ================= -->
+<section id="historico" class="aba">
+    <h2><i class="fas fa-history"></i> Histórico de Atendimentos</h2>
+
+    <div class="search-box">
+        <input type="text" id="buscaHistorico" placeholder="🔍 Pesquisar por paciente..." onkeyup="filtrarHistorico()">
+    </div>
+
+    <div id="listaHistorico" class="cards-grid">
+        {% if historico %}
+            {% for h in historico %}
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-user-circle"></i> {{ h[1] }}</h3>
+                    <span class="status status-Finalizado">Finalizado</span>
+                </div>
+                <div class="card-body">
+                    <p><strong><i class="fas fa-stethoscope"></i> Especialidade:</strong> {{ h[4] }}</p>
+                    <p><strong><i class="fas fa-user-md"></i> Médico:</strong> {{ h[5] }}</p>
+                    <p><strong><i class="fas fa-calendar-day"></i> Data:</strong> {{ h[6] }}</p>
+                    <p><strong><i class="fas fa-clock"></i> Hora:</strong> {{ h[7] }}</p>
+                    <p><strong><i class="fas fa-map-marker-alt"></i> Tipo:</strong> {{ h[3] }}</p>
+                    {% if h[3] == 'Presencial' %}
+                    <p><strong><i class="fas fa-building"></i> Unidade:</strong> {{ h[8] }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-folder-open"></i>
+                <p>Nenhum atendimento finalizado</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<footer>
+    <p>Este projeto foi desenvolvido exclusivamente para fins escolares, com o objetivo de aplicar conhecimentos acadêmicos na prática.</p>
+    <p>© 2026 - EEEP Dona Creusa do Carmo Rocha</p>
+</footer>
+
+<script>
+    // Toast System
+    function showToast(title, message, type = 'info', duration = 4000) {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        let icon = '';
+        switch(type) {
+            case 'success': icon = '<i class="fas fa-check-circle"></i>'; break;
+            case 'error': icon = '<i class="fas fa-exclamation-circle"></i>'; break;
+            case 'warning': icon = '<i class="fas fa-exclamation-triangle"></i>'; break;
+            default: icon = '<i class="fas fa-info-circle"></i>';
+        }
+        toast.innerHTML = `
+            <div class="toast-icon">${icon}</div>
+            <div class="toast-content">
+                <div class="toast-title">${title}</div>
+                <div class="toast-message">${message}</div>
+            </div>
+            <button class="toast-close"><i class="fas fa-times"></i></button>
+        `;
+        container.appendChild(toast);
+        const closeBtn = toast.querySelector('.toast-close');
+        closeBtn.addEventListener('click', () => toast.remove());
+        setTimeout(() => { if (toast.parentNode) toast.remove(); }, duration);
+    }
+
+    // Trocar abas
+    function trocarAba(id) {
+        document.querySelectorAll('.aba').forEach(a => a.classList.remove('ativa'));
+        document.getElementById(id).classList.add('ativa');
+        
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+    }
+
+    // Preencher formulário de prontuário
+    function preencherPacienteProntuario() {
+        let valor = document.getElementById("select_paciente_prontuario").value.split("|");
+        document.getElementById("paciente_nome_prontuario").value = valor[0] || '';
+        document.getElementById("paciente_email_prontuario").value = valor[1] || '';
+    }
+
+    // Preencher formulário de exame
+    function preencherPacienteExame() {
+        let valor = document.getElementById("select_paciente_exame").value.split("|");
+        document.getElementById("paciente_nome_exame").value = valor[0] || '';
+        document.getElementById("paciente_email_exame").value = valor[1] || '';
+    }
+
+    // Filtro da agenda
+    function filtrarPaciente() {
+        let input = document.getElementById("busca").value.toLowerCase();
+        let cards = document.querySelectorAll("#listaAgenda .card");
+
+        cards.forEach(card => {
+            let nome = card.querySelector(".card-header h3").textContent.toLowerCase();
+            card.style.display = nome.includes(input) ? "block" : "none";
+        });
+    }
+
+    // Filtro do histórico
+    function filtrarHistorico() {
+        let input = document.getElementById("buscaHistorico").value.toLowerCase();
+        let cards = document.querySelectorAll("#listaHistorico .card");
+
+        cards.forEach(card => {
+            let nome = card.querySelector(".card-header h3").textContent.toLowerCase();
+            card.style.display = nome.includes(input) ? "block" : "none";
+        });
+    }
+
+    // Logout
+    const logoutBtn = document.getElementById('logoutBtn');
+    if(logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            showToast('Saindo...', 'Redirecionando para página de login', 'info', 1500);
+            setTimeout(() => window.location.href = '/', 1500);
+        });
+    }
+
+    // Inicializar
+    window.onload = function() {
+        if(document.getElementById("select_paciente_prontuario")) preencherPacienteProntuario();
+        if(document.getElementById("select_paciente_exame")) preencherPacienteExame();
+    }
+</script>
+
+</body>
+</html>
