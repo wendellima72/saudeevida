@@ -469,14 +469,25 @@
   document.querySelectorAll('.menu a').forEach(l => l.addEventListener('click', closeMobileMenu));
   window.addEventListener('resize', () => { if (window.innerWidth > 768) closeMobileMenu(); });
 
-  // ── NOTIFICAÇÕES ──
+  // ── NOTIFICAÇÕES COM CONTROLE DE POLLING ──
   let notifCarregadas = [];
+  let notifIntervalId = null;
+  let notifTimeoutId = null;
 
   async function carregarNotificacoes() {
     try {
       const resp = await fetch('/notificacoes');
-      if (!resp.ok) return;
+      if (!resp.ok) {
+        console.warn('Erro ao buscar notificações:', resp.status);
+        return;
+      }
       const data = await resp.json();
+      
+      // Se a resposta não for um array, ignora
+      if (!Array.isArray(data)) {
+        console.warn('Resposta inválida de /notificacoes');
+        return;
+      }
 
       // Pega IDs já lidos do localStorage
       const lidas = JSON.parse(localStorage.getItem('notif_lidas') || '[]');
@@ -495,12 +506,14 @@
 
       // Renderiza lista
       renderNotifs(data, lidas);
-    } catch(e) {}
+    } catch(e) {
+      console.warn('Erro ao carregar notificações:', e);
+    }
   }
 
   function renderNotifs(lista, lidas) {
     const container = document.getElementById('notifList');
-    if (!lista.length) {
+    if (!lista || !lista.length) {
       container.innerHTML = '<div class="notif-empty"><i class="fas fa-bell-slash"></i>Nenhuma notificação</div>';
       return;
     }
@@ -524,7 +537,6 @@
   function toggleNotif() {
     const dd = document.getElementById('notifDropdown');
     dd.classList.toggle('show');
-    // Fecha user dropdown se aberto
     document.getElementById('userDropdown').classList.remove('show');
   }
 
@@ -546,9 +558,65 @@
     if (wrap && !wrap.contains(e.target)) dd.classList.remove('show');
   });
 
-  // Carrega ao iniciar e a cada 60 segundos
-  carregarNotificacoes();
-  setInterval(carregarNotificacoes, 60000);
+  // ── INICIAR POLLING DE NOTIFICAÇÕES ──
+  function iniciarPollingNotificacoes() {
+    // Limpa qualquer intervalo anterior
+    if (notifIntervalId) {
+      clearInterval(notifIntervalId);
+      notifIntervalId = null;
+    }
+    if (notifTimeoutId) {
+      clearTimeout(notifTimeoutId);
+      notifTimeoutId = null;
+    }
+
+    // Carrega imediatamente
+    carregarNotificacoes();
+
+    // Configura polling a cada 60 segundos
+    notifIntervalId = setInterval(carregarNotificacoes, 60000);
+  }
+
+  // ── PARAR POLLING ──
+  function pararPollingNotificacoes() {
+    if (notifIntervalId) {
+      clearInterval(notifIntervalId);
+      notifIntervalId = null;
+    }
+    if (notifTimeoutId) {
+      clearTimeout(notifTimeoutId);
+      notifTimeoutId = null;
+    }
+    console.log('Polling de notificações interrompido');
+  }
+
+  // ── GERENCIAR POLLING BASEADO NA VISIBILIDADE DA PÁGINA ──
+  document.addEventListener('visibilitychange', function() {
+    if (document.hidden) {
+      // Página minimizada/em background - para o polling
+      pararPollingNotificacoes();
+    } else {
+      // Página visível novamente - reinicia o polling
+      iniciarPollingNotificacoes();
+    }
+  });
+
+  // ── PARAR POLLING AO FECHAR A PÁGINA ──
+  window.addEventListener('beforeunload', function() {
+    pararPollingNotificacoes();
+  });
+
+  // ── INICIAR POLLING AO CARREGAR A PÁGINA ──
+  document.addEventListener('DOMContentLoaded', function() {
+    iniciarPollingNotificacoes();
+  });
+
+  // Se o DOM já estiver carregado, inicia imediatamente
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', iniciarPollingNotificacoes);
+  } else {
+    iniciarPollingNotificacoes();
+  }
 
 
   // ── MODO ESCURO ──
