@@ -466,7 +466,10 @@
   document.querySelectorAll('.menu a').forEach(l => l.addEventListener('click', closeMobileMenu));
   window.addEventListener('resize', () => { if (window.innerWidth > 768) closeMobileMenu(); });
 
-  // ── NOTIFICAÇÕES SEM POLLING AUTOMÁTICO (CARREGA APENAS AO CLICAR) ──
+  // ============================================================
+  // ⚠️ NOTIFICAÇÕES - SEM CARREGAMENTO AUTOMÁTICO ⚠️
+  // As notificações SÓ carregam quando o usuário clica no sino
+  // ============================================================
   let notifCarregadas = [];
 
   async function carregarNotificacoes() {
@@ -539,7 +542,7 @@
     const userDropdown = document.getElementById('userDropdown');
     if (userDropdown) userDropdown.classList.remove('show');
     
-    // Recarrega as notificações ao abrir
+    // ⚠️ SÓ CARREGA QUANDO O USUÁRIO CLICA NO SINO ⚠️
     if (!isOpen) {
       carregarNotificacoes();
     }
@@ -566,8 +569,13 @@
     }
   });
 
-  // ── ⚠️ NÃO CARREGA NOTIFICAÇÕES AUTOMATICAMENTE ⚠️ ──
-  // O carregamento só acontece quando o usuário clica no sino
+  // ═══════════════════════════════════════════════════════════════
+  // ⚠️⚠️⚠️ NENHUM CARREGAMENTO AUTOMÁTICO DE NOTIFICAÇÕES ⚠️⚠️⚠️
+  // O código abaixo foi REMOVIDO completamente:
+  // - SEM setInterval
+  // - SEM carregarNotificacoes() ao carregar a página
+  // - SEM DOMContentLoaded para notificações
+  // ═══════════════════════════════════════════════════════════════
 
   // ── MODO ESCURO ──
   function toggleDarkMode() {
