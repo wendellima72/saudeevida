@@ -691,88 +691,199 @@ def alterar_senha():
 
 # ==================== API CHATBASE ====================
 
-# ==================== NOTIFICAÇÕES ====================
+# ==================== NOTIFICAÇÕES CORRIGIDAS ====================
 
 @app.route('/notificacoes')
 def notificacoes():
     """Retorna notificações do usuário logado"""
-    if 'usuario' not in session:
+    if 'user_id' not in session:
         return jsonify([])
 
-    email = session['usuario']
-    conn = conectar()
-    cursor = conn.cursor()
+    user_id = session['user_id']
+    
+    try:
+        conn = conectar()
+        cursor = conn.cursor()
 
-    # Consultas agendadas nos próximos 7 dias
-    cursor.execute("""
-        SELECT id, medico, especialidade, data, hora, status, tipo
-        FROM consultas
-        WHERE email = ?
-        AND status != 'Cancelado'
-        AND date(data) >= date('now')
-        AND date(data) <= date('now', '+7 days')
-        ORDER BY data ASC, hora ASC
-    """, (email,))
-    proximas = cursor.fetchall()
+        # Buscar consultas do usuário nos próximos 7 dias
+        cursor.execute("""
+            SELECT id, medico, especialidade, data, hora, status, tipo
+            FROM consultas
+            WHERE usuario_id = ?
+            AND status != 'Cancelado'
+            AND date(data) >= date('now')
+            AND date(data) <= date('now', '+7 days')
+            ORDER BY data ASC, hora ASC
+        """, (user_id,))
+        proximas = cursor.fetchall()
 
-    # Consultas com status atualizado recentemente (confirmadas/finalizadas)
-    cursor.execute("""
-        SELECT id, medico, especialidade, data, hora, status, tipo
-        FROM consultas
-        WHERE email = ?
-        AND status IN ('Confirmado', 'Finalizado')
-        ORDER BY id DESC
-        LIMIT 5
-    """, (email,))
-    atualizadas = cursor.fetchall()
+        # Buscar consultas com status atualizado recentemente
+        cursor.execute("""
+            SELECT id, medico, especialidade, data, hora, status, tipo
+            FROM consultas
+            WHERE usuario_id = ?
+            AND status IN ('Confirmado', 'Finalizado')
+            ORDER BY id DESC
+            LIMIT 5
+        """, (user_id,))
+        atualizadas = cursor.fetchall()
 
-    conn.close()
+        conn.close()
 
-    notifs = []
+        notifs = []
 
-    for c in proximas:
-        notifs.append({
-            'id': c[0],
-            'tipo': 'proxima',
-            'icone': 'fa-calendar-check',
-            'cor': '#1c9fd3',
-            'titulo': f'Consulta em breve',
-            'mensagem': f'{c[1]} — {c[3]} às {c[4]}',
-            'data': c[3]
-        })
-
-    for c in atualizadas:
-        if c[5] == 'Confirmado':
+        for c in proximas:
             notifs.append({
                 'id': c[0],
-                'tipo': 'confirmada',
-                'icone': 'fa-circle-check',
-                'cor': '#10b981',
-                'titulo': 'Consulta confirmada!',
+                'tipo': 'proxima',
+                'icone': 'fa-calendar-check',
+                'cor': '#1c9fd3',
+                'titulo': 'Consulta em breve',
                 'mensagem': f'{c[1]} — {c[3]} às {c[4]}',
                 'data': c[3]
             })
-        elif c[5] == 'Finalizado':
-            notifs.append({
-                'id': c[0],
-                'tipo': 'finalizada',
-                'icone': 'fa-star',
-                'cor': '#f59e0b',
-                'titulo': 'Consulta finalizada',
-                'mensagem': f'Como foi sua consulta com {c[1]}?',
-                'data': c[3]
-            })
 
-    # Remove duplicatas por id+tipo
-    vistos = set()
-    unicos = []
-    for n in notifs:
-        chave = f"{n['id']}-{n['tipo']}"
-        if chave not in vistos:
-            vistos.add(chave)
-            unicos.append(n)
+        for c in atualizadas:
+            if c[5] == 'Confirmado':
+                notifs.append({
+                    'id': c[0],
+                    'tipo': 'confirmada',
+                    'icone': 'fa-circle-check',
+                    'cor': '#10b981',
+                    'titulo': 'Consulta confirmada!',
+                    'mensagem': f'{c[1]} — {c[3]} às {c[4]}',
+                    'data': c[3]
+                })
+            elif c[5] == 'Finalizado':
+                notifs.append({
+                    'id': c[0],
+                    'tipo': 'finalizada',
+                    'icone': 'fa-star',
+                    'cor': '#f59e0b',
+                    'titulo': 'Consulta finalizada',
+                    'mensagem': f'Como foi sua consulta com {c[1]}?',
+                    'data': c[3]
+                })
 
-    return jsonify(unicos[:8])
+        # Remove duplicatas
+        vistos = set()
+        unicos = []
+        for n in notifs:
+            chave = f"{n['id']}-{n['tipo']}"
+            if chave not in vistos:
+                vistos.add(chave)
+                unicos.append(n)
+
+        return jsonify(unicos[:8])
+
+    except Exception as e:
+        print(f'Erro em /notificacoes: {e}')
+        return jsonify([])  # Retorna array vazio em caso de erro
+
+
+# ==================== ROTA DE AGENDAMENTO ====================
+
+@app.route('/agendar', methods=['POST'])
+def agendar_consulta():
+    """Rota para agendar uma nova consulta"""
+    if 'user_id' not in session:
+        return redirect('/')
+    
+    # Pegar dados do formulário
+    nome = request.form.get('nome')
+    tipo = request.form.get('tipo')
+    unidade = request.form.get('unidade')
+    especialidade = request.form.get('especialidade')
+    medico = request.form.get('medico')
+    data = request.form.get('data')
+    hora = request.form.get('hora')
+    
+    # Validar dados
+    if not all([nome, tipo, unidade, especialidade, medico, data, hora]):
+        return "Dados incompletos!", 400
+    
+    try:
+        conn = conectar()
+        cursor = conn.cursor()
+        
+        # Verificar se já existe consulta no mesmo horário para este médico
+        cursor.execute("""
+            SELECT id FROM consultas 
+            WHERE medico = ? AND data = ? AND hora = ? AND status != 'Cancelado'
+        """, (medico, data, hora))
+        
+        if cursor.fetchone():
+            conn.close()
+            return "Horário já ocupado!", 409
+        
+        # Inserir no banco
+        cursor.execute('''
+        INSERT INTO consultas (usuario_id, medico, especialidade, data, hora, status, tipo, unidade)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            session['user_id'],
+            medico,
+            especialidade,
+            data,
+            hora,
+            'Aguardando',  # Status inicial
+            tipo,
+            unidade
+        ))
+        
+        conn.commit()
+        conn.close()
+        
+        return redirect('/agendamentos?sucesso=true')
+        
+    except Exception as e:
+        print(f'Erro ao agendar: {e}')
+        return "Erro ao agendar consulta", 500
+
+
+# ==================== ROTA DE CANCELAMENTO DE CONSULTA ====================
+
+@app.route('/cancelar_consulta', methods=['POST'])
+def cancelar_consulta():
+    """Cancela uma consulta existente"""
+    if 'user_id' not in session:
+        return redirect('/')
+    
+    consulta_id = request.form.get('id')
+    user_id = session['user_id']
+    
+    if not consulta_id:
+        return redirect('/agendamentos')
+    
+    try:
+        conn = conectar()
+        cursor = conn.cursor()
+        
+        # Verificar se a consulta pertence ao usuário
+        cursor.execute("""
+            SELECT id FROM consultas 
+            WHERE id = ? AND usuario_id = ?
+        """, (consulta_id, user_id))
+        
+        if not cursor.fetchone():
+            conn.close()
+            return "Consulta não encontrada", 404
+        
+        # Cancelar a consulta
+        cursor.execute("""
+            UPDATE consultas 
+            SET status = 'Cancelado' 
+            WHERE id = ?
+        """, (consulta_id,))
+        
+        conn.commit()
+        conn.close()
+        
+        return redirect('/agendamentos?cancelado=true')
+        
+    except Exception as e:
+        print(f'Erro ao cancelar consulta: {e}')
+        return "Erro ao cancelar consulta", 500
 
 
 @app.route('/marcar_notif_lidas', methods=['POST'])
