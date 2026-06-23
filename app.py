@@ -691,94 +691,13 @@ def alterar_senha():
 
 # ==================== API CHATBASE ====================
 
-# ==================== NOTIFICAÇÕES CORRIGIDAS ====================
-
+# ═══════════════════════════════════════════════════════════════════
+# ⚠️  ROTA /notificacoes DESABILITADA - SEMPRE RETORNA VAZIO ⚠️
+# ═══════════════════════════════════════════════════════════════════
 @app.route('/notificacoes')
 def notificacoes():
-    """Retorna notificações do usuário logado"""
-    if 'user_id' not in session:
-        return jsonify([])
-
-    user_id = session['user_id']
-    
-    try:
-        conn = conectar()
-        cursor = conn.cursor()
-
-        # Buscar consultas do usuário nos próximos 7 dias
-        cursor.execute("""
-            SELECT id, medico, especialidade, data, hora, status, tipo
-            FROM consultas
-            WHERE usuario_id = ?
-            AND status != 'Cancelado'
-            AND date(data) >= date('now')
-            AND date(data) <= date('now', '+7 days')
-            ORDER BY data ASC, hora ASC
-        """, (user_id,))
-        proximas = cursor.fetchall()
-
-        # Buscar consultas com status atualizado recentemente
-        cursor.execute("""
-            SELECT id, medico, especialidade, data, hora, status, tipo
-            FROM consultas
-            WHERE usuario_id = ?
-            AND status IN ('Confirmado', 'Finalizado')
-            ORDER BY id DESC
-            LIMIT 5
-        """, (user_id,))
-        atualizadas = cursor.fetchall()
-
-        conn.close()
-
-        notifs = []
-
-        for c in proximas:
-            notifs.append({
-                'id': c[0],
-                'tipo': 'proxima',
-                'icone': 'fa-calendar-check',
-                'cor': '#1c9fd3',
-                'titulo': 'Consulta em breve',
-                'mensagem': f'{c[1]} — {c[3]} às {c[4]}',
-                'data': c[3]
-            })
-
-        for c in atualizadas:
-            if c[5] == 'Confirmado':
-                notifs.append({
-                    'id': c[0],
-                    'tipo': 'confirmada',
-                    'icone': 'fa-circle-check',
-                    'cor': '#10b981',
-                    'titulo': 'Consulta confirmada!',
-                    'mensagem': f'{c[1]} — {c[3]} às {c[4]}',
-                    'data': c[3]
-                })
-            elif c[5] == 'Finalizado':
-                notifs.append({
-                    'id': c[0],
-                    'tipo': 'finalizada',
-                    'icone': 'fa-star',
-                    'cor': '#f59e0b',
-                    'titulo': 'Consulta finalizada',
-                    'mensagem': f'Como foi sua consulta com {c[1]}?',
-                    'data': c[3]
-                })
-
-        # Remove duplicatas
-        vistos = set()
-        unicos = []
-        for n in notifs:
-            chave = f"{n['id']}-{n['tipo']}"
-            if chave not in vistos:
-                vistos.add(chave)
-                unicos.append(n)
-
-        return jsonify(unicos[:8])
-
-    except Exception as e:
-        print(f'Erro em /notificacoes: {e}')
-        return jsonify([])  # Retorna array vazio em caso de erro
+    """Retorna notificações do usuário logado - DESABILITADO"""
+    return jsonify([])
 
 
 # ==================== ROTA DE AGENDAMENTO ====================
