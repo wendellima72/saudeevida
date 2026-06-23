@@ -73,94 +73,6 @@
       background: #0f1923 !important; color: #e8eef5 !important; border-color: #1e2f44 !important;
     }
 
-
-    /* ===================== SINO DE NOTIFICAÇÕES ===================== */
-    .notif-wrap { position: relative; }
-    .notif-btn {
-      width: 36px; height: 36px; border-radius: 50%;
-      background: rgba(255,255,255,0.15);
-      border: none; color: #fff; cursor: pointer; font-size: 16px;
-      display: flex; align-items: center; justify-content: center;
-      transition: var(--transition); flex-shrink: 0; position: relative;
-    }
-    .notif-btn:hover { background: rgba(255,255,255,0.28); transform: scale(1.1); }
-    .notif-badge {
-      position: absolute; top: -3px; right: -3px;
-      background: #ef4444; color: #fff;
-      width: 18px; height: 18px; border-radius: 50%;
-      font-size: 10px; font-weight: 700;
-      display: none; align-items: center; justify-content: center;
-      border: 2px solid var(--primary);
-      font-family: 'Poppins', sans-serif;
-    }
-    .notif-badge.show { display: flex; }
-    .notif-dropdown {
-      position: absolute; top: 48px; right: 0;
-      background: var(--white); border-radius: 16px;
-      box-shadow: var(--shadow-lg); width: 320px;
-      border: 1px solid var(--border); display: none; z-index: 200;
-      overflow: hidden;
-    }
-    .notif-dropdown.show { display: block; animation: fadeIn 0.2s ease; }
-    .notif-header {
-      padding: 14px 18px; border-bottom: 1px solid var(--border);
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .notif-header span {
-      font-size: 13px; font-weight: 700;
-      color: var(--text-dark); font-family: 'Poppins', sans-serif;
-    }
-    .notif-limpar {
-      font-size: 11px; color: var(--primary); cursor: pointer;
-      background: none; border: none; font-family: 'Poppins', sans-serif;
-      font-weight: 600;
-    }
-    .notif-list { max-height: 320px; overflow-y: auto; }
-    .notif-list::-webkit-scrollbar { width: 4px; }
-    .notif-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-    .notif-item {
-      display: flex; align-items: flex-start; gap: 12px;
-      padding: 14px 18px; border-bottom: 1px solid var(--border);
-      transition: background 0.2s; cursor: pointer;
-    }
-    .notif-item:last-child { border-bottom: none; }
-    .notif-item:hover { background: var(--gray-bg); }
-    .notif-icon {
-      width: 36px; height: 36px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; font-size: 15px;
-    }
-    .notif-body { flex: 1; min-width: 0; }
-    .notif-titulo {
-      font-size: 12px; font-weight: 700; color: var(--text-dark);
-      font-family: 'Poppins', sans-serif; margin-bottom: 3px;
-    }
-    .notif-msg {
-      font-size: 11px; color: var(--text-gray);
-      font-family: 'Poppins', sans-serif; line-height: 1.4;
-    }
-    .notif-empty {
-      padding: 32px; text-align: center;
-      color: var(--text-light); font-size: 13px;
-      font-family: 'Poppins', sans-serif;
-    }
-    .notif-empty i { font-size: 32px; display: block; margin-bottom: 10px; opacity: 0.4; }
-    .notif-footer {
-      padding: 10px 18px; border-top: 1px solid var(--border);
-      text-align: center;
-    }
-    .notif-footer a {
-      font-size: 12px; color: var(--primary); font-weight: 600;
-      text-decoration: none; font-family: 'Poppins', sans-serif;
-    }
-    [data-theme="dark"] .notif-dropdown { background: #1a2332; border-color: #1e2f44; }
-    [data-theme="dark"] .notif-header { border-color: #1e2f44; }
-    [data-theme="dark"] .notif-header span { color: #e8eef5; }
-    [data-theme="dark"] .notif-item { border-color: #1e2f44; }
-    [data-theme="dark"] .notif-item:hover { background: #0f1923; }
-    [data-theme="dark"] .notif-titulo { color: #e8eef5; }
-    [data-theme="dark"] .notif-footer { border-color: #1e2f44; background: #1a2332; }
-
     /* Botão modo escuro na navbar */
     .dark-toggle {
       width: 36px; height: 36px;
@@ -282,7 +194,6 @@
       .menu ul { gap: 16px; }
       .menu ul li a { font-size: 0.88rem; }
       .right-area { gap: 10px; }
-      .notif-dropdown { width: min(320px, calc(100vw - 32px)); }
     }
     @media (max-width: 768px) {
       .container-header { padding: 0 16px; }
@@ -301,16 +212,11 @@
       .medic-name { font-size: 0.95rem; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
       .logo { width: 52px; }
       .right-area { gap: 6px; }
-      .dark-toggle, .notif-btn { width: 40px; height: 40px; font-size: 15px; }
+      .dark-toggle { width: 40px; height: 40px; font-size: 15px; }
       .user-dropdown {
         position: fixed; bottom: 0; top: auto; left: 0; right: 0;
         border-radius: 20px 20px 0 0; width: 100%; min-width: 0;
         padding-bottom: env(safe-area-inset-bottom, 0);
-      }
-      .notif-dropdown {
-        position: fixed; top: auto; bottom: 0; left: 0; right: 0;
-        width: 100%; max-width: none; border-radius: 20px 20px 0 0;
-        max-height: 70dvh;
       }
       .toast-container { top: auto; bottom: 16px; left: 16px; right: 16px; max-width: none; }
       footer { padding: 24px 16px; font-size: 0.8rem; }
@@ -362,24 +268,7 @@
       <button class="dark-toggle" id="darkToggle" onclick="toggleDarkMode()" title="Modo escuro">
         <i class="fas fa-moon" id="darkIcon"></i>
       </button>
-      <div class="notif-wrap">
-        <button class="notif-btn" onclick="toggleNotif()" title="Notificações">
-          <i class="fas fa-bell"></i>
-          <span class="notif-badge" id="notifBadge">0</span>
-        </button>
-        <div class="notif-dropdown" id="notifDropdown">
-          <div class="notif-header">
-            <span><i class="fas fa-bell" style="color:var(--primary);margin-right:6px"></i> Notificações</span>
-            <button class="notif-limpar" onclick="limparNotif()">Marcar como lidas</button>
-          </div>
-          <div class="notif-list" id="notifList">
-            <div class="notif-empty"><i class="fas fa-bell-slash"></i>Sem notificações</div>
-          </div>
-          <div class="notif-footer">
-            <a href="/agendamentos"><i class="fas fa-calendar"></i> Ver agendamentos</a>
-          </div>
-        </div>
-      </div>
+      <!-- SINO DE NOTIFICAÇÕES REMOVIDO COMPLETAMENTE -->
       <div class="user-menu">
         <button class="user-btn" onclick="toggleUserMenu()">
           <div class="user-avatar"><i class="fas fa-user-circle"></i></div>
@@ -465,117 +354,6 @@
   if (menuOverlay) menuOverlay.addEventListener('click', closeMobileMenu);
   document.querySelectorAll('.menu a').forEach(l => l.addEventListener('click', closeMobileMenu));
   window.addEventListener('resize', () => { if (window.innerWidth > 768) closeMobileMenu(); });
-
-  // ============================================================
-  // ⚠️ NOTIFICAÇÕES - SEM CARREGAMENTO AUTOMÁTICO ⚠️
-  // As notificações SÓ carregam quando o usuário clica no sino
-  // ============================================================
-  let notifCarregadas = [];
-
-  async function carregarNotificacoes() {
-    try {
-      const resp = await fetch('/notificacoes');
-      if (!resp.ok) {
-        console.warn('Erro ao buscar notificações:', resp.status);
-        return;
-      }
-      const data = await resp.json();
-      
-      if (!Array.isArray(data)) {
-        console.warn('Resposta inválida de /notificacoes');
-        return;
-      }
-
-      const lidas = JSON.parse(localStorage.getItem('notif_lidas') || '[]');
-      const novas = data.filter(n => !lidas.includes(n.id + '-' + n.tipo));
-
-      notifCarregadas = data;
-
-      const badge = document.getElementById('notifBadge');
-      if (badge) {
-        if (novas.length > 0) {
-          badge.textContent = novas.length > 9 ? '9+' : novas.length;
-          badge.classList.add('show');
-        } else {
-          badge.classList.remove('show');
-        }
-      }
-
-      renderNotifs(data, lidas);
-    } catch(e) {
-      console.warn('Erro ao carregar notificações:', e);
-    }
-  }
-
-  function renderNotifs(lista, lidas) {
-    const container = document.getElementById('notifList');
-    if (!container) return;
-    
-    if (!lista || !lista.length) {
-      container.innerHTML = '<div class="notif-empty"><i class="fas fa-bell-slash"></i>Nenhuma notificação</div>';
-      return;
-    }
-    const lidas_set = new Set(lidas);
-    container.innerHTML = lista.map(n => {
-      const isLida = lidas_set.has(n.id + '-' + n.tipo);
-      const bg = isLida ? '' : 'background:rgba(28,159,211,0.06);';
-      return `<div class="notif-item" style="${bg}" onclick="irAgendamentos()">
-        <div class="notif-icon" style="background:${n.cor}22;">
-          <i class="fas ${n.icone}" style="color:${n.cor}"></i>
-        </div>
-        <div class="notif-body">
-          <div class="notif-titulo">${n.titulo}</div>
-          <div class="notif-msg">${n.mensagem}</div>
-        </div>
-        ${!isLida ? '<div style="width:8px;height:8px;border-radius:50%;background:#1c9fd3;flex-shrink:0;margin-top:4px;"></div>' : ''}
-      </div>`;
-    }).join('');
-  }
-
-  function toggleNotif() {
-    const dd = document.getElementById('notifDropdown');
-    if (!dd) return;
-    
-    const isOpen = dd.classList.contains('show');
-    dd.classList.toggle('show');
-    
-    const userDropdown = document.getElementById('userDropdown');
-    if (userDropdown) userDropdown.classList.remove('show');
-    
-    // ⚠️ SÓ CARREGA QUANDO O USUÁRIO CLICA NO SINO ⚠️
-    if (!isOpen) {
-      carregarNotificacoes();
-    }
-  }
-
-  function limparNotif() {
-    const ids = notifCarregadas.map(n => n.id + '-' + n.tipo);
-    localStorage.setItem('notif_lidas', JSON.stringify(ids));
-    const badge = document.getElementById('notifBadge');
-    if (badge) badge.classList.remove('show');
-    renderNotifs(notifCarregadas, ids);
-  }
-
-  function irAgendamentos() {
-    window.location.href = '/agendamentos';
-  }
-
-  // Fecha ao clicar fora
-  document.addEventListener('click', function(e) {
-    const wrap = document.querySelector('.notif-wrap');
-    const dd = document.getElementById('notifDropdown');
-    if (wrap && !wrap.contains(e.target) && dd) {
-      dd.classList.remove('show');
-    }
-  });
-
-  // ═══════════════════════════════════════════════════════════════
-  // ⚠️⚠️⚠️ NENHUM CARREGAMENTO AUTOMÁTICO DE NOTIFICAÇÕES ⚠️⚠️⚠️
-  // O código abaixo foi REMOVIDO completamente:
-  // - SEM setInterval
-  // - SEM carregarNotificacoes() ao carregar a página
-  // - SEM DOMContentLoaded para notificações
-  // ═══════════════════════════════════════════════════════════════
 
   // ── MODO ESCURO ──
   function toggleDarkMode() {
