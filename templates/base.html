@@ -469,10 +469,8 @@
   document.querySelectorAll('.menu a').forEach(l => l.addEventListener('click', closeMobileMenu));
   window.addEventListener('resize', () => { if (window.innerWidth > 768) closeMobileMenu(); });
 
-  // ── NOTIFICAÇÕES COM CONTROLE DE POLLING ──
+  // ── NOTIFICAÇÕES SEM POLLING AUTOMÁTICO (CARREGA APENAS AO CLICAR) ──
   let notifCarregadas = [];
-  let notifIntervalId = null;
-  let notifTimeoutId = null;
 
   async function carregarNotificacoes() {
     try {
@@ -483,28 +481,26 @@
       }
       const data = await resp.json();
       
-      // Se a resposta não for um array, ignora
       if (!Array.isArray(data)) {
         console.warn('Resposta inválida de /notificacoes');
         return;
       }
 
-      // Pega IDs já lidos do localStorage
       const lidas = JSON.parse(localStorage.getItem('notif_lidas') || '[]');
       const novas = data.filter(n => !lidas.includes(n.id + '-' + n.tipo));
 
       notifCarregadas = data;
 
-      // Atualiza badge
       const badge = document.getElementById('notifBadge');
-      if (novas.length > 0) {
-        badge.textContent = novas.length > 9 ? '9+' : novas.length;
-        badge.classList.add('show');
-      } else {
-        badge.classList.remove('show');
+      if (badge) {
+        if (novas.length > 0) {
+          badge.textContent = novas.length > 9 ? '9+' : novas.length;
+          badge.classList.add('show');
+        } else {
+          badge.classList.remove('show');
+        }
       }
 
-      // Renderiza lista
       renderNotifs(data, lidas);
     } catch(e) {
       console.warn('Erro ao carregar notificações:', e);
@@ -513,6 +509,8 @@
 
   function renderNotifs(lista, lidas) {
     const container = document.getElementById('notifList');
+    if (!container) return;
+    
     if (!lista || !lista.length) {
       container.innerHTML = '<div class="notif-empty"><i class="fas fa-bell-slash"></i>Nenhuma notificação</div>';
       return;
@@ -536,14 +534,26 @@
 
   function toggleNotif() {
     const dd = document.getElementById('notifDropdown');
+    if (!dd) return;
+    
+    const isOpen = dd.classList.contains('show');
     dd.classList.toggle('show');
-    document.getElementById('userDropdown').classList.remove('show');
+    
+    // Fecha o dropdown do usuário se estiver aberto
+    const userDropdown = document.getElementById('userDropdown');
+    if (userDropdown) userDropdown.classList.remove('show');
+    
+    // Recarrega as notificações ao abrir
+    if (!isOpen) {
+      carregarNotificacoes();
+    }
   }
 
   function limparNotif() {
     const ids = notifCarregadas.map(n => n.id + '-' + n.tipo);
     localStorage.setItem('notif_lidas', JSON.stringify(ids));
-    document.getElementById('notifBadge').classList.remove('show');
+    const badge = document.getElementById('notifBadge');
+    if (badge) badge.classList.remove('show');
     renderNotifs(notifCarregadas, ids);
   }
 
@@ -555,67 +565,25 @@
   document.addEventListener('click', function(e) {
     const wrap = document.querySelector('.notif-wrap');
     const dd = document.getElementById('notifDropdown');
-    if (wrap && !wrap.contains(e.target)) dd.classList.remove('show');
+    if (wrap && !wrap.contains(e.target) && dd) {
+      dd.classList.remove('show');
+    }
   });
 
-  // ── INICIAR POLLING DE NOTIFICAÇÕES ──
-  function iniciarPollingNotificacoes() {
-    // Limpa qualquer intervalo anterior
-    if (notifIntervalId) {
-      clearInterval(notifIntervalId);
-      notifIntervalId = null;
+  // ── CARREGA NOTIFICAÇÕES UMA ÚNICA VEZ AO INICIAR ──
+  // Usa um flag global para garantir que só executa uma vez
+  if (!window._notificacoesCarregadas) {
+    window._notificacoesCarregadas = true;
+    
+    function carregarInicial() {
+      carregarNotificacoes();
     }
-    if (notifTimeoutId) {
-      clearTimeout(notifTimeoutId);
-      notifTimeoutId = null;
-    }
-
-    // Carrega imediatamente
-    carregarNotificacoes();
-
-    // Configura polling a cada 60 segundos
-    notifIntervalId = setInterval(carregarNotificacoes, 60000);
-  }
-
-  // ── PARAR POLLING ──
-  function pararPollingNotificacoes() {
-    if (notifIntervalId) {
-      clearInterval(notifIntervalId);
-      notifIntervalId = null;
-    }
-    if (notifTimeoutId) {
-      clearTimeout(notifTimeoutId);
-      notifTimeoutId = null;
-    }
-    console.log('Polling de notificações interrompido');
-  }
-
-  // ── GERENCIAR POLLING BASEADO NA VISIBILIDADE DA PÁGINA ──
-  document.addEventListener('visibilitychange', function() {
-    if (document.hidden) {
-      // Página minimizada/em background - para o polling
-      pararPollingNotificacoes();
+    
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      carregarInicial();
     } else {
-      // Página visível novamente - reinicia o polling
-      iniciarPollingNotificacoes();
+      document.addEventListener('DOMContentLoaded', carregarInicial);
     }
-  });
-
-  // ── PARAR POLLING AO FECHAR A PÁGINA ──
-  window.addEventListener('beforeunload', function() {
-    pararPollingNotificacoes();
-  });
-
-  // ── INICIAR POLLING AO CARREGAR A PÁGINA ──
-  document.addEventListener('DOMContentLoaded', function() {
-    iniciarPollingNotificacoes();
-  });
-
-  // Se o DOM já estiver carregado, inicia imediatamente
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', iniciarPollingNotificacoes);
-  } else {
-    iniciarPollingNotificacoes();
   }
 
 
