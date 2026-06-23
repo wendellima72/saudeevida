@@ -406,9 +406,6 @@
   <p>© 2026 - EEEP Dona Creusa do Carmo Rocha</p>
 </footer>
 
-
-
-
 <script>
   // ── TOAST ──
   function showToast(title, message, type = 'info', duration = 4000) {
@@ -539,7 +536,6 @@
     const isOpen = dd.classList.contains('show');
     dd.classList.toggle('show');
     
-    // Fecha o dropdown do usuário se estiver aberto
     const userDropdown = document.getElementById('userDropdown');
     if (userDropdown) userDropdown.classList.remove('show');
     
@@ -570,22 +566,8 @@
     }
   });
 
-  // ── CARREGA NOTIFICAÇÕES UMA ÚNICA VEZ AO INICIAR ──
-  // Usa um flag global para garantir que só executa uma vez
-  if (!window._notificacoesCarregadas) {
-    window._notificacoesCarregadas = true;
-    
-    function carregarInicial() {
-      carregarNotificacoes();
-    }
-    
-    if (document.readyState === 'complete' || document.readyState === 'interactive') {
-      carregarInicial();
-    } else {
-      document.addEventListener('DOMContentLoaded', carregarInicial);
-    }
-  }
-
+  // ── ⚠️ NÃO CARREGA NOTIFICAÇÕES AUTOMATICAMENTE ⚠️ ──
+  // O carregamento só acontece quando o usuário clica no sino
 
   // ── MODO ESCURO ──
   function toggleDarkMode() {
