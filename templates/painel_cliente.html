@@ -498,29 +498,30 @@
 
 {% block extra_js %}
 <script>
+  // ── SLIDESHOW ──
   const slides = [
     { img: "{{ url_for('static', filename='img/med1.png') }}", title: "Bem-vindo ao Saúde & Vida", desc: "Excelência em cuidados médicos com tecnologia de ponta" },
     { img: "{{ url_for('static', filename='img/med2.png') }}", title: "Equipe Especializada", desc: "Profissionais qualificados para o seu bem-estar" }
   ];
   let currentSlide = 0;
+  
   function mostrarSlide() {
     const slide = slides[currentSlide];
     document.getElementById('slide-img').src = slide.img;
     document.getElementById('slide-title').innerText = slide.title;
     document.getElementById('slide-desc').innerText = slide.desc;
   }
+  
   function trocarSlide(d) {
     currentSlide += d;
     if (currentSlide >= slides.length) currentSlide = 0;
     if (currentSlide < 0) currentSlide = slides.length - 1;
     mostrarSlide();
   }
+  
   window.trocarSlide = trocarSlide;
   mostrarSlide();
   setInterval(() => trocarSlide(1), 5000);
-  window.addEventListener('DOMContentLoaded', () => {
-    showToast('Bem-vindo!', 'Que bom ter você novamente no Saúde & Vida', 'success', 4000);
-  });
 
   // ── TUTORIAIS ──
   function abrirVideo(youtubeId, titulo) {
@@ -533,12 +534,20 @@
     }
     document.getElementById('modalVideo').classList.add('show');
   }
+  
   function fecharVideo() {
     document.getElementById('modalVideo').classList.remove('show');
     document.getElementById('modalVideoConteudo').innerHTML = '';
   }
+  
   document.getElementById('modalVideo').addEventListener('click', function(e) {
     if (e.target === this) fecharVideo();
   });
+
+  // ═══════════════════════════════════════════════════════════
+  // ⚠️ REMOVIDO: showToast de boas-vindas que chamava notificações
+  // ═══════════════════════════════════════════════════════════
+  // O toast de boas-vindas foi removido para evitar 
+  // qualquer chamada automática para /notificacoes
 </script>
 {% endblock %}
